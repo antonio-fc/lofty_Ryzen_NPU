@@ -42,7 +42,7 @@ module {
     aie.objectfifo @of_c12toc11(%tile_1_4, {%tile_1_3}, 2 : i32) : !aie.objectfifo<memref<1024xf32>> 
     aie.objectfifo @ofc11toc02(%tile_1_3, {%tile_0_4}, 2 : i32) : !aie.objectfifo<memref<1024xf32>> 
     aie.objectfifo @ofc02toc01(%tile_0_4, {%tile_0_3}, 10 : i32) : !aie.objectfifo<memref<1xf32>> 
-    aie.objectfifo @out(%tile_0_3, {%tile_1_0}, 10 : i32) : !aie.objectfifo<memref<1xf32>> 
+    aie.objectfifo @out(%tile_0_3, {%tile_1_0}, 2 : i32) : !aie.objectfifo<memref<1xf32>> 
     %core_1_2 = aie.core(%tile_1_2) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index

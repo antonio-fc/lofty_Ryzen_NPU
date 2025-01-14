@@ -114,7 +114,7 @@ def loafty():
         # M3 = mean M2 (ct[0][0])
         
         # Output
-        of_out = object_fifo("out", ct[0][1], st[1], 10, scalar_ty)
+        of_out = object_fifo("out", ct[0][1], st[1], 2, scalar_ty)
 
         # Set up compute tiles        
         @core(ct[1][0], "scale.o") # This is scale of u with l
