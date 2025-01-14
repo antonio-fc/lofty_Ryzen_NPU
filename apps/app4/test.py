@@ -134,8 +134,8 @@ def main(opts):
         # print(f"errors in iter {i}: {errors}")
         # print("cut")
         if(i == 13):
-            for j in entire_buffer[:9]:
-                print(j)
+            for j in entire_buffer[:1]:
+                print(f"Mean: {j/3}")
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
         npu_time_min = min(npu_time_min, npu_time)

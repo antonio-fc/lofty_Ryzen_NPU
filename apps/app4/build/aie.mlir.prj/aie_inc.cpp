@@ -380,7 +380,7 @@ __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(1,0), XAie_LockIn
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(1,0), XAie_LockInit(5, 0)));
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,3), XAie_LockInit(0, 2)));
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,3), XAie_LockInit(1, 0)));
-__mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,4), XAie_LockInit(2, 2)));
+__mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,4), XAie_LockInit(2, 10)));
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,4), XAie_LockInit(3, 0)));
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,4), XAie_LockInit(0, 2)));
 __mlir_aie_try(XAie_LockSetValue(&(ctx->DevInst), XAie_TileLoc(0,4), XAie_LockInit(1, 0)));
@@ -618,6 +618,118 @@ int mlir_aie_write_buffer_ofc02toc01_buff_1(aie_libxaie_ctx_t* ctx, int index, f
   caster c; c.f = value;
   int32_t int_value = c.i;
 AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_1_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_2_offset = 5120;
+float mlir_aie_read_buffer_ofc02toc01_buff_2(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_2_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_2(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_2_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_3_offset = 20480;
+float mlir_aie_read_buffer_ofc02toc01_buff_3(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_3_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_3(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_3_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_4_offset = 32772;
+float mlir_aie_read_buffer_ofc02toc01_buff_4(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_4_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_4(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_4_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_5_offset = 49156;
+float mlir_aie_read_buffer_ofc02toc01_buff_5(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_5_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_5(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_5_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_6_offset = 5124;
+float mlir_aie_read_buffer_ofc02toc01_buff_6(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_6_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_6(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_6_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_7_offset = 20484;
+float mlir_aie_read_buffer_ofc02toc01_buff_7(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_7_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_7(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_7_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_8_offset = 32776;
+float mlir_aie_read_buffer_ofc02toc01_buff_8(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_8_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_8(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_8_offset + (index*4), int_value);
+return rc;
+}
+const int ofc02toc01_buff_9_offset = 49160;
+float mlir_aie_read_buffer_ofc02toc01_buff_9(aie_libxaie_ctx_t* ctx, int index) {
+u32 value; auto rc = XAie_DataMemRdWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_9_offset + (index*4), &value);
+  union caster { int32_t i; float f; };
+  caster c; c.i = value;
+  return c.f;
+}
+int mlir_aie_write_buffer_ofc02toc01_buff_9(aie_libxaie_ctx_t* ctx, int index, float value) {
+  union caster { int32_t i; float f; };
+  caster c; c.f = value;
+  int32_t int_value = c.i;
+AieRC rc =    XAie_DataMemWrWord(&(ctx->DevInst), XAie_TileLoc(0,4), ofc02toc01_buff_9_offset + (index*4), int_value);
 return rc;
 }
 const int ofc11toc02_cons_buff_0_offset = 1024;

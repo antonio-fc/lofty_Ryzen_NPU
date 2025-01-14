@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C004, LENGTH = 0x3FFC
+   data (!RX) : ORIGIN = 0x7C00C, LENGTH = 0x3FF4
 }
 ENTRY(__start)
 SECTIONS
@@ -54,6 +54,30 @@ ofc02toc01_buff_0 = .;
 . += 0x4;
 . = 0x7C000;
 ofc02toc01_buff_1 = .;
+. += 0x4;
+. = 0x71400;
+ofc02toc01_buff_2 = .;
+. += 0x4;
+. = 0x75000;
+ofc02toc01_buff_3 = .;
+. += 0x4;
+. = 0x78004;
+ofc02toc01_buff_4 = .;
+. += 0x4;
+. = 0x7C004;
+ofc02toc01_buff_5 = .;
+. += 0x4;
+. = 0x71404;
+ofc02toc01_buff_6 = .;
+. += 0x4;
+. = 0x75004;
+ofc02toc01_buff_7 = .;
+. += 0x4;
+. = 0x78008;
+ofc02toc01_buff_8 = .;
+. += 0x4;
+. = 0x7C008;
+ofc02toc01_buff_9 = .;
 . += 0x4;
 . = 0x70400;
 ofc11toc02_cons_buff_0 = .;
