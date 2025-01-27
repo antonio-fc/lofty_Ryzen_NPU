@@ -60,6 +60,9 @@ endif
 run: ${targetname}.exe build/final.xclbin
 	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE
 
+run_py: build/final.xclbin
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE
+
 clean: 
 	rm -rf build _build ${targetname}.exe 
 

@@ -58,6 +58,28 @@ int verify(int CSize, std::vector<T> A, std::vector<T> C, int verbosity) {
   return errors;
 }
 
+template <typename T>
+int print(int CSize, std::vector<T> A, std::vector<T> C, int verbosity) {
+    int count = 0;
+    for (uint32_t i = 0; i < CSize; i++) {
+        std::bfloat16_t ref = exp(A[i]);
+        std::bfloat16_t val = C[i];
+        // Let's check if they are inf or nan, and if so just pass because
+        // comparisions will then fail, even for matches
+        if (std::isnan(ref)) {
+            std::cout << "NaN" << std::endl;
+            continue;
+        } else if (std::isinf(ref)) {
+            std::cout << "Inf" << std::endl;
+            break;
+        } else {
+            std::cout << i << ", " << val << std::endl;
+        }
+        count++;
+    }
+    return count;
+}
+
 // ----------------------------------------------------------------------------
 // Main
 // ----------------------------------------------------------------------------
@@ -76,6 +98,7 @@ int main(int argc, const char *argv[]) {
   int n_iterations = vm["iters"].as<int>();
   int n_warmup_iterations = vm["warmup"].as<int>();
   int trace_size = vm["trace_sz"].as<int>();
+    std::cout << trace_size << std::endl;
 
   int INOUT0_VOLUME = 65536; // Input only, 65536x bfloat16_t
   int INOUT1_VOLUME = 65536; // Input only, 65536x bfloat16_t
@@ -209,6 +232,10 @@ int main(int argc, const char *argv[]) {
     std::vector<INOUT1_DATATYPE> CVec(INOUT1_VOLUME);
 
     memcpy(CVec.data(), bufOut, (CVec.size() * sizeof(INOUT1_DATATYPE)));
+
+    // auto ff = print(INOUT1_VOLUME, AVec, CVec, verbosity);
+    // std::cout << "number of cycles: " << ff << std::endl;
+    
     if (do_verify) {
       if (verbosity >= 1) {
         std::cout << "Verifying results ..." << std::endl;
@@ -229,8 +256,8 @@ int main(int argc, const char *argv[]) {
 
     // Write trace values if trace_size > 0
     if (trace_size > 0) {
-      test_utils::write_out_trace(((char *)bufOut) + INOUT1_SIZE, trace_size,
-                                  vm["trace_file"].as<std::string>());
+        test_utils::write_out_trace(((char *)bufOut) + INOUT1_SIZE, trace_size, vm["trace_file"].as<std::string>());
+        std::cout << vm["trace_file"].as<std::string>() << std::endl;
     }
 
     // Accumulate run times

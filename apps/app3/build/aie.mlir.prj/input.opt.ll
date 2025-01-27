@@ -5,8 +5,8 @@ target triple = "aie2"
 
 @in_cons_buff_1 = external global [1024 x i32]
 @in_cons_buff_0 = external global [1024 x i32]
-@out_buff_1 = external global [1 x i32]
-@out_buff_0 = external global [1 x i32]
+@out_buff_1 = external global [1024 x i32]
+@out_buff_0 = external global [1024 x i32]
 
 ; Function Attrs: nounwind
 declare void @llvm.aie2.acquire(i32, i32) #0
@@ -14,104 +14,124 @@ declare void @llvm.aie2.acquire(i32, i32) #0
 ; Function Attrs: nounwind
 declare void @llvm.aie2.release(i32, i32) #0
 
-declare void @mean(ptr, ptr, i32) local_unnamed_addr
+declare void @passthrough(ptr, ptr, i32) local_unnamed_addr
 
 define void @core_0_2() local_unnamed_addr {
 .new:
-  %0 = and i64 ptrtoint (ptr @out_buff_0 to i64), 28
-  %1 = icmp eq i64 %0, 0
-  %2 = and i64 ptrtoint (ptr @in_cons_buff_0 to i64), 28
-  %3 = icmp eq i64 %2, 0
-  %4 = and i64 ptrtoint (ptr @out_buff_1 to i64), 28
-  %5 = icmp eq i64 %4, 0
-  %6 = and i64 ptrtoint (ptr @in_cons_buff_1 to i64), 28
-  %7 = icmp eq i64 %6, 0
   br label %.preheader
 
 .preheader:                                       ; preds = %.preheader, %.new
   %niter = phi i64 [ 0, %.new ], [ %niter.next.3, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %1)
-  tail call void @llvm.assume(i1 %3)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %5)
-  tail call void @llvm.assume(i1 %7)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   %niter.next.3 = add nuw nsw i64 %niter, 4
@@ -122,26 +142,30 @@ define void @core_0_2() local_unnamed_addr {
   %epil.iter = phi i64 [ %epil.iter.next, %.preheader.epil ], [ 0, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %1)
-  tail call void @llvm.assume(i1 %3)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %5)
-  tail call void @llvm.assume(i1 %7)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_0, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_0, ptr nonnull @out_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @mean(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in_cons_buff_1, i64 32) ]
+  tail call void @passthrough(ptr nonnull @in_cons_buff_1, ptr nonnull @out_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   %epil.iter.next = add i64 %epil.iter, 1

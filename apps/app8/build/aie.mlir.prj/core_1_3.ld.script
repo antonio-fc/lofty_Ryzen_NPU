@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7D000, LENGTH = 0x3000
+   data (!RX) : ORIGIN = 0x75000, LENGTH = 0xB000
 }
 ENTRY(__start)
 SECTIONS
@@ -41,40 +41,58 @@ SECTIONS
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x40400;
-out_buff_0 = .;
-. += 0x1000;
-. = 0x44000;
-out_buff_1 = .;
-. += 0x1000;
-. = 0x48000;
 addB0_buff_0 = .;
 . += 0x1000;
-. = 0x4C000;
+. = 0x44000;
 addB0_buff_1 = .;
 . += 0x1000;
-. = 0x49000;
+. = 0x41400;
 l_cons_buff_0 = .;
 . += 0x4;
-. = 0x4D000;
+. = 0x45000;
 l_cons_buff_1 = .;
 . += 0x4;
-. = 0x41400;
+. = 0x48000;
 u_cons_buff_0 = .;
 . += 0x1000;
-. = 0x45000;
+. = 0x4C000;
 u_cons_buff_1 = .;
+. += 0x1000;
+. = 0x50400;
+of_cosD_buff_0 = .;
+. += 0x1000;
+. = 0x54000;
+of_cosD_buff_1 = .;
+. += 0x1000;
+. = 0x58000;
+of_scaleC_buff_0 = .;
+. += 0x1000;
+. = 0x5C000;
+of_scaleC_buff_1 = .;
+. += 0x1000;
+. = 0x51400;
+in0_cons_buff_0 = .;
+. += 0x4;
+. = 0x55000;
+in0_cons_buff_1 = .;
+. += 0x4;
+. = 0x60400;
+of_meanF_buff_0 = .;
+. += 0x1000;
+. = 0x64000;
+of_meanF_buff_1 = .;
+. += 0x1000;
+. = 0x68000;
+in1_cons_buff_0 = .;
+. += 0x1000;
+. = 0x6C000;
+in1_cons_buff_1 = .;
 . += 0x1000;
 . = 0x70400;
 addB1_buff_0 = .;
 . += 0x1000;
 . = 0x74000;
 addB1_buff_1 = .;
-. += 0x1000;
-. = 0x78000;
-in1_cons_buff_0 = .;
-. += 0x1000;
-. = 0x7C000;
-in1_cons_buff_1 = .;
 . += 0x1000;
   .bss : { *(.bss*) } > data
 }

@@ -1537,341 +1537,321 @@ module {
       %18 = arith.addf %16, %17 : f32
       %cst = arith.constant 9.000000e+00 : f32
       %19 = arith.divf %18, %cst : f32
+      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
+      aie.use_lock(%out_cons_lock, Release, 1)
       %c0_12 = arith.constant 0 : index
-      memref.store %19, %out_buff_0[%c0_12] : memref<1xf32>
-      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
-      aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_13 = arith.constant 0 : index
+      %c1_13 = arith.constant 1 : index
       %c1_14 = arith.constant 1 : index
-      %c1_15 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
+      %c0_15 = arith.constant 0 : index
+      %20 = memref.load %ofc02toc01_buff_9[%c0_15] : memref<1xf32>
       %c0_16 = arith.constant 0 : index
-      %20 = memref.load %ofc02toc01_buff_9[%c0_16] : memref<1xf32>
-      %c0_17 = arith.constant 0 : index
-      %21 = memref.load %ofc02toc01_buff_0[%c0_17] : memref<1xf32>
+      %21 = memref.load %ofc02toc01_buff_0[%c0_16] : memref<1xf32>
       %22 = arith.addf %20, %21 : f32
-      %c0_18 = arith.constant 0 : index
-      %23 = memref.load %ofc02toc01_buff_1[%c0_18] : memref<1xf32>
+      %c0_17 = arith.constant 0 : index
+      %23 = memref.load %ofc02toc01_buff_1[%c0_17] : memref<1xf32>
       %24 = arith.addf %22, %23 : f32
-      %c0_19 = arith.constant 0 : index
-      %25 = memref.load %ofc02toc01_buff_2[%c0_19] : memref<1xf32>
+      %c0_18 = arith.constant 0 : index
+      %25 = memref.load %ofc02toc01_buff_2[%c0_18] : memref<1xf32>
       %26 = arith.addf %24, %25 : f32
-      %c0_20 = arith.constant 0 : index
-      %27 = memref.load %ofc02toc01_buff_3[%c0_20] : memref<1xf32>
+      %c0_19 = arith.constant 0 : index
+      %27 = memref.load %ofc02toc01_buff_3[%c0_19] : memref<1xf32>
       %28 = arith.addf %26, %27 : f32
-      %c0_21 = arith.constant 0 : index
-      %29 = memref.load %ofc02toc01_buff_4[%c0_21] : memref<1xf32>
+      %c0_20 = arith.constant 0 : index
+      %29 = memref.load %ofc02toc01_buff_4[%c0_20] : memref<1xf32>
       %30 = arith.addf %28, %29 : f32
-      %c0_22 = arith.constant 0 : index
-      %31 = memref.load %ofc02toc01_buff_5[%c0_22] : memref<1xf32>
+      %c0_21 = arith.constant 0 : index
+      %31 = memref.load %ofc02toc01_buff_5[%c0_21] : memref<1xf32>
       %32 = arith.addf %30, %31 : f32
-      %c0_23 = arith.constant 0 : index
-      %33 = memref.load %ofc02toc01_buff_6[%c0_23] : memref<1xf32>
+      %c0_22 = arith.constant 0 : index
+      %33 = memref.load %ofc02toc01_buff_6[%c0_22] : memref<1xf32>
       %34 = arith.addf %32, %33 : f32
-      %c0_24 = arith.constant 0 : index
-      %35 = memref.load %ofc02toc01_buff_7[%c0_24] : memref<1xf32>
+      %c0_23 = arith.constant 0 : index
+      %35 = memref.load %ofc02toc01_buff_7[%c0_23] : memref<1xf32>
       %36 = arith.addf %34, %35 : f32
-      %cst_25 = arith.constant 9.000000e+00 : f32
-      %37 = arith.divf %36, %cst_25 : f32
-      %c0_26 = arith.constant 0 : index
-      memref.store %37, %out_buff_1[%c0_26] : memref<1xf32>
+      %cst_24 = arith.constant 9.000000e+00 : f32
+      %37 = arith.divf %36, %cst_24 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_27 = arith.constant 0 : index
-      %c1_28 = arith.constant 1 : index
-      %c1_29 = arith.constant 1 : index
+      %c0_25 = arith.constant 0 : index
+      %c1_26 = arith.constant 1 : index
+      %c1_27 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_30 = arith.constant 0 : index
-      %38 = memref.load %ofc02toc01_buff_8[%c0_30] : memref<1xf32>
-      %c0_31 = arith.constant 0 : index
-      %39 = memref.load %ofc02toc01_buff_9[%c0_31] : memref<1xf32>
+      %c0_28 = arith.constant 0 : index
+      %38 = memref.load %ofc02toc01_buff_8[%c0_28] : memref<1xf32>
+      %c0_29 = arith.constant 0 : index
+      %39 = memref.load %ofc02toc01_buff_9[%c0_29] : memref<1xf32>
       %40 = arith.addf %38, %39 : f32
-      %c0_32 = arith.constant 0 : index
-      %41 = memref.load %ofc02toc01_buff_0[%c0_32] : memref<1xf32>
+      %c0_30 = arith.constant 0 : index
+      %41 = memref.load %ofc02toc01_buff_0[%c0_30] : memref<1xf32>
       %42 = arith.addf %40, %41 : f32
-      %c0_33 = arith.constant 0 : index
-      %43 = memref.load %ofc02toc01_buff_1[%c0_33] : memref<1xf32>
+      %c0_31 = arith.constant 0 : index
+      %43 = memref.load %ofc02toc01_buff_1[%c0_31] : memref<1xf32>
       %44 = arith.addf %42, %43 : f32
-      %c0_34 = arith.constant 0 : index
-      %45 = memref.load %ofc02toc01_buff_2[%c0_34] : memref<1xf32>
+      %c0_32 = arith.constant 0 : index
+      %45 = memref.load %ofc02toc01_buff_2[%c0_32] : memref<1xf32>
       %46 = arith.addf %44, %45 : f32
-      %c0_35 = arith.constant 0 : index
-      %47 = memref.load %ofc02toc01_buff_3[%c0_35] : memref<1xf32>
+      %c0_33 = arith.constant 0 : index
+      %47 = memref.load %ofc02toc01_buff_3[%c0_33] : memref<1xf32>
       %48 = arith.addf %46, %47 : f32
-      %c0_36 = arith.constant 0 : index
-      %49 = memref.load %ofc02toc01_buff_4[%c0_36] : memref<1xf32>
+      %c0_34 = arith.constant 0 : index
+      %49 = memref.load %ofc02toc01_buff_4[%c0_34] : memref<1xf32>
       %50 = arith.addf %48, %49 : f32
-      %c0_37 = arith.constant 0 : index
-      %51 = memref.load %ofc02toc01_buff_5[%c0_37] : memref<1xf32>
+      %c0_35 = arith.constant 0 : index
+      %51 = memref.load %ofc02toc01_buff_5[%c0_35] : memref<1xf32>
       %52 = arith.addf %50, %51 : f32
-      %c0_38 = arith.constant 0 : index
-      %53 = memref.load %ofc02toc01_buff_6[%c0_38] : memref<1xf32>
+      %c0_36 = arith.constant 0 : index
+      %53 = memref.load %ofc02toc01_buff_6[%c0_36] : memref<1xf32>
       %54 = arith.addf %52, %53 : f32
-      %cst_39 = arith.constant 9.000000e+00 : f32
-      %55 = arith.divf %54, %cst_39 : f32
-      %c0_40 = arith.constant 0 : index
-      memref.store %55, %out_buff_0[%c0_40] : memref<1xf32>
+      %cst_37 = arith.constant 9.000000e+00 : f32
+      %55 = arith.divf %54, %cst_37 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
+      %c0_38 = arith.constant 0 : index
+      %c1_39 = arith.constant 1 : index
+      %c1_40 = arith.constant 1 : index
+      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
+      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
       %c0_41 = arith.constant 0 : index
-      %c1_42 = arith.constant 1 : index
-      %c1_43 = arith.constant 1 : index
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_44 = arith.constant 0 : index
-      %56 = memref.load %ofc02toc01_buff_7[%c0_44] : memref<1xf32>
-      %c0_45 = arith.constant 0 : index
-      %57 = memref.load %ofc02toc01_buff_8[%c0_45] : memref<1xf32>
+      %56 = memref.load %ofc02toc01_buff_7[%c0_41] : memref<1xf32>
+      %c0_42 = arith.constant 0 : index
+      %57 = memref.load %ofc02toc01_buff_8[%c0_42] : memref<1xf32>
       %58 = arith.addf %56, %57 : f32
-      %c0_46 = arith.constant 0 : index
-      %59 = memref.load %ofc02toc01_buff_9[%c0_46] : memref<1xf32>
+      %c0_43 = arith.constant 0 : index
+      %59 = memref.load %ofc02toc01_buff_9[%c0_43] : memref<1xf32>
       %60 = arith.addf %58, %59 : f32
-      %c0_47 = arith.constant 0 : index
-      %61 = memref.load %ofc02toc01_buff_0[%c0_47] : memref<1xf32>
+      %c0_44 = arith.constant 0 : index
+      %61 = memref.load %ofc02toc01_buff_0[%c0_44] : memref<1xf32>
       %62 = arith.addf %60, %61 : f32
-      %c0_48 = arith.constant 0 : index
-      %63 = memref.load %ofc02toc01_buff_1[%c0_48] : memref<1xf32>
+      %c0_45 = arith.constant 0 : index
+      %63 = memref.load %ofc02toc01_buff_1[%c0_45] : memref<1xf32>
       %64 = arith.addf %62, %63 : f32
-      %c0_49 = arith.constant 0 : index
-      %65 = memref.load %ofc02toc01_buff_2[%c0_49] : memref<1xf32>
+      %c0_46 = arith.constant 0 : index
+      %65 = memref.load %ofc02toc01_buff_2[%c0_46] : memref<1xf32>
       %66 = arith.addf %64, %65 : f32
-      %c0_50 = arith.constant 0 : index
-      %67 = memref.load %ofc02toc01_buff_3[%c0_50] : memref<1xf32>
+      %c0_47 = arith.constant 0 : index
+      %67 = memref.load %ofc02toc01_buff_3[%c0_47] : memref<1xf32>
       %68 = arith.addf %66, %67 : f32
-      %c0_51 = arith.constant 0 : index
-      %69 = memref.load %ofc02toc01_buff_4[%c0_51] : memref<1xf32>
+      %c0_48 = arith.constant 0 : index
+      %69 = memref.load %ofc02toc01_buff_4[%c0_48] : memref<1xf32>
       %70 = arith.addf %68, %69 : f32
-      %c0_52 = arith.constant 0 : index
-      %71 = memref.load %ofc02toc01_buff_5[%c0_52] : memref<1xf32>
+      %c0_49 = arith.constant 0 : index
+      %71 = memref.load %ofc02toc01_buff_5[%c0_49] : memref<1xf32>
       %72 = arith.addf %70, %71 : f32
-      %cst_53 = arith.constant 9.000000e+00 : f32
-      %73 = arith.divf %72, %cst_53 : f32
+      %cst_50 = arith.constant 9.000000e+00 : f32
+      %73 = arith.divf %72, %cst_50 : f32
+      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
+      aie.use_lock(%out_cons_lock, Release, 1)
+      %c0_51 = arith.constant 0 : index
+      %c1_52 = arith.constant 1 : index
+      %c1_53 = arith.constant 1 : index
+      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
+      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
       %c0_54 = arith.constant 0 : index
-      memref.store %73, %out_buff_1[%c0_54] : memref<1xf32>
-      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
-      aie.use_lock(%out_cons_lock, Release, 1)
+      %74 = memref.load %ofc02toc01_buff_6[%c0_54] : memref<1xf32>
       %c0_55 = arith.constant 0 : index
-      %c1_56 = arith.constant 1 : index
-      %c1_57 = arith.constant 1 : index
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_58 = arith.constant 0 : index
-      %74 = memref.load %ofc02toc01_buff_6[%c0_58] : memref<1xf32>
-      %c0_59 = arith.constant 0 : index
-      %75 = memref.load %ofc02toc01_buff_7[%c0_59] : memref<1xf32>
+      %75 = memref.load %ofc02toc01_buff_7[%c0_55] : memref<1xf32>
       %76 = arith.addf %74, %75 : f32
-      %c0_60 = arith.constant 0 : index
-      %77 = memref.load %ofc02toc01_buff_8[%c0_60] : memref<1xf32>
+      %c0_56 = arith.constant 0 : index
+      %77 = memref.load %ofc02toc01_buff_8[%c0_56] : memref<1xf32>
       %78 = arith.addf %76, %77 : f32
-      %c0_61 = arith.constant 0 : index
-      %79 = memref.load %ofc02toc01_buff_9[%c0_61] : memref<1xf32>
+      %c0_57 = arith.constant 0 : index
+      %79 = memref.load %ofc02toc01_buff_9[%c0_57] : memref<1xf32>
       %80 = arith.addf %78, %79 : f32
-      %c0_62 = arith.constant 0 : index
-      %81 = memref.load %ofc02toc01_buff_0[%c0_62] : memref<1xf32>
+      %c0_58 = arith.constant 0 : index
+      %81 = memref.load %ofc02toc01_buff_0[%c0_58] : memref<1xf32>
       %82 = arith.addf %80, %81 : f32
-      %c0_63 = arith.constant 0 : index
-      %83 = memref.load %ofc02toc01_buff_1[%c0_63] : memref<1xf32>
+      %c0_59 = arith.constant 0 : index
+      %83 = memref.load %ofc02toc01_buff_1[%c0_59] : memref<1xf32>
       %84 = arith.addf %82, %83 : f32
-      %c0_64 = arith.constant 0 : index
-      %85 = memref.load %ofc02toc01_buff_2[%c0_64] : memref<1xf32>
+      %c0_60 = arith.constant 0 : index
+      %85 = memref.load %ofc02toc01_buff_2[%c0_60] : memref<1xf32>
       %86 = arith.addf %84, %85 : f32
-      %c0_65 = arith.constant 0 : index
-      %87 = memref.load %ofc02toc01_buff_3[%c0_65] : memref<1xf32>
+      %c0_61 = arith.constant 0 : index
+      %87 = memref.load %ofc02toc01_buff_3[%c0_61] : memref<1xf32>
       %88 = arith.addf %86, %87 : f32
-      %c0_66 = arith.constant 0 : index
-      %89 = memref.load %ofc02toc01_buff_4[%c0_66] : memref<1xf32>
+      %c0_62 = arith.constant 0 : index
+      %89 = memref.load %ofc02toc01_buff_4[%c0_62] : memref<1xf32>
       %90 = arith.addf %88, %89 : f32
-      %cst_67 = arith.constant 9.000000e+00 : f32
-      %91 = arith.divf %90, %cst_67 : f32
+      %cst_63 = arith.constant 9.000000e+00 : f32
+      %91 = arith.divf %90, %cst_63 : f32
+      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
+      aie.use_lock(%out_cons_lock, Release, 1)
+      %c0_64 = arith.constant 0 : index
+      %c1_65 = arith.constant 1 : index
+      %c1_66 = arith.constant 1 : index
+      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
+      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
+      %c0_67 = arith.constant 0 : index
+      %92 = memref.load %ofc02toc01_buff_5[%c0_67] : memref<1xf32>
       %c0_68 = arith.constant 0 : index
-      memref.store %91, %out_buff_0[%c0_68] : memref<1xf32>
-      aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
-      aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_69 = arith.constant 0 : index
-      %c1_70 = arith.constant 1 : index
-      %c1_71 = arith.constant 1 : index
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_72 = arith.constant 0 : index
-      %92 = memref.load %ofc02toc01_buff_5[%c0_72] : memref<1xf32>
-      %c0_73 = arith.constant 0 : index
-      %93 = memref.load %ofc02toc01_buff_6[%c0_73] : memref<1xf32>
+      %93 = memref.load %ofc02toc01_buff_6[%c0_68] : memref<1xf32>
       %94 = arith.addf %92, %93 : f32
-      %c0_74 = arith.constant 0 : index
-      %95 = memref.load %ofc02toc01_buff_7[%c0_74] : memref<1xf32>
+      %c0_69 = arith.constant 0 : index
+      %95 = memref.load %ofc02toc01_buff_7[%c0_69] : memref<1xf32>
       %96 = arith.addf %94, %95 : f32
-      %c0_75 = arith.constant 0 : index
-      %97 = memref.load %ofc02toc01_buff_8[%c0_75] : memref<1xf32>
+      %c0_70 = arith.constant 0 : index
+      %97 = memref.load %ofc02toc01_buff_8[%c0_70] : memref<1xf32>
       %98 = arith.addf %96, %97 : f32
-      %c0_76 = arith.constant 0 : index
-      %99 = memref.load %ofc02toc01_buff_9[%c0_76] : memref<1xf32>
+      %c0_71 = arith.constant 0 : index
+      %99 = memref.load %ofc02toc01_buff_9[%c0_71] : memref<1xf32>
       %100 = arith.addf %98, %99 : f32
-      %c0_77 = arith.constant 0 : index
-      %101 = memref.load %ofc02toc01_buff_0[%c0_77] : memref<1xf32>
+      %c0_72 = arith.constant 0 : index
+      %101 = memref.load %ofc02toc01_buff_0[%c0_72] : memref<1xf32>
       %102 = arith.addf %100, %101 : f32
-      %c0_78 = arith.constant 0 : index
-      %103 = memref.load %ofc02toc01_buff_1[%c0_78] : memref<1xf32>
+      %c0_73 = arith.constant 0 : index
+      %103 = memref.load %ofc02toc01_buff_1[%c0_73] : memref<1xf32>
       %104 = arith.addf %102, %103 : f32
-      %c0_79 = arith.constant 0 : index
-      %105 = memref.load %ofc02toc01_buff_2[%c0_79] : memref<1xf32>
+      %c0_74 = arith.constant 0 : index
+      %105 = memref.load %ofc02toc01_buff_2[%c0_74] : memref<1xf32>
       %106 = arith.addf %104, %105 : f32
-      %c0_80 = arith.constant 0 : index
-      %107 = memref.load %ofc02toc01_buff_3[%c0_80] : memref<1xf32>
+      %c0_75 = arith.constant 0 : index
+      %107 = memref.load %ofc02toc01_buff_3[%c0_75] : memref<1xf32>
       %108 = arith.addf %106, %107 : f32
-      %cst_81 = arith.constant 9.000000e+00 : f32
-      %109 = arith.divf %108, %cst_81 : f32
-      %c0_82 = arith.constant 0 : index
-      memref.store %109, %out_buff_1[%c0_82] : memref<1xf32>
+      %cst_76 = arith.constant 9.000000e+00 : f32
+      %109 = arith.divf %108, %cst_76 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_83 = arith.constant 0 : index
-      %c1_84 = arith.constant 1 : index
-      %c1_85 = arith.constant 1 : index
+      %c0_77 = arith.constant 0 : index
+      %c1_78 = arith.constant 1 : index
+      %c1_79 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_86 = arith.constant 0 : index
-      %110 = memref.load %ofc02toc01_buff_4[%c0_86] : memref<1xf32>
-      %c0_87 = arith.constant 0 : index
-      %111 = memref.load %ofc02toc01_buff_5[%c0_87] : memref<1xf32>
+      %c0_80 = arith.constant 0 : index
+      %110 = memref.load %ofc02toc01_buff_4[%c0_80] : memref<1xf32>
+      %c0_81 = arith.constant 0 : index
+      %111 = memref.load %ofc02toc01_buff_5[%c0_81] : memref<1xf32>
       %112 = arith.addf %110, %111 : f32
-      %c0_88 = arith.constant 0 : index
-      %113 = memref.load %ofc02toc01_buff_6[%c0_88] : memref<1xf32>
+      %c0_82 = arith.constant 0 : index
+      %113 = memref.load %ofc02toc01_buff_6[%c0_82] : memref<1xf32>
       %114 = arith.addf %112, %113 : f32
-      %c0_89 = arith.constant 0 : index
-      %115 = memref.load %ofc02toc01_buff_7[%c0_89] : memref<1xf32>
+      %c0_83 = arith.constant 0 : index
+      %115 = memref.load %ofc02toc01_buff_7[%c0_83] : memref<1xf32>
       %116 = arith.addf %114, %115 : f32
-      %c0_90 = arith.constant 0 : index
-      %117 = memref.load %ofc02toc01_buff_8[%c0_90] : memref<1xf32>
+      %c0_84 = arith.constant 0 : index
+      %117 = memref.load %ofc02toc01_buff_8[%c0_84] : memref<1xf32>
       %118 = arith.addf %116, %117 : f32
-      %c0_91 = arith.constant 0 : index
-      %119 = memref.load %ofc02toc01_buff_9[%c0_91] : memref<1xf32>
+      %c0_85 = arith.constant 0 : index
+      %119 = memref.load %ofc02toc01_buff_9[%c0_85] : memref<1xf32>
       %120 = arith.addf %118, %119 : f32
-      %c0_92 = arith.constant 0 : index
-      %121 = memref.load %ofc02toc01_buff_0[%c0_92] : memref<1xf32>
+      %c0_86 = arith.constant 0 : index
+      %121 = memref.load %ofc02toc01_buff_0[%c0_86] : memref<1xf32>
       %122 = arith.addf %120, %121 : f32
-      %c0_93 = arith.constant 0 : index
-      %123 = memref.load %ofc02toc01_buff_1[%c0_93] : memref<1xf32>
+      %c0_87 = arith.constant 0 : index
+      %123 = memref.load %ofc02toc01_buff_1[%c0_87] : memref<1xf32>
       %124 = arith.addf %122, %123 : f32
-      %c0_94 = arith.constant 0 : index
-      %125 = memref.load %ofc02toc01_buff_2[%c0_94] : memref<1xf32>
+      %c0_88 = arith.constant 0 : index
+      %125 = memref.load %ofc02toc01_buff_2[%c0_88] : memref<1xf32>
       %126 = arith.addf %124, %125 : f32
-      %cst_95 = arith.constant 9.000000e+00 : f32
-      %127 = arith.divf %126, %cst_95 : f32
-      %c0_96 = arith.constant 0 : index
-      memref.store %127, %out_buff_0[%c0_96] : memref<1xf32>
+      %cst_89 = arith.constant 9.000000e+00 : f32
+      %127 = arith.divf %126, %cst_89 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_97 = arith.constant 0 : index
-      %c1_98 = arith.constant 1 : index
-      %c1_99 = arith.constant 1 : index
+      %c0_90 = arith.constant 0 : index
+      %c1_91 = arith.constant 1 : index
+      %c1_92 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_100 = arith.constant 0 : index
-      %128 = memref.load %ofc02toc01_buff_3[%c0_100] : memref<1xf32>
-      %c0_101 = arith.constant 0 : index
-      %129 = memref.load %ofc02toc01_buff_4[%c0_101] : memref<1xf32>
+      %c0_93 = arith.constant 0 : index
+      %128 = memref.load %ofc02toc01_buff_3[%c0_93] : memref<1xf32>
+      %c0_94 = arith.constant 0 : index
+      %129 = memref.load %ofc02toc01_buff_4[%c0_94] : memref<1xf32>
       %130 = arith.addf %128, %129 : f32
-      %c0_102 = arith.constant 0 : index
-      %131 = memref.load %ofc02toc01_buff_5[%c0_102] : memref<1xf32>
+      %c0_95 = arith.constant 0 : index
+      %131 = memref.load %ofc02toc01_buff_5[%c0_95] : memref<1xf32>
       %132 = arith.addf %130, %131 : f32
-      %c0_103 = arith.constant 0 : index
-      %133 = memref.load %ofc02toc01_buff_6[%c0_103] : memref<1xf32>
+      %c0_96 = arith.constant 0 : index
+      %133 = memref.load %ofc02toc01_buff_6[%c0_96] : memref<1xf32>
       %134 = arith.addf %132, %133 : f32
-      %c0_104 = arith.constant 0 : index
-      %135 = memref.load %ofc02toc01_buff_7[%c0_104] : memref<1xf32>
+      %c0_97 = arith.constant 0 : index
+      %135 = memref.load %ofc02toc01_buff_7[%c0_97] : memref<1xf32>
       %136 = arith.addf %134, %135 : f32
-      %c0_105 = arith.constant 0 : index
-      %137 = memref.load %ofc02toc01_buff_8[%c0_105] : memref<1xf32>
+      %c0_98 = arith.constant 0 : index
+      %137 = memref.load %ofc02toc01_buff_8[%c0_98] : memref<1xf32>
       %138 = arith.addf %136, %137 : f32
-      %c0_106 = arith.constant 0 : index
-      %139 = memref.load %ofc02toc01_buff_9[%c0_106] : memref<1xf32>
+      %c0_99 = arith.constant 0 : index
+      %139 = memref.load %ofc02toc01_buff_9[%c0_99] : memref<1xf32>
       %140 = arith.addf %138, %139 : f32
-      %c0_107 = arith.constant 0 : index
-      %141 = memref.load %ofc02toc01_buff_0[%c0_107] : memref<1xf32>
+      %c0_100 = arith.constant 0 : index
+      %141 = memref.load %ofc02toc01_buff_0[%c0_100] : memref<1xf32>
       %142 = arith.addf %140, %141 : f32
-      %c0_108 = arith.constant 0 : index
-      %143 = memref.load %ofc02toc01_buff_1[%c0_108] : memref<1xf32>
+      %c0_101 = arith.constant 0 : index
+      %143 = memref.load %ofc02toc01_buff_1[%c0_101] : memref<1xf32>
       %144 = arith.addf %142, %143 : f32
-      %cst_109 = arith.constant 9.000000e+00 : f32
-      %145 = arith.divf %144, %cst_109 : f32
-      %c0_110 = arith.constant 0 : index
-      memref.store %145, %out_buff_1[%c0_110] : memref<1xf32>
+      %cst_102 = arith.constant 9.000000e+00 : f32
+      %145 = arith.divf %144, %cst_102 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_111 = arith.constant 0 : index
-      %c1_112 = arith.constant 1 : index
-      %c1_113 = arith.constant 1 : index
+      %c0_103 = arith.constant 0 : index
+      %c1_104 = arith.constant 1 : index
+      %c1_105 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_114 = arith.constant 0 : index
-      %146 = memref.load %ofc02toc01_buff_2[%c0_114] : memref<1xf32>
-      %c0_115 = arith.constant 0 : index
-      %147 = memref.load %ofc02toc01_buff_3[%c0_115] : memref<1xf32>
+      %c0_106 = arith.constant 0 : index
+      %146 = memref.load %ofc02toc01_buff_2[%c0_106] : memref<1xf32>
+      %c0_107 = arith.constant 0 : index
+      %147 = memref.load %ofc02toc01_buff_3[%c0_107] : memref<1xf32>
       %148 = arith.addf %146, %147 : f32
-      %c0_116 = arith.constant 0 : index
-      %149 = memref.load %ofc02toc01_buff_4[%c0_116] : memref<1xf32>
+      %c0_108 = arith.constant 0 : index
+      %149 = memref.load %ofc02toc01_buff_4[%c0_108] : memref<1xf32>
       %150 = arith.addf %148, %149 : f32
-      %c0_117 = arith.constant 0 : index
-      %151 = memref.load %ofc02toc01_buff_5[%c0_117] : memref<1xf32>
+      %c0_109 = arith.constant 0 : index
+      %151 = memref.load %ofc02toc01_buff_5[%c0_109] : memref<1xf32>
       %152 = arith.addf %150, %151 : f32
-      %c0_118 = arith.constant 0 : index
-      %153 = memref.load %ofc02toc01_buff_6[%c0_118] : memref<1xf32>
+      %c0_110 = arith.constant 0 : index
+      %153 = memref.load %ofc02toc01_buff_6[%c0_110] : memref<1xf32>
       %154 = arith.addf %152, %153 : f32
-      %c0_119 = arith.constant 0 : index
-      %155 = memref.load %ofc02toc01_buff_7[%c0_119] : memref<1xf32>
+      %c0_111 = arith.constant 0 : index
+      %155 = memref.load %ofc02toc01_buff_7[%c0_111] : memref<1xf32>
       %156 = arith.addf %154, %155 : f32
-      %c0_120 = arith.constant 0 : index
-      %157 = memref.load %ofc02toc01_buff_8[%c0_120] : memref<1xf32>
+      %c0_112 = arith.constant 0 : index
+      %157 = memref.load %ofc02toc01_buff_8[%c0_112] : memref<1xf32>
       %158 = arith.addf %156, %157 : f32
-      %c0_121 = arith.constant 0 : index
-      %159 = memref.load %ofc02toc01_buff_9[%c0_121] : memref<1xf32>
+      %c0_113 = arith.constant 0 : index
+      %159 = memref.load %ofc02toc01_buff_9[%c0_113] : memref<1xf32>
       %160 = arith.addf %158, %159 : f32
-      %c0_122 = arith.constant 0 : index
-      %161 = memref.load %ofc02toc01_buff_0[%c0_122] : memref<1xf32>
+      %c0_114 = arith.constant 0 : index
+      %161 = memref.load %ofc02toc01_buff_0[%c0_114] : memref<1xf32>
       %162 = arith.addf %160, %161 : f32
-      %cst_123 = arith.constant 9.000000e+00 : f32
-      %163 = arith.divf %162, %cst_123 : f32
-      %c0_124 = arith.constant 0 : index
-      memref.store %163, %out_buff_0[%c0_124] : memref<1xf32>
+      %cst_115 = arith.constant 9.000000e+00 : f32
+      %163 = arith.divf %162, %cst_115 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
-      %c0_125 = arith.constant 0 : index
-      %c1_126 = arith.constant 1 : index
-      %c1_127 = arith.constant 1 : index
+      %c0_116 = arith.constant 0 : index
+      %c1_117 = arith.constant 1 : index
+      %c1_118 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_128 = arith.constant 0 : index
-      %164 = memref.load %ofc02toc01_buff_1[%c0_128] : memref<1xf32>
-      %c0_129 = arith.constant 0 : index
-      %165 = memref.load %ofc02toc01_buff_2[%c0_129] : memref<1xf32>
+      %c0_119 = arith.constant 0 : index
+      %164 = memref.load %ofc02toc01_buff_1[%c0_119] : memref<1xf32>
+      %c0_120 = arith.constant 0 : index
+      %165 = memref.load %ofc02toc01_buff_2[%c0_120] : memref<1xf32>
       %166 = arith.addf %164, %165 : f32
-      %c0_130 = arith.constant 0 : index
-      %167 = memref.load %ofc02toc01_buff_3[%c0_130] : memref<1xf32>
+      %c0_121 = arith.constant 0 : index
+      %167 = memref.load %ofc02toc01_buff_3[%c0_121] : memref<1xf32>
       %168 = arith.addf %166, %167 : f32
-      %c0_131 = arith.constant 0 : index
-      %169 = memref.load %ofc02toc01_buff_4[%c0_131] : memref<1xf32>
+      %c0_122 = arith.constant 0 : index
+      %169 = memref.load %ofc02toc01_buff_4[%c0_122] : memref<1xf32>
       %170 = arith.addf %168, %169 : f32
-      %c0_132 = arith.constant 0 : index
-      %171 = memref.load %ofc02toc01_buff_5[%c0_132] : memref<1xf32>
+      %c0_123 = arith.constant 0 : index
+      %171 = memref.load %ofc02toc01_buff_5[%c0_123] : memref<1xf32>
       %172 = arith.addf %170, %171 : f32
-      %c0_133 = arith.constant 0 : index
-      %173 = memref.load %ofc02toc01_buff_6[%c0_133] : memref<1xf32>
+      %c0_124 = arith.constant 0 : index
+      %173 = memref.load %ofc02toc01_buff_6[%c0_124] : memref<1xf32>
       %174 = arith.addf %172, %173 : f32
-      %c0_134 = arith.constant 0 : index
-      %175 = memref.load %ofc02toc01_buff_7[%c0_134] : memref<1xf32>
+      %c0_125 = arith.constant 0 : index
+      %175 = memref.load %ofc02toc01_buff_7[%c0_125] : memref<1xf32>
       %176 = arith.addf %174, %175 : f32
-      %c0_135 = arith.constant 0 : index
-      %177 = memref.load %ofc02toc01_buff_8[%c0_135] : memref<1xf32>
+      %c0_126 = arith.constant 0 : index
+      %177 = memref.load %ofc02toc01_buff_8[%c0_126] : memref<1xf32>
       %178 = arith.addf %176, %177 : f32
-      %c0_136 = arith.constant 0 : index
-      %179 = memref.load %ofc02toc01_buff_9[%c0_136] : memref<1xf32>
+      %c0_127 = arith.constant 0 : index
+      %179 = memref.load %ofc02toc01_buff_9[%c0_127] : memref<1xf32>
       %180 = arith.addf %178, %179 : f32
-      %cst_137 = arith.constant 9.000000e+00 : f32
-      %181 = arith.divf %180, %cst_137 : f32
-      %c0_138 = arith.constant 0 : index
-      memref.store %181, %out_buff_1[%c0_138] : memref<1xf32>
+      %cst_128 = arith.constant 9.000000e+00 : f32
+      %181 = arith.divf %180, %cst_128 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
       %182 = arith.addi %0, %c10 : index
@@ -1882,41 +1862,39 @@ module {
       %184 = arith.cmpi slt, %183, %c9223372036854775807 : index
       cf.cond_br %184, ^bb5, ^bb6
     ^bb5:  // pred: ^bb4
-      %c0_139 = arith.constant 0 : index
-      %c1_140 = arith.constant 1 : index
-      %c1_141 = arith.constant 1 : index
+      %c0_129 = arith.constant 0 : index
+      %c1_130 = arith.constant 1 : index
+      %c1_131 = arith.constant 1 : index
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%ofc02toc01_cons_lock, AcquireGreaterEqual, 9)
-      %c0_142 = arith.constant 0 : index
-      %185 = memref.load %ofc02toc01_buff_0[%c0_142] : memref<1xf32>
-      %c0_143 = arith.constant 0 : index
-      %186 = memref.load %ofc02toc01_buff_1[%c0_143] : memref<1xf32>
+      %c0_132 = arith.constant 0 : index
+      %185 = memref.load %ofc02toc01_buff_0[%c0_132] : memref<1xf32>
+      %c0_133 = arith.constant 0 : index
+      %186 = memref.load %ofc02toc01_buff_1[%c0_133] : memref<1xf32>
       %187 = arith.addf %185, %186 : f32
-      %c0_144 = arith.constant 0 : index
-      %188 = memref.load %ofc02toc01_buff_2[%c0_144] : memref<1xf32>
+      %c0_134 = arith.constant 0 : index
+      %188 = memref.load %ofc02toc01_buff_2[%c0_134] : memref<1xf32>
       %189 = arith.addf %187, %188 : f32
-      %c0_145 = arith.constant 0 : index
-      %190 = memref.load %ofc02toc01_buff_3[%c0_145] : memref<1xf32>
+      %c0_135 = arith.constant 0 : index
+      %190 = memref.load %ofc02toc01_buff_3[%c0_135] : memref<1xf32>
       %191 = arith.addf %189, %190 : f32
-      %c0_146 = arith.constant 0 : index
-      %192 = memref.load %ofc02toc01_buff_4[%c0_146] : memref<1xf32>
+      %c0_136 = arith.constant 0 : index
+      %192 = memref.load %ofc02toc01_buff_4[%c0_136] : memref<1xf32>
       %193 = arith.addf %191, %192 : f32
-      %c0_147 = arith.constant 0 : index
-      %194 = memref.load %ofc02toc01_buff_5[%c0_147] : memref<1xf32>
+      %c0_137 = arith.constant 0 : index
+      %194 = memref.load %ofc02toc01_buff_5[%c0_137] : memref<1xf32>
       %195 = arith.addf %193, %194 : f32
-      %c0_148 = arith.constant 0 : index
-      %196 = memref.load %ofc02toc01_buff_6[%c0_148] : memref<1xf32>
+      %c0_138 = arith.constant 0 : index
+      %196 = memref.load %ofc02toc01_buff_6[%c0_138] : memref<1xf32>
       %197 = arith.addf %195, %196 : f32
-      %c0_149 = arith.constant 0 : index
-      %198 = memref.load %ofc02toc01_buff_7[%c0_149] : memref<1xf32>
+      %c0_139 = arith.constant 0 : index
+      %198 = memref.load %ofc02toc01_buff_7[%c0_139] : memref<1xf32>
       %199 = arith.addf %197, %198 : f32
-      %c0_150 = arith.constant 0 : index
-      %200 = memref.load %ofc02toc01_buff_8[%c0_150] : memref<1xf32>
+      %c0_140 = arith.constant 0 : index
+      %200 = memref.load %ofc02toc01_buff_8[%c0_140] : memref<1xf32>
       %201 = arith.addf %199, %200 : f32
-      %cst_151 = arith.constant 9.000000e+00 : f32
-      %202 = arith.divf %201, %cst_151 : f32
-      %c0_152 = arith.constant 0 : index
-      memref.store %202, %out_buff_0[%c0_152] : memref<1xf32>
+      %cst_141 = arith.constant 9.000000e+00 : f32
+      %202 = arith.divf %201, %cst_141 : f32
       aie.use_lock(%ofc02toc01_prod_lock, Release, 9)
       aie.use_lock(%out_cons_lock, Release, 1)
       %203 = arith.addi %183, %c1 : index

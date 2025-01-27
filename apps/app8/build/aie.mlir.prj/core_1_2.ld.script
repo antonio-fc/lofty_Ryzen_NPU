@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7D004, LENGTH = 0x2FFC
+   data (!RX) : ORIGIN = 0x7D000, LENGTH = 0x3000
 }
 ENTRY(__start)
 SECTIONS
@@ -49,34 +49,22 @@ addB1_buff_0 = .;
 . = 0x64000;
 addB1_buff_1 = .;
 . += 0x1000;
-. = 0x68000;
-in1_cons_buff_0 = .;
-. += 0x1000;
-. = 0x6C000;
-in1_cons_buff_1 = .;
-. += 0x1000;
 . = 0x70400;
-out_buff_0 = .;
-. += 0x1000;
-. = 0x74000;
-out_buff_1 = .;
-. += 0x1000;
-. = 0x78000;
 addB0_buff_0 = .;
 . += 0x1000;
-. = 0x7C000;
+. = 0x74000;
 addB0_buff_1 = .;
 . += 0x1000;
-. = 0x79000;
+. = 0x71400;
 l_cons_buff_0 = .;
 . += 0x4;
-. = 0x7D000;
+. = 0x75000;
 l_cons_buff_1 = .;
 . += 0x4;
-. = 0x71400;
+. = 0x78000;
 u_cons_buff_0 = .;
 . += 0x1000;
-. = 0x75000;
+. = 0x7C000;
 u_cons_buff_1 = .;
 . += 0x1000;
   .bss : { *(.bss*) } > data

@@ -17,6 +17,8 @@ from aie.helpers.dialects.ext.scf import (
 )  # scf (structured control flow) dialect
 from aie.helpers.util import np_ndarray_type_get_shape
 
+import aie.utils.trace as trace_utils
+
 
 # AI Engine structural design function
 def my_eltwise_exp():
@@ -44,7 +46,7 @@ def my_eltwise_exp():
         # Type used in the memory tile which aggregates across the 4 cores
         A_memTile_ty = np.ndarray[(n * n_cores,), np.dtype[bfloat16]]
         C_memTile_ty = np.ndarray[(n * n_cores,), np.dtype[bfloat16]]
-
+d
         # AIE Core Function declarations
 
         exp_bf16_1024 = external_func("exp_bf16_1024", inputs=[tile_ty, tile_ty])
@@ -89,6 +91,8 @@ def my_eltwise_exp():
             of_offsets = []
         object_fifo_link(outC_fifos, outC, of_offsets, [])
 
+        # trace_utils.configure_packet_tracing_aie2(cores, ShimTile, 4096, N * 2)
+
         # Compute tile bodies
         for i in range(n_cores):
             # Compute tile i
@@ -109,9 +113,8 @@ def my_eltwise_exp():
 
         @runtime_sequence(tensor_ty, tensor_ty)
         def sequence(A, C):
-            npu_dma_memcpy_nd(
-                metadata=inA, bd_id=1, mem=A, sizes=[1, 1, 1, N], issue_token=True
-            )
+            # trace_utils.configure_packet_tracing_flow(cores, ShimTile)
+            npu_dma_memcpy_nd(metadata=inA, bd_id=1, mem=A, sizes=[1, 1, 1, N], issue_token=True)
             npu_dma_memcpy_nd(metadata=outC, bd_id=0, mem=C, sizes=[1, 1, 1, N])
             dma_wait(inA, outC)
 

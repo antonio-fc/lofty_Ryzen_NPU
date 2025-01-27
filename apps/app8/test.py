@@ -40,8 +40,8 @@ def main(opts):
     INOUT1_SIZE = INOUT1_VOLUME * INOUT1_DATATYPE().itemsize
     INOUT2_SIZE = INOUT2_VOLUME * INOUT2_DATATYPE().itemsize
 
-    OUT_SIZE = INOUT0_SIZE
-    OUT_DATATYPE = INOUT2_DATATYPE
+    OUT_SIZE = INOUT1_SIZE
+    OUT_DATATYPE = INOUT1_DATATYPE
 
     # ------------------------------------------------------
     # Get device, load the xclbin & kernel and register them
@@ -51,13 +51,12 @@ def main(opts):
     # ------------------------------------------------------
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------
-    # I dont know what the kernel.group_id() is for :(
     bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
     bo_inout0 = xrt.bo(device, INOUT1_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (2 pi f / SPEED_OF_LIGHT)
     bo_inout1 = xrt.bo(device, INOUT0_SIZE, xrt.bo.host_only, kernel.group_id(4)) # vis
     bo_inout2 = xrt.bo(device, INOUT0_SIZE*3, xrt.bo.host_only, kernel.group_id(5)) # baselines (u, v, w)
     bo_inout3 = xrt.bo(device, INOUT2_SIZE*3, xrt.bo.host_only, kernel.group_id(6)) # l, m, n
-    bo_inout4 = xrt.bo(device, OUT_SIZE*3, xrt.bo.host_only, kernel.group_id(7))    # output
+    bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
 
     # Initialize instruction buffer
     bo_instr.write(instr_v, 0)
@@ -152,12 +151,13 @@ def main(opts):
         # print(f"errors in iter {i}: {errors}")
         if i == 13:
             print("\nOutput from distributed input 1/3:")
-            output_buffer = output_buffer.reshape(9, 1024)
-            for x in output_buffer:
-                print(x)
-            print("\nExpected output from distributed input 1/3")
-            for x in inout2a.reshape(9, 1024):
-                print(x)
+            # output_buffer = output_buffer.reshape(9, 1024)
+            print(output_buffer)
+            # for x in output_buffer[0]:
+            #     print(x)
+            # print("\nExpected output from distributed input 1/3")
+            # for x in inout2a:
+            #     print(x)
             npu_time = stop - start
             npu_time_total = npu_time_total + npu_time
             npu_time_min = min(npu_time_min, npu_time)

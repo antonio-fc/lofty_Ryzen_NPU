@@ -18,6 +18,7 @@ def my_vector_scalar():
     MSIZE = 4096
     TSIZE = 1024
     ITER = 4
+    typeT = np.float
     @device(AIEDevice.npu1_1col)
     def device_body():
         tensor_ty = np.ndarray[(MSIZE,), np.dtype[np.int32]]
@@ -32,12 +33,17 @@ def my_vector_scalar():
         )
         passthrough = external_func(
             "passthrough",
-            inputs=[tile_ty, scalar_ty, np.int32],
+            inputs=[tile_ty, tile_ty, np.int32],
         )
 
         mean = external_func(
             "mean",
             inputs=[tile_ty, scalar_ty, np.int32],
+        )
+
+        cos = external_func(
+            "cos",
+            inputs=[tile_ty, tile_ty, np.int]
         )
 
         # Tile declarations
@@ -64,11 +70,11 @@ def my_vector_scalar():
         # Column 0
         
         # Output
-        of_out = object_fifo("out", ct[0][0], st[0], 2, scalar_ty) # outputs 1 int32
+        of_out = object_fifo("out", ct[0][0], st[0], 2, tile_ty) # outputs 1 int32
 
         # Set up compute tiles
         # Compute tile 2
-        @core(ct[0][0], "mean.o")
+        @core(ct[0][0], "passthrough.o")
         def core_body():
             # Effective while(1)
             for _ in range_(sys.maxsize):
@@ -76,16 +82,16 @@ def my_vector_scalar():
                 for _ in range_(ITER):
                     elem_out = of_out.acquire(ObjectFifoPort.Produce, 1)  # acquiring 1 x int32
                     elem_in = of_in.acquire(ObjectFifoPort.Consume, 1) # acquiring 1024 x int32
-                    mean(elem_in, elem_out, TSIZE)
+                    passthrough(elem_in, elem_out, TSIZE)
                     of_in.release(ObjectFifoPort.Consume, 1)
                     of_out.release(ObjectFifoPort.Produce, 1)
 
         # To/from AIE-array data movement
-        @runtime_sequence(tensor_ty, scalar_ty, tile2_ty)
+        @runtime_sequence(tensor_ty, scalar_ty, tensor_ty)
         def sequence(A, F, C):
             npu_dma_memcpy_nd(metadata=of_in, bd_id=1, mem=A, sizes=[1, 1, 1, MSIZE])
             npu_dma_memcpy_nd(metadata=of_factor, bd_id=2, mem=F, sizes=[1, 1, 1, 1])
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=C, sizes=[1, 1, 1, 4])
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=C, sizes=[1, 1, 1, MSIZE])
             # We know of_out will complete after of_in and of_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 
