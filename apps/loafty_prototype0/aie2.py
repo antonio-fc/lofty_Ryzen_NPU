@@ -61,9 +61,14 @@ def declaring_kernel_func(tile_ty, scalar_ty, dtype):
     kernel4 = external_func("mean",
         inputs=[tile_ty, scalar_ty, dtype],
     )
+    # kernel for the second mean (scalar)
+    name5 = "mean_w"
+    kernel5 = external_func("mean_w",
+        inputs=[tile_ty, scalar_ty, dtype, dtype],
+    )
     # kernel for the cosing using lut and vectors
-    name5 = "cos"
-    kernel5 = external_func("cos_float_1024",
+    name6 = "cos"
+    kernel6 = external_func("cos_float_1024",
         inputs=[tile_ty, tile_ty, dtype],
     )
     return {
@@ -72,6 +77,8 @@ def declaring_kernel_func(tile_ty, scalar_ty, dtype):
         name2: kernel2,
         name3: kernel3,
         name4: kernel4,
+        name5: kernel5,
+        name6: kernel6,
     }
 
 
@@ -87,7 +94,7 @@ def loafty():
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
-    dtype_k = np.int16
+    dtype_k = np.int32
 
     # Device setup
     @device(AIEDevice.npu1_4col)
@@ -107,7 +114,7 @@ def loafty():
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[0], ct[0][1], 2, scalar_ty) # input: factor (2 * pi * f / SL)
+        of_in_factor = object_fifo("in0", st[0], ct[0][1], 2, scalar_ty) # input: factor (-2 * pi * f / SL)
         of_in_vis = object_fifo("in1", st[0], ct[1][2], 2, tile_ty) # input: visibilities
         of_in_baselines = object_fifo("in2", st[1], mt[1], 1, tile_ty3) # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
         of_in_lmn = object_fifo("in3", st[1], mt[2], 1, scalar_ty3) # input: baseline scale (lmn)
@@ -150,7 +157,7 @@ def loafty():
         of_meanG = object_fifo("of_meanG", ct[2][2], ct[3][2], 2, scalar_ty) # from F
         
         # Output
-        of_out = object_fifo("out", ct[2][2], st[3], 3, scalar_ty) # from G
+        of_out = object_fifo("out", ct[2][2], st[3], 2, scalar_ty) # from G
 
         @core(ct[1][0], "scale.o") # Multiplying u * l
         def core_body():
@@ -251,39 +258,45 @@ def loafty():
         #     for _ in range_(ITER_KERNEL):
         #         for _ in range_(ITER_M):
         #             mean_in = of_meanF.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-        #             mean_out = of_meanG.acquire(ObjectFifoPort.Produce, 1) # object size: 1
+        #             mean_out = of_meanG.acquire(ObjectFifoPort.Produce, 1) # object size: 2
         #             kernels['mean'](mean_in, mean_out, TSIZE)
         #             of_meanG.release(ObjectFifoPort.Produce, 1)
         #             of_meanF.release(ObjectFifoPort.Consume, 1)
 
-        @core(ct[2][2], "mean.o") 
+        @core(ct[2][2], "mean_w.o") 
         def core_body():
             for _ in range_(ITER_KERNEL):
-                b = of_out.acquire(ObjectFifoPort.Produce, 2) # object size: 1
-                a = of_meanF.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-                # kernels['mean'](a, b[0], TSIZE)
-                # b[1] = a[0]
-                of_out.release(ObjectFifoPort.Produce, 2)
+                mean_out = of_out.acquire(ObjectFifoPort.Produce, 1) # object size: 2
+
+                # Acquiring one at the beginning to be able to call the initializing version of the kernel
+                mean_in = of_meanF.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
+                kernels['mean_w'](mean_in, mean_out, 0, 0) # initializing the sum
+                kernels['mean_w'](mean_in, mean_out, TSIZE, 1)
                 of_meanF.release(ObjectFifoPort.Consume, 1)
-                for _ in range_(1, ITER_M):
+                
+                for _ in range_(2, ITER_M):
                     mean_in = of_meanF.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-                    mean_out = of_out.acquire(ObjectFifoPort.Produce, 1) # object size: 1
-                    kernels['mean'](mean_in, mean_out, TSIZE)
-                    of_out.release(ObjectFifoPort.Produce, 1)
+                    kernels['mean_w'](mean_in, mean_out, TSIZE, 1)
                     of_meanF.release(ObjectFifoPort.Consume, 1)
 
-        # @core(ct[3][2]) 
+                # Acquiring one at the end to be able to call the division version of the kernel
+                mean_in = of_meanF.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
+                kernels['mean_w'](mean_in, mean_out, TSIZE, 1)
+                kernels['mean_w'](mean_in, mean_out, ITER_M * TSIZE, 2) # dividing the sum to get the final mean
+                of_meanF.release(ObjectFifoPort.Consume, 1)
+                
+                of_out.release(ObjectFifoPort.Produce, 1)
+
+        # @core(ct[3][2], "mean_w.o") 
         # def core_body():
         #     for _ in range_(ITER_KERNEL):
-        #         mean_out = of_out.acquire(ObjectFifoPort.Produce, 1) # object size: 1
-        #         mean_init = of_meanG.acquire(ObjectFifoPort.Consume, 1) # object size: 1
-        #         mean_out[0] = mean_init[0] # for non-scalar objects need
-        #         of_meanG.release(ObjectFifoPort.Consume, 1)
-        #         for _ in range_(1, ITER_M):
-        #             mean_in = of_meanG.acquire(ObjectFifoPort.Consume, 1) # object size: 1
-        #             mean_out[0] = mean_out[0] + mean_in[0]
+        #         mean_out = of_out.acquire(ObjectFifoPort.Produce, 1) # object size: 2
+        #         kernels['mean_w'](mean_out, mean_out, 0) # initializing the sum
+        #         for _ in range_(ITER_M):
+        #             mean_in = of_meanG.acquire(ObjectFifoPort.Consume, 1) # object size: 2
+        #             kernels['mean_w'](mean_in, mean_out, 1)
         #             of_meanG.release(ObjectFifoPort.Consume, 1)
-        #         mean_out[1] = mean_out[0]/ITER_M
+        #         kernels['mean_w'](mean_out, mean_out, ITER_M)
         #         of_out.release(ObjectFifoPort.Produce, 1)
                     
                     
@@ -294,7 +307,7 @@ def loafty():
             npu_dma_memcpy_nd(metadata=of_in_vis, bd_id=2, mem=vis, sizes=[1, 1, 1, MSIZE]) # input: visibilities
             npu_dma_memcpy_nd(metadata=of_in_baselines, bd_id=3, mem=baselines, sizes=[1, 1, 1, MSIZE*3]) # input: baselines
             npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=4, mem=lmn, sizes=[1, 1, 1, BSIZE*3]) # input: baseline scales
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, 10]) # output
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, 2]) # output
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 

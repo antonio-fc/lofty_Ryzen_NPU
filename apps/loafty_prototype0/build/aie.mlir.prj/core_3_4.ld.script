@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C004, LENGTH = 0x3FFC
+   data (!RX) : ORIGIN = 0x74004, LENGTH = 0xBFFC
 }
 ENTRY(__start)
 SECTIONS
@@ -40,37 +40,19 @@ SECTIONS
 . = 0x70000;
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
-. = 0x40400;
-addA1_cons_buff_0 = .;
-. += 0x800;
-. = 0x44000;
-addA1_cons_buff_1 = .;
-. += 0x800;
 . = 0x50400;
-of_meanF_buff_0 = .;
-. += 0x800;
+of_meanG_buff_0 = .;
+. += 0x4;
 . = 0x54000;
-of_meanF_buff_1 = .;
-. += 0x800;
-. = 0x58000;
-in1_cons_buff_0 = .;
-. += 0x800;
-. = 0x5C000;
-in1_cons_buff_1 = .;
-. += 0x800;
+of_meanG_buff_1 = .;
+. += 0x4;
 . = 0x70400;
 out_buff_0 = .;
 . += 0x4;
 . = 0x74000;
 out_buff_1 = .;
 . += 0x4;
-. = 0x78000;
-of_meanG_buff_0 = .;
-. += 0x4;
-. = 0x7C000;
-of_meanG_buff_1 = .;
-. += 0x4;
   .bss : { *(.bss*) } > data
 }
 INPUT(mean_w.o)
-PROVIDE(main = core_2_4);
+PROVIDE(main = core_3_4);

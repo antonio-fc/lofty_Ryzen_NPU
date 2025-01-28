@@ -40,7 +40,6 @@ target triple = "aie2"
 @of_meanF_buff_0 = external global [1024 x bfloat]
 @of_meanG_buff_1 = external global [2 x bfloat]
 @of_meanG_buff_0 = external global [2 x bfloat]
-@out_buff_2 = external global [2 x bfloat]
 @out_buff_1 = external global [2 x bfloat]
 @out_buff_0 = external global [2 x bfloat]
 @out_cons = external global [2 x bfloat]
@@ -90,451 +89,168 @@ declare void @llvm.aie2.acquire(i32, i32)
 
 declare void @llvm.aie2.release(i32, i32)
 
-declare void @vector_scalar_mul_aie_scalar(ptr, ptr, ptr, i16)
+declare void @vector_scalar_mul_aie_scalar(ptr, ptr, ptr, i32)
 
-declare void @passthrough(ptr, ptr, i16)
+declare void @passthrough(ptr, ptr, i32)
 
-declare void @vector_add_aie_scalar(ptr, ptr, ptr, i16)
+declare void @vector_add_aie_scalar(ptr, ptr, ptr, i32)
 
-declare void @vector_mult_aie_scalar(ptr, ptr, ptr, i16)
+declare void @vector_mult_aie_scalar(ptr, ptr, ptr, i32)
 
-declare void @mean(ptr, ptr, i16)
+declare void @mean(ptr, ptr, i32)
 
-declare void @cos_float_1024(ptr, ptr, i16)
+declare void @mean_w(ptr, ptr, i32, i32)
+
+declare void @cos_float_1024(ptr, ptr, i32)
 
 define void @core_2_4() {
   br label %1
 
-1:                                                ; preds = %4, %0
-  %2 = phi i64 [ %5, %4 ], [ 0, %0 ]
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
   %3 = icmp slt i64 %2, 9223372036854775806
-  br i1 %3, label %4, label %6
+  br i1 %3, label %4, label %18
 
 4:                                                ; preds = %1
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
   call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 9, i32 0)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 2, %4 ]
+  %7 = icmp slt i64 %6, 8
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 9216, i32 2)
   call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.acquire(i32 19, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_1, i32 9, i32 0)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_1, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 2, %10 ]
+  %13 = icmp slt i64 %12, 8
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_1, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_1, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_1, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_1, i32 1024, i32 1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_1, i32 9216, i32 2)
   call void @llvm.aie2.release(i32 18, i32 1)
-  %5 = add i64 %2, 6
+  call void @llvm.aie2.release(i32 51, i32 1)
+  %17 = add i64 %2, 2
   br label %1
 
-6:                                                ; preds = %1
-  call void @llvm.aie2.acquire(i32 50, i32 -2)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.release(i32 51, i32 2)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
+18:                                               ; preds = %1
   call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
   call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_1, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_2, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_1, ptr @out_buff_2, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
-  call void @llvm.aie2.release(i32 18, i32 1)
-  call void @llvm.aie2.acquire(i32 19, i32 -1)
-  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 9, i32 0)
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
-  call void @mean(ptr @of_meanF_buff_0, ptr @out_buff_0, i16 1024)
-  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
   call void @llvm.aie2.release(i32 18, i32 1)
+  br label %19
+
+19:                                               ; preds = %22, %18
+  %20 = phi i64 [ %23, %22 ], [ 2, %18 ]
+  %21 = icmp slt i64 %20, 8
+  br i1 %21, label %22, label %24
+
+22:                                               ; preds = %19
+  call void @llvm.aie2.acquire(i32 19, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_0, i32 1024, i32 1)
+  call void @llvm.aie2.release(i32 18, i32 1)
+  call void @llvm.aie2.acquire(i32 19, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
+  call void @llvm.aie2.release(i32 18, i32 1)
+  %23 = add i64 %20, 2
+  br label %19
+
+24:                                               ; preds = %19
+  call void @llvm.aie2.acquire(i32 19, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_1, ptr @out_buff_0, i32 1024, i32 1)
+  call void @llvm.aie2.release(i32 18, i32 1)
+  call void @llvm.aie2.acquire(i32 19, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 1024, i32 1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
+  call void @mean_w(ptr @of_meanF_buff_0, ptr @out_buff_0, i32 9216, i32 2)
+  call void @llvm.aie2.release(i32 18, i32 1)
+  call void @llvm.aie2.release(i32 51, i32 1)
   ret void
 }
 
@@ -558,7 +274,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_0, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -568,7 +284,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_1, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -582,7 +298,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_0, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -600,7 +316,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_1, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -610,7 +326,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_0, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -624,7 +340,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_1, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -643,7 +359,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_0, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -653,7 +369,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_1, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_1, ptr @in1_cons_buff_1, ptr @of_meanF_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -667,7 +383,7 @@ define void @core_1_4() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_meanF_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in1_cons_buff_0, i64 32) ]
-  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i16 1024)
+  call void @vector_mult_aie_scalar(ptr @of_multE_buff_0, ptr @in1_cons_buff_0, ptr @of_meanF_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 51, i32 1)
   call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -692,14 +408,14 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.acquire(i32 5, i32 -1)
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   %8 = add i64 %5, 2
@@ -710,7 +426,7 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   br label %10
@@ -725,14 +441,14 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.acquire(i32 5, i32 -1)
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   %14 = add i64 %11, 2
@@ -743,7 +459,7 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   %16 = add i64 %2, 2
@@ -759,14 +475,14 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.acquire(i32 5, i32 -1)
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_1, ptr @of_multE_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   %21 = add i64 %18, 2
@@ -777,7 +493,7 @@ define void @core_0_4() {
   call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i16 1024)
+  call void @passthrough(ptr @of_cosD_buff_0, ptr @of_multE_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   ret void
@@ -806,7 +522,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.acquire(i32 51, i32 -1)
@@ -814,7 +530,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   %9 = add i64 %6, 2
@@ -826,7 +542,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -844,7 +560,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.acquire(i32 51, i32 -1)
@@ -852,7 +568,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   %15 = add i64 %12, 2
@@ -864,7 +580,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -886,7 +602,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.acquire(i32 51, i32 -1)
@@ -894,7 +610,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_1, ptr @of_cosD_buff_1, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   %23 = add i64 %20, 2
@@ -906,7 +622,7 @@ define void @core_0_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @of_scaleC_buff_0, ptr @of_cosD_buff_0, ptr @in0_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -933,7 +649,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -943,7 +659,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -957,7 +673,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -975,7 +691,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -985,7 +701,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -999,7 +715,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1018,7 +734,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1028,7 +744,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_1, ptr @addB1_buff_1, ptr @of_scaleC_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1042,7 +758,7 @@ define void @core_1_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleC_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addB0_buff_0, ptr @addB1_buff_0, ptr @of_scaleC_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 19, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1069,7 +785,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1079,7 +795,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1093,7 +809,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1111,7 +827,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1121,7 +837,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1135,7 +851,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1154,7 +870,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1164,7 +880,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_1, ptr @addA1_cons_buff_1, ptr @addB1_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1178,7 +894,7 @@ define void @core_2_3() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
-  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i16 1024)
+  call void @vector_add_aie_scalar(ptr @addA0_buff_0, ptr @addA1_cons_buff_0, ptr @addB1_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 17, i32 1)
   call void @llvm.aie2.release(i32 4, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
@@ -1208,7 +924,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1216,7 +932,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %9 = add i64 %6, 2
@@ -1228,7 +944,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1246,7 +962,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1254,7 +970,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %15 = add i64 %12, 2
@@ -1266,7 +982,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1288,7 +1004,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1296,7 +1012,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_1, ptr @addA1_buff_1, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %23 = add i64 %20, 2
@@ -1308,7 +1024,7 @@ define void @core_3_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA1_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @n_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @w_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @w_cons_buff_0, ptr @addA1_buff_0, ptr @n_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1338,7 +1054,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1346,7 +1062,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %9 = add i64 %6, 2
@@ -1358,7 +1074,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1376,7 +1092,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1384,7 +1100,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %15 = add i64 %12, 2
@@ -1396,7 +1112,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1418,7 +1134,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1426,7 +1142,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_1, ptr @addA0_buff_1, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %23 = add i64 %20, 2
@@ -1438,7 +1154,7 @@ define void @core_2_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addA0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @m_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @v_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @v_cons_buff_0, ptr @addA0_buff_0, ptr @m_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1468,7 +1184,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1476,7 +1192,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %9 = add i64 %6, 2
@@ -1488,7 +1204,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1506,7 +1222,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1514,7 +1230,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %15 = add i64 %12, 2
@@ -1526,7 +1242,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_1, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_1, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -1548,7 +1264,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
@@ -1556,7 +1272,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_1, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_1, ptr @addB0_buff_1, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   %23 = add i64 %20, 2
@@ -1568,7 +1284,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @addB0_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @l_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @u_cons_buff_0, i64 32) ]
-  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i16 1024)
+  call void @vector_scalar_mul_aie_scalar(ptr @u_cons_buff_0, ptr @addB0_buff_0, ptr @l_cons_buff_0, i32 1024)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)

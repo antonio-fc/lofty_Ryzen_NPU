@@ -20,7 +20,8 @@ void mean(bfloat16 *a,  bfloat16 *c, int32_t N) {
     for (int i = 0; i < N; i++) {
         sum += a[i];
     }
-    *c = sum / N;
+    c[0] = sum / N;
+    c[1] = c[0];
 }
 
 } // extern "C"

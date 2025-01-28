@@ -38,11 +38,15 @@ build/mean.o: ${srcdir}/kernels/mean.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
+build/mean_w.o: ${srcdir}/kernels/mean_weighted.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
 build/cos.o: ${srcdir}/kernels/cos_float.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_mult.o build/mean.o build/cos.o
+build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_mult.o build/mean.o build/mean_w.o build/cos.o
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
 				--no-xchesscc --no-xbridge \

@@ -32,12 +32,13 @@ module {
     memref.global "public" @in1 : memref<1024xbf16>
     memref.global "public" @in0_cons : memref<2xbf16>
     memref.global "public" @in0 : memref<2xbf16>
-    func.func private @vector_scalar_mul_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16)
-    func.func private @passthrough(memref<1024xbf16>, memref<1024xbf16>, i16)
-    func.func private @vector_add_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16)
-    func.func private @vector_mult_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16)
-    func.func private @mean(memref<1024xbf16>, memref<2xbf16>, i16)
-    func.func private @cos_float_1024(memref<1024xbf16>, memref<1024xbf16>, i16)
+    func.func private @vector_scalar_mul_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32)
+    func.func private @passthrough(memref<1024xbf16>, memref<1024xbf16>, i32)
+    func.func private @vector_add_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32)
+    func.func private @vector_mult_aie_scalar(memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32)
+    func.func private @mean(memref<1024xbf16>, memref<2xbf16>, i32)
+    func.func private @mean_w(memref<1024xbf16>, memref<2xbf16>, i32, i32)
+    func.func private @cos_float_1024(memref<1024xbf16>, memref<1024xbf16>, i32)
     %tile_0_0 = aie.tile(0, 0) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 15>}
     %tile_0_3 = aie.tile(0, 3) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 29>}
     %tile_0_4 = aie.tile(0, 4) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 30>}
@@ -55,11 +56,10 @@ module {
     %tile_3_2 = aie.tile(3, 2) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 27>}
     %out_buff_0 = aie.buffer(%tile_2_4) {address = 1024 : i32, mem_bank = 0 : i32, sym_name = "out_buff_0"} : memref<2xbf16> 
     %out_buff_1 = aie.buffer(%tile_2_4) {address = 16384 : i32, mem_bank = 1 : i32, sym_name = "out_buff_1"} : memref<2xbf16> 
-    %out_buff_2 = aie.buffer(%tile_2_4) {address = 32768 : i32, mem_bank = 2 : i32, sym_name = "out_buff_2"} : memref<2xbf16> 
-    %out_prod_lock = aie.lock(%tile_2_4, 2) {init = 3 : i32, sym_name = "out_prod_lock"}
+    %out_prod_lock = aie.lock(%tile_2_4, 2) {init = 2 : i32, sym_name = "out_prod_lock"}
     %out_cons_lock = aie.lock(%tile_2_4, 3) {init = 0 : i32, sym_name = "out_cons_lock"}
-    %of_meanG_buff_0 = aie.buffer(%tile_2_4) {address = 49152 : i32, mem_bank = 3 : i32, sym_name = "of_meanG_buff_0"} : memref<2xbf16> 
-    %of_meanG_buff_1 = aie.buffer(%tile_2_4) {address = 1028 : i32, mem_bank = 0 : i32, sym_name = "of_meanG_buff_1"} : memref<2xbf16> 
+    %of_meanG_buff_0 = aie.buffer(%tile_2_4) {address = 32768 : i32, mem_bank = 2 : i32, sym_name = "of_meanG_buff_0"} : memref<2xbf16> 
+    %of_meanG_buff_1 = aie.buffer(%tile_2_4) {address = 49152 : i32, mem_bank = 3 : i32, sym_name = "of_meanG_buff_1"} : memref<2xbf16> 
     %of_meanF_buff_0 = aie.buffer(%tile_1_4) {address = 1024 : i32, mem_bank = 0 : i32, sym_name = "of_meanF_buff_0"} : memref<1024xbf16> 
     %of_meanF_buff_1 = aie.buffer(%tile_1_4) {address = 16384 : i32, mem_bank = 1 : i32, sym_name = "of_meanF_buff_1"} : memref<1024xbf16> 
     %of_meanF_prod_lock = aie.lock(%tile_1_4, 2) {init = 2 : i32, sym_name = "of_meanF_prod_lock"}
@@ -147,7 +147,7 @@ module {
     aie.flow(%tile_3_2, DMA : 0, %tile_2_3, DMA : 0)
     aie.flow(%tile_2_4, DMA : 0, %tile_3_0, DMA : 0)
     %core_1_2 = aie.core(%tile_1_2) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -165,12 +165,12 @@ module {
     ^bb4:  // pred: ^bb3
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2 : index
@@ -178,7 +178,7 @@ module {
     ^bb5:  // pred: ^bb3
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%l_cons_prod_lock, Release, 1)
@@ -190,12 +190,12 @@ module {
     ^bb7:  // pred: ^bb6
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2 : index
@@ -203,7 +203,7 @@ module {
     ^bb8:  // pred: ^bb6
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%l_cons_prod_lock, Release, 1)
@@ -218,12 +218,12 @@ module {
     ^bb11:  // pred: ^bb10
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_1, %addB0_buff_1, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2 : index
@@ -231,14 +231,14 @@ module {
     ^bb12:  // pred: ^bb10
       aie.use_lock(%u_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%u_cons_buff_0, %addB0_buff_0, %l_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addB0_cons_lock, Release, 1)
       aie.use_lock(%u_cons_prod_lock, Release, 1)
       aie.use_lock(%l_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "scale.o"}
     %core_2_2 = aie.core(%tile_2_2) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -256,12 +256,12 @@ module {
     ^bb4:  // pred: ^bb3
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2 : index
@@ -269,7 +269,7 @@ module {
     ^bb5:  // pred: ^bb3
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%m_cons_prod_lock, Release, 1)
@@ -281,12 +281,12 @@ module {
     ^bb7:  // pred: ^bb6
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2 : index
@@ -294,7 +294,7 @@ module {
     ^bb8:  // pred: ^bb6
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%m_cons_prod_lock, Release, 1)
@@ -309,12 +309,12 @@ module {
     ^bb11:  // pred: ^bb10
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_1, %addA0_buff_1, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2 : index
@@ -322,14 +322,14 @@ module {
     ^bb12:  // pred: ^bb10
       aie.use_lock(%v_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA0_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%v_cons_buff_0, %addA0_buff_0, %m_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA0_cons_lock, Release, 1)
       aie.use_lock(%v_cons_prod_lock, Release, 1)
       aie.use_lock(%m_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "scale.o"}
     %core_3_2 = aie.core(%tile_3_2) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -347,12 +347,12 @@ module {
     ^bb4:  // pred: ^bb3
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2 : index
@@ -360,7 +360,7 @@ module {
     ^bb5:  // pred: ^bb3
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%n_cons_prod_lock, Release, 1)
@@ -372,12 +372,12 @@ module {
     ^bb7:  // pred: ^bb6
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2 : index
@@ -385,7 +385,7 @@ module {
     ^bb8:  // pred: ^bb6
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%n_cons_prod_lock, Release, 1)
@@ -400,12 +400,12 @@ module {
     ^bb11:  // pred: ^bb10
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_1, %addA1_buff_1, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2 : index
@@ -413,14 +413,14 @@ module {
     ^bb12:  // pred: ^bb10
       aie.use_lock(%w_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%w_cons_buff_0, %addA1_buff_0, %n_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%addA1_cons_lock, Release, 1)
       aie.use_lock(%w_cons_prod_lock, Release, 1)
       aie.use_lock(%n_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "scale.o"}
     %core_2_3 = aie.core(%tile_2_3) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -438,14 +438,14 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
@@ -455,7 +455,7 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
@@ -467,14 +467,14 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
@@ -484,7 +484,7 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
@@ -499,14 +499,14 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_1, %addA1_cons_buff_1, %addB1_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
@@ -516,14 +516,14 @@ module {
       aie.use_lock(%addA0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addA1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addA0_buff_0, %addA1_cons_buff_0, %addB1_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%addB1_cons_lock, Release, 1)
       aie.use_lock(%addA0_prod_lock, Release, 1)
       aie.use_lock(%addA1_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "vector_add.o"}
     %core_1_3 = aie.core(%tile_1_3) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -541,14 +541,14 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
@@ -558,7 +558,7 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
@@ -570,14 +570,14 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
@@ -587,7 +587,7 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
@@ -602,14 +602,14 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_1, %addB1_buff_1, %of_scaleC_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
@@ -619,14 +619,14 @@ module {
       aie.use_lock(%addB0_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%addB1_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_scaleC_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_add_aie_scalar(%addB0_buff_0, %addB1_buff_0, %of_scaleC_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_scaleC_cons_lock, Release, 1)
       aie.use_lock(%addB0_prod_lock, Release, 1)
       aie.use_lock(%addB1_prod_lock, Release, 1)
       aie.end
     } {link_with = "vector_add.o"}
     %core_0_3 = aie.core(%tile_0_3) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -644,12 +644,12 @@ module {
     ^bb4:  // pred: ^bb3
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2 : index
@@ -657,7 +657,7 @@ module {
     ^bb5:  // pred: ^bb3
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%in0_cons_prod_lock, Release, 1)
@@ -669,12 +669,12 @@ module {
     ^bb7:  // pred: ^bb6
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2 : index
@@ -682,7 +682,7 @@ module {
     ^bb8:  // pred: ^bb6
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%in0_cons_prod_lock, Release, 1)
@@ -697,12 +697,12 @@ module {
     ^bb11:  // pred: ^bb10
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_1, %of_cosD_buff_1, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2 : index
@@ -710,14 +710,14 @@ module {
     ^bb12:  // pred: ^bb10
       aie.use_lock(%of_scaleC_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_cosD_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      func.call @vector_scalar_mul_aie_scalar(%of_scaleC_buff_0, %of_cosD_buff_0, %in0_cons_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<2xbf16>, i32) -> ()
       aie.use_lock(%of_cosD_cons_lock, Release, 1)
       aie.use_lock(%of_scaleC_prod_lock, Release, 1)
       aie.use_lock(%in0_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "scale.o"}
     %core_0_4 = aie.core(%tile_0_4) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -734,12 +734,12 @@ module {
     ^bb4:  // pred: ^bb3
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2 : index
@@ -747,7 +747,7 @@ module {
     ^bb5:  // pred: ^bb3
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       cf.br ^bb6(%c0 : index)
@@ -757,12 +757,12 @@ module {
     ^bb7:  // pred: ^bb6
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2 : index
@@ -770,7 +770,7 @@ module {
     ^bb8:  // pred: ^bb6
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %8 = arith.addi %0, %c2 : index
@@ -783,12 +783,12 @@ module {
     ^bb11:  // pred: ^bb10
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2 : index
@@ -796,13 +796,13 @@ module {
     ^bb12:  // pred: ^bb10
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
-      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @passthrough(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.end
     } {link_with = "passthrough.o"}
     %core_1_4 = aie.core(%tile_1_4) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
@@ -820,14 +820,14 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
@@ -837,7 +837,7 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
@@ -849,14 +849,14 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
@@ -866,7 +866,7 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
@@ -881,14 +881,14 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_1, %in1_cons_buff_1, %of_meanF_buff_1, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
@@ -898,340 +898,118 @@ module {
       aie.use_lock(%of_multE_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%in1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_meanF_prod_lock, AcquireGreaterEqual, 1)
-      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i16) -> ()
+      func.call @vector_mult_aie_scalar(%of_multE_buff_0, %in1_cons_buff_0, %of_meanF_buff_0, %c1024_i32) : (memref<1024xbf16>, memref<1024xbf16>, memref<1024xbf16>, i32) -> ()
       aie.use_lock(%of_meanF_cons_lock, Release, 1)
       aie.use_lock(%of_multE_prod_lock, Release, 1)
       aie.use_lock(%in1_cons_prod_lock, Release, 1)
       aie.end
     } {link_with = "vector_mult.o"}
     %core_2_4 = aie.core(%tile_2_4) {
-      %c1024_i16 = arith.constant 1024 : i16
+      %c2_i32 = arith.constant 2 : i32
+      %c9216_i32 = arith.constant 9216 : i32
+      %c8 = arith.constant 8 : index
+      %c1_i32 = arith.constant 1 : i32
+      %c1024_i32 = arith.constant 1024 : i32
+      %c0_i32 = arith.constant 0 : i32
+      %c9_i32 = arith.constant 9 : i32
       %c0 = arith.constant 0 : index
       %c9223372036854775806 = arith.constant 9223372036854775806 : index
-      %c6 = arith.constant 6 : index
+      %c2 = arith.constant 2 : index
       cf.br ^bb1(%c0 : index)
-    ^bb1(%0: index):  // 2 preds: ^bb0, ^bb2
+    ^bb1(%0: index):  // 2 preds: ^bb0, ^bb8
       %1 = arith.cmpi slt, %0, %c9223372036854775806 : index
-      cf.cond_br %1, ^bb2, ^bb3
+      cf.cond_br %1, ^bb2, ^bb9
     ^bb2:  // pred: ^bb1
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c9_i32, %c0_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      cf.br ^bb3(%c2 : index)
+    ^bb3(%2: index):  // 2 preds: ^bb2, ^bb4
+      %3 = arith.cmpi slt, %2, %c8 : index
+      cf.cond_br %3, ^bb4, ^bb5
+    ^bb4:  // pred: ^bb3
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
       aie.use_lock(%of_meanF_prod_lock, Release, 1)
       aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      %4 = arith.addi %2, %c2 : index
+      cf.br ^bb3(%4 : index)
+    ^bb5:  // pred: ^bb3
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c9216_i32, %c2_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%out_cons_lock, Release, 1)
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_1, %c9_i32, %c0_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_1, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      cf.br ^bb6(%c2 : index)
+    ^bb6(%5: index):  // 2 preds: ^bb5, ^bb7
+      %6 = arith.cmpi slt, %5, %c8 : index
+      cf.cond_br %6, ^bb7, ^bb8
+    ^bb7:  // pred: ^bb6
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_1, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
       aie.use_lock(%of_meanF_prod_lock, Release, 1)
       aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_1, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      %7 = arith.addi %5, %c2 : index
+      cf.br ^bb6(%7 : index)
+    ^bb8:  // pred: ^bb6
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_1, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_1, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_1, %c9216_i32, %c2_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%out_cons_lock, Release, 1)
+      %8 = arith.addi %0, %c2 : index
+      cf.br ^bb1(%8 : index)
+    ^bb9:  // pred: ^bb1
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c9_i32, %c0_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      cf.br ^bb10(%c2 : index)
+    ^bb10(%9: index):  // 2 preds: ^bb9, ^bb11
+      %10 = arith.cmpi slt, %9, %c8 : index
+      cf.cond_br %10, ^bb11, ^bb12
+    ^bb11:  // pred: ^bb10
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      %11 = arith.addi %9, %c2 : index
+      cf.br ^bb10(%11 : index)
+    ^bb12:  // pred: ^bb10
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_1, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
+      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c1024_i32, %c1_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      func.call @mean_w(%of_meanF_buff_0, %out_buff_0, %c9216_i32, %c2_i32) : (memref<1024xbf16>, memref<2xbf16>, i32, i32) -> ()
+      aie.use_lock(%of_meanF_prod_lock, Release, 1)
       aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      %2 = arith.addi %0, %c6 : index
-      cf.br ^bb1(%2 : index)
-    ^bb3:  // pred: ^bb1
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 2)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_cons_lock, Release, 2)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_1, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_1, %out_buff_2, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
-      aie.use_lock(%of_meanF_cons_lock, AcquireGreaterEqual, 1)
-      aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
-      func.call @mean(%of_meanF_buff_0, %out_buff_0, %c1024_i16) : (memref<1024xbf16>, memref<2xbf16>, i16) -> ()
-      aie.use_lock(%out_cons_lock, Release, 1)
-      aie.use_lock(%of_meanF_prod_lock, Release, 1)
       aie.end
-    } {link_with = "mean.o"}
+    } {link_with = "mean_w.o"}
     memref.global "private" constant @blockwrite_data_0 : memref<8xi32> = dense<[1, 0, 0, 0, -2147483648, 0, 0, 33554432]>
     memref.global "private" constant @blockwrite_data_1 : memref<8xi32> = dense<[4608, 0, 0, 0, -2147483648, 0, 0, 33554432]>
     memref.global "private" constant @blockwrite_data_2 : memref<8xi32> = dense<[13824, 0, 0, 0, -2147483648, 0, 0, 33554432]>
     memref.global "private" constant @blockwrite_data_3 : memref<8xi32> = dense<[98304, 0, 0, 0, -2147483648, 0, 0, 33554432]>
-    memref.global "private" constant @blockwrite_data_4 : memref<8xi32> = dense<[5, 0, 0, 0, -2147483648, 0, 0, 33554432]>
     aiex.runtime_sequence(%arg0: memref<9216xbf16>, %arg1: memref<9216xbf16>, %arg2: memref<9216xbf16>, %arg3: memref<9216xbf16>, %arg4: memref<9216xbf16>) {
       %0 = memref.get_global @blockwrite_data_0 : memref<8xi32>
       aiex.npu.blockwrite(%0) {address = 118816 : ui32} : memref<8xi32>
@@ -1249,7 +1027,7 @@ module {
       aiex.npu.blockwrite(%3) {address = 33673344 : ui32} : memref<8xi32>
       aiex.npu.address_patch {addr = 33673348 : ui32, arg_idx = 3 : i32, arg_plus = 0 : i32}
       aiex.npu.write32 {address = 119324 : ui32, column = 1 : i32, row = 0 : i32, value = 4 : ui32}
-      %4 = memref.get_global @blockwrite_data_4 : memref<8xi32>
+      %4 = memref.get_global @blockwrite_data_0 : memref<8xi32>
       aiex.npu.blockwrite(%4) {address = 100782080 : ui32} : memref<8xi32>
       aiex.npu.address_patch {addr = 100782084 : ui32, arg_idx = 4 : i32, arg_plus = 0 : i32}
       aiex.npu.maskwrite32 {address = 119296 : ui32, column = 3 : i32, mask = 3840 : ui32, row = 0 : i32, value = 3840 : ui32}
@@ -1461,23 +1239,18 @@ module {
       aie.end
     }
     %mem_2_4 = aie.mem(%tile_2_4) {
-      %0 = aie.dma_start(MM2S, 0, ^bb1, ^bb4)
-    ^bb1:  // 2 preds: ^bb0, ^bb3
+      %0 = aie.dma_start(MM2S, 0, ^bb1, ^bb3)
+    ^bb1:  // 2 preds: ^bb0, ^bb2
       aie.use_lock(%out_cons_lock, AcquireGreaterEqual, 1)
       aie.dma_bd(%out_buff_0 : memref<2xbf16>, 0, 2) {bd_id = 0 : i32, next_bd_id = 1 : i32}
       aie.use_lock(%out_prod_lock, Release, 1)
       aie.next_bd ^bb2
     ^bb2:  // pred: ^bb1
       aie.use_lock(%out_cons_lock, AcquireGreaterEqual, 1)
-      aie.dma_bd(%out_buff_1 : memref<2xbf16>, 0, 2) {bd_id = 1 : i32, next_bd_id = 2 : i32}
-      aie.use_lock(%out_prod_lock, Release, 1)
-      aie.next_bd ^bb3
-    ^bb3:  // pred: ^bb2
-      aie.use_lock(%out_cons_lock, AcquireGreaterEqual, 1)
-      aie.dma_bd(%out_buff_2 : memref<2xbf16>, 0, 2) {bd_id = 2 : i32, next_bd_id = 0 : i32}
+      aie.dma_bd(%out_buff_1 : memref<2xbf16>, 0, 2) {bd_id = 1 : i32, next_bd_id = 0 : i32}
       aie.use_lock(%out_prod_lock, Release, 1)
       aie.next_bd ^bb1
-    ^bb4:  // pred: ^bb0
+    ^bb3:  // pred: ^bb0
       aie.end
     }
     aie.shim_dma_allocation @out(S2MM, 0, 3)

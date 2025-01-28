@@ -33,7 +33,7 @@ def main(opts):
     INOUT0_VOLUME = int(MSIZE)  
     INOUT1_VOLUME = int(2)  
     INOUT2_VOLUME = int(BSIZE)  
-    INOUT3_VOLUME = int(10)  
+    INOUT3_VOLUME = int(2)  
 
     dtype = bfloat16
     INOUT0_DATATYPE = dtype
@@ -90,10 +90,10 @@ def main(opts):
     for x in inout2:
         print(x)
     
+    inout3 = np.empty((INOUT2_VOLUME*3,), dtype=INOUT2_DATATYPE)     # l, m, n
     inout3a = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # l
     inout3b = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # m
     inout3c = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # n
-    inout3 = np.empty((INOUT2_VOLUME*3,), dtype=INOUT2_DATATYPE)     # l, m, n
     inout3[0::3] = inout3a
     inout3[1::3] = inout3b
     inout3[2::3] = inout3c
