@@ -16,12 +16,12 @@ __attribute__((always_inline))  aie::vector<float, 16> getCosFloat(aie::vector<f
     const int step_i = 8;
     
     lut_type lut_i(LUT_elems, ilut_ab, ilut_cd);
-    aie::parallel_lookup<uint16, lut_type, aie::lut_oor_policy::truncate> // index
+    aie::parallel_lookup<uint32, lut_type, aie::lut_oor_policy::truncate> // index
     lookup_i(lut_i, step_i);
     
     // todo: convert to range 0 - pi/2 and save in 'index'
 
-    aie::vector<uint16, 16> index = aie::filter_even(x.cast_to<uint16>(), 1);
+    aie::vector<uint32, 16> index = x.cast_to<uint32>();
     
     auto cos_result = lookup_i.fetch(index);
     

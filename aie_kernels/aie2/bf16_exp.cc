@@ -2,7 +2,6 @@
 
 template <const int N>
 void exp_bf16_func(bfloat16 *restrict in, bfloat16 *restrict out) {
-
   int vec_size = 16;
   for (int i = 0; i < N; i += vec_size)
     chess_prepare_for_pipelining chess_loop_range(64, 64) {
