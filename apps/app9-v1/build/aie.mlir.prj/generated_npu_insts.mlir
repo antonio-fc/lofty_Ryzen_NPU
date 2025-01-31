@@ -805,7 +805,7 @@ module {
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.end
-    } {link_with = "cos.o"}
+    } {link_with = "kernels.a"}
     %core_1_4 = aie.core(%tile_1_4) {
       %c1024_i32 = arith.constant 1024 : i32
       %c8 = arith.constant 8 : index

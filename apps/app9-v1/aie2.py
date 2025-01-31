@@ -217,7 +217,7 @@ def loafty():
                     of_scaleC.release(ObjectFifoPort.Consume, 1)
                 of_in_factor.release(ObjectFifoPort.Consume, 1)
 
-        @core(ct[0][2], "cos.o") # Applying cosine to C [D] (need to finish implementing cosine)
+        @core(ct[0][2], "kernels.a") # Applying cosine to C [D] (need to finish implementing cosine)
         def core_body():
             for _ in range_(ITER_KERNEL):
                 for _ in range_(ITER_M):

@@ -69,5 +69,5 @@ of_multE_buff_1 = .;
 . += 0x1000;
   .bss : { *(.bss*) } > data
 }
-INPUT(cos.o)
+INPUT(kernels.a)
 PROVIDE(main = core_0_4);

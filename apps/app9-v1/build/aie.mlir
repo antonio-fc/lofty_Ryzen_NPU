@@ -216,7 +216,7 @@ module {
         }
       }
       aie.end
-    } {link_with = "cos.o"}
+    } {link_with = "kernels.a"}
     %core_1_4 = aie.core(%tile_1_4) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index

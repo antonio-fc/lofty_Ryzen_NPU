@@ -42,7 +42,14 @@ build/cos.o: ${srcdir}/kernels/cos_float.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_mult.o build/mean.o build/cos.o
+build/lut_ops.o: ${srcdir}/kernels/lut_ops.cpp
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/kernels.a: build/cos.o build/lut_ops.o
+	ar rvs $@ $+
+
+build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_mult.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
 				--no-xchesscc --no-xbridge \
