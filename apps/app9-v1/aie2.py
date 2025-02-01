@@ -54,9 +54,14 @@ def declaring_kernel_func(tile_ty, scalar_ty, dtype):
     kernel4 = external_func("mean",
         inputs=[tile_ty, scalar_ty, dtype],
     )
-    # kernel for the cosing using lut and vectors
-    name5 = "cos"
-    kernel5 = external_func("cos_float_1024",
+    # kernel for the cosine using lut and vectors
+    name5 = "sin"
+    kernel5 = external_func("sin_float_1024",
+        inputs=[tile_ty, tile_ty, dtype],
+    )
+    # kernel for the cosine using lut and vectors
+    name6 = "cos"
+    kernel6 = external_func("cos_float_1024",
         inputs=[tile_ty, tile_ty, dtype],
     )
     return {
@@ -66,6 +71,7 @@ def declaring_kernel_func(tile_ty, scalar_ty, dtype):
         name3: kernel3,
         name4: kernel4,
         name5: kernel5,
+        name6: kernel6,
     }
 
 
@@ -223,7 +229,7 @@ def loafty():
                 for _ in range_(ITER_M):
                     obj_in = of_cosD.acquire(ObjectFifoPort.Consume, 1)
                     obj_out = of_multE.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['cos'](obj_in, obj_out, TSIZE)
+                    kernels['sin'](obj_in, obj_out, TSIZE)
                     of_multE.release(ObjectFifoPort.Produce, 1)
                     of_cosD.release(ObjectFifoPort.Consume, 1)
 

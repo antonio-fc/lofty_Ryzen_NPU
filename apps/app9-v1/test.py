@@ -66,7 +66,7 @@ def main(opts):
     inout1 = np.ones(INOUT0_VOLUME, dtype=INOUT2_DATATYPE)          # vis
     
     inout2a = np.zeros(INOUT0_VOLUME, dtype=INOUT0_DATATYPE) # u
-    inout2b = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE) # u # v
+    inout2b = np.arange(-INOUT0_VOLUME/4000, INOUT0_VOLUME/4000, 0.0005, dtype=INOUT0_DATATYPE) # u # v
     inout2c = np.zeros(INOUT0_VOLUME, dtype=INOUT0_DATATYPE) # u # w
     inout2 = np.empty((INOUT0_VOLUME*3,), dtype=INOUT0_DATATYPE)     # baselines (u, v, w)
     inout2 = inout2.reshape(9*3, ISIZE)

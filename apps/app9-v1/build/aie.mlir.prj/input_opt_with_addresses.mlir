@@ -91,6 +91,7 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.func @vector_add_aie_scalar(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @vector_mult_aie_scalar(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @mean(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
+  llvm.func @sin_float_1024(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @cos_float_1024(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @core_1_4() {
     %0 = llvm.mlir.addressof @in1_cons_buff_1 : !llvm.ptr
@@ -290,7 +291,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%21, %3 : !llvm.ptr, i64)] : i1
     %22 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%22, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%22, %21, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%22, %21, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %12) : (i32, i32) -> ()
@@ -299,7 +300,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%23, %3 : !llvm.ptr, i64)] : i1
     %24 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%24, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%24, %23, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%24, %23, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     %25 = llvm.add %19, %14 : i64
@@ -311,7 +312,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%26, %3 : !llvm.ptr, i64)] : i1
     %27 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%27, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%27, %26, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%27, %26, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.br ^bb5(%15 : i64)
@@ -325,14 +326,14 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%30, %3 : !llvm.ptr, i64)] : i1
     %31 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%31, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%31, %30, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%31, %30, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %12) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %12) : (i32, i32) -> ()
     llvm.intr.assume %4 ["align"(%26, %3 : !llvm.ptr, i64)] : i1
     llvm.intr.assume %4 ["align"(%27, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%27, %26, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%27, %26, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     %32 = llvm.add %28, %14 : i64
@@ -344,7 +345,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%33, %3 : !llvm.ptr, i64)] : i1
     %34 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%34, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%34, %33, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%34, %33, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     %35 = llvm.add %17, %14 : i64
@@ -359,7 +360,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%38, %3 : !llvm.ptr, i64)] : i1
     %39 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%39, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%39, %38, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%39, %38, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %12) : (i32, i32) -> ()
@@ -368,7 +369,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%40, %3 : !llvm.ptr, i64)] : i1
     %41 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%41, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%41, %40, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%41, %40, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     %42 = llvm.add %36, %14 : i64
@@ -380,7 +381,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.intr.assume %4 ["align"(%43, %3 : !llvm.ptr, i64)] : i1
     %44 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x f32>
     llvm.intr.assume %4 ["align"(%44, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @cos_float_1024(%44, %43, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @sin_float_1024(%44, %43, %11) : (!llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.return

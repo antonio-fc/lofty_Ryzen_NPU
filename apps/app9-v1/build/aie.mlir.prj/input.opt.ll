@@ -50,7 +50,7 @@ declare void @vector_add_aie_scalar(ptr, ptr, ptr, i32) local_unnamed_addr
 
 declare void @vector_mult_aie_scalar(ptr, ptr, ptr, i32) local_unnamed_addr
 
-declare void @cos_float_1024(ptr, ptr, i32) local_unnamed_addr
+declare void @sin_float_1024(ptr, ptr, i32) local_unnamed_addr
 
 define void @core_1_4() local_unnamed_addr {
   br label %.preheader3
@@ -344,126 +344,126 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   %2 = add nuw nsw i64 %1, 2
@@ -475,63 +475,63 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_1, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_1, ptr nonnull @of_multE_buff_1, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   tail call void @llvm.aie2.acquire(i32 5, i32 -1)
   tail call void @llvm.aie2.acquire(i32 48, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_multE_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @of_cosD_buff_0, i64 32) ]
-  tail call void @cos_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
+  tail call void @sin_float_1024(ptr nonnull @of_cosD_buff_0, ptr nonnull @of_multE_buff_0, i32 1024)
   tail call void @llvm.aie2.release(i32 49, i32 1)
   tail call void @llvm.aie2.release(i32 4, i32 1)
   ret void

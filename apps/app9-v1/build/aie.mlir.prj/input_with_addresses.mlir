@@ -37,6 +37,7 @@ module {
     func.func private @vector_add_aie_scalar(memref<1024xf32>, memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @vector_mult_aie_scalar(memref<1024xf32>, memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @mean(memref<1024xf32>, memref<1xf32>, i32)
+    func.func private @sin_float_1024(memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @cos_float_1024(memref<1024xf32>, memref<1024xf32>, i32)
     %tile_0_0 = aie.tile(0, 0) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 15>}
     %tile_0_1 = aie.tile(0, 1) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 26>}
@@ -912,13 +913,13 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_3 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_3) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_3) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %4 = arith.addi %2, %c2_2 : index
@@ -927,7 +928,7 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_4 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_4) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_4) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %c0_5 = arith.constant 0 : index
@@ -943,13 +944,13 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_10 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_10) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_10) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_11 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_11) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_11) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %7 = arith.addi %5, %c2_9 : index
@@ -958,7 +959,7 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_12 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_12) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_12) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %8 = arith.addi %0, %c2 : index
@@ -977,13 +978,13 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_18 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_18) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_18) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_19 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_19) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_1, %of_multE_buff_1, %c1024_i32_19) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       %11 = arith.addi %9, %c2_17 : index
@@ -992,7 +993,7 @@ module {
       aie.use_lock(%of_cosD_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%of_multE_prod_lock, AcquireGreaterEqual, 1)
       %c1024_i32_20 = arith.constant 1024 : i32
-      func.call @cos_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_20) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+      func.call @sin_float_1024(%of_cosD_buff_0, %of_multE_buff_0, %c1024_i32_20) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
       aie.use_lock(%of_multE_cons_lock, Release, 1)
       aie.use_lock(%of_cosD_prod_lock, Release, 1)
       aie.end

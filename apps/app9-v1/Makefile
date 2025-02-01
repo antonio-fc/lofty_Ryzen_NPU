@@ -38,7 +38,7 @@ build/mean.o: ${srcdir}/kernels/mean.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/cos.o: ${srcdir}/kernels/cos_float.cc
+build/trig.o: ${srcdir}/kernels/trig_float.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -46,7 +46,7 @@ build/lut_ops.o: ${srcdir}/kernels/lut_ops.cpp
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/kernels.a: build/cos.o build/lut_ops.o
+build/kernels.a: build/trig.o build/lut_ops.o
 	ar rvs $@ $+
 
 build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_mult.o build/mean.o build/kernels.a

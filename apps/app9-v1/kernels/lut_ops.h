@@ -4,6 +4,12 @@
 #endif
 #include "aie_api/aie.hpp"
 
+using lut_type = aie::lut<4, float, float>;
+const int LUT_elems = 512;
+const int step_i = 0; // Optional lower bits that will be ignored for indexing the lut
+
+alignas(aie::vector_decl_align) extern float sin_ilut_ab[512];
+alignas(aie::vector_decl_align) extern float sin_ilut_cd[512];
 alignas(aie::vector_decl_align) extern float cos_ilut_ab[512];
 alignas(aie::vector_decl_align) extern float cos_ilut_cd[512];
 
@@ -35,16 +41,27 @@ aie::vector<uint32, 16> v16float_to_v16uint(aie::vector<float, 16> input) {
     return index;
 }
 
+__attribute__((always_inline))  aie::vector<float, 16> getSinFloat(aie::vector<float, 16> x) {
+    float __aie_dm_resource_a *ilut_ab = (float __aie_dm_resource_a *)sin_ilut_ab;
+    float __aie_dm_resource_b *ilut_cd = (float __aie_dm_resource_b *)sin_ilut_cd;
+    
+    lut_type lut_i(LUT_elems, ilut_ab, ilut_cd);
+    aie::parallel_lookup<uint32, lut_type, aie::lut_oor_policy::truncate> // index
+    lookup_i(lut_i, step_i);
+    
+    auto index = v16float_to_v16uint(x);
+    
+    auto sin_result = lookup_i.fetch(index);
+    
+    return sin_result;
+}
+
 __attribute__((always_inline))  aie::vector<float, 16> getCosFloat(aie::vector<float, 16> x) {
     float __aie_dm_resource_a *ilut_ab = (float __aie_dm_resource_a *)cos_ilut_ab;
     float __aie_dm_resource_b *ilut_cd = (float __aie_dm_resource_b *)cos_ilut_cd;
     
-    using lut_type = aie::lut<4, float, float>;
-    const int LUT_elems = 512;
-    const int step_i = 0; // Optional lower bits that will be ignored for indexing the lut
-    
     lut_type lut_i(LUT_elems, ilut_ab, ilut_cd);
-    aie::parallel_lookup<uint16, lut_type, aie::lut_oor_policy::truncate> // index
+    aie::parallel_lookup<uint32, lut_type, aie::lut_oor_policy::truncate> // index
     lookup_i(lut_i, step_i);
     
     auto index = v16float_to_v16uint(x);

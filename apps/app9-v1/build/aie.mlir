@@ -5,6 +5,7 @@ module {
     func.func private @vector_add_aie_scalar(memref<1024xf32>, memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @vector_mult_aie_scalar(memref<1024xf32>, memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @mean(memref<1024xf32>, memref<1xf32>, i32)
+    func.func private @sin_float_1024(memref<1024xf32>, memref<1024xf32>, i32)
     func.func private @cos_float_1024(memref<1024xf32>, memref<1024xf32>, i32)
     %tile_0_0 = aie.tile(0, 0)
     %tile_0_1 = aie.tile(0, 1)
@@ -210,7 +211,7 @@ module {
           %2 = aie.objectfifo.acquire @of_multE(Produce, 1) : !aie.objectfifosubview<memref<1024xf32>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<1024xf32>> -> memref<1024xf32>
           %c1024_i32 = arith.constant 1024 : i32
-          func.call @cos_float_1024(%1, %3, %c1024_i32) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
+          func.call @sin_float_1024(%1, %3, %c1024_i32) : (memref<1024xf32>, memref<1024xf32>, i32) -> ()
           aie.objectfifo.release @of_multE(Produce, 1)
           aie.objectfifo.release @of_cosD(Consume, 1)
         }
