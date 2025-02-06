@@ -28,20 +28,24 @@ void mean(bfloat16 *a,  bfloat16 *c, uint32_t N, uint32_t op) {
         case 1: {// accumulate
             // bfloat16 sum = 0.0f;
             auto sum_v = aie::zeros<bfloat16, VEC_SIZE>();
+            aie::accum<accfloat, VEC_SIZE> acc;
+            acc.from_vector(sum_v, 0);
+            // auto acc = aie::from_vector<accfloat, VEC_SIZE>(init, 0);
             for (int i = 0; i < N; i += VEC_SIZE) {
                 auto input = aie::load_v<VEC_SIZE>(a + i);
-                // sum_v = aie::add(sum_v, input);
-                sum_v = input;
+                acc = aie::add(acc, input);
+                // sum_v = input;
                 // sum += a[i];
             }
             // c[0] += sum;
             // float s = aie::reduce_add(sum_v);
-            // c[0] += aie::reduce_add(sum_v);
-            c[0] = sum_v[0];
+            aie::vector<float, VEC_SIZE> sum = acc.to_vector<float>(0);
+            c[0] += aie::reduce_add(sum);
+            // c[0] = sum[0];
             break;
         }
         case 2: {// divide
-            // c[0] /= (bfloat16) N;
+            c[0] /= N;
             break;
         }
         default:
