@@ -116,9 +116,9 @@ def loafty():
         # AIE-array data movement with object fifos
         # Inputs
         of_in_factor = object_fifo("in0", st[0], ct[0][1], 2, scalar_ty) # input: factor (2 * pi * f / SL)
-        of_in_vis = object_fifo("in1", st[3], mt[3], 1, tile_ty2)         # input: visibilities
-        of_in_baselines = object_fifo("in2", st[1], mt[1], 1, tile_ty3)  # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
-        of_in_lmn = object_fifo("in3", st[1], mt[2], 1, scalar_ty3)      # input: baseline scale (lmn)
+        of_in_vis = object_fifo("in1", st[3], mt[3], 2, tile_ty2)         # input: visibilities
+        of_in_baselines = object_fifo("in2", st[1], mt[1], 2, tile_ty3)  # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
+        of_in_lmn = object_fifo("in3", st[1], mt[2], 2, scalar_ty3)      # input: baseline scale (lmn)
 
         # Distributing visibilities (real and imaginary)
         of_visR = object_fifo("visR", mt[3], ct[3][2], 2, tile_ty)
