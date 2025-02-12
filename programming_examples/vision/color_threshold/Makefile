@@ -20,13 +20,6 @@ COLORTHRESHOLD_HEIGHT = 1080
 
 targetname = colorThreshold
 
-aie_py_src=aie2_colorThreshold.py
-use_alt?=0
-
-ifeq (${use_alt}, 1)
-aie_py_src=aie2_colorThreshold_alt.py
-endif
-
 all: build/final_${COLORTHRESHOLD_WIDTH}.xclbin
 
 mlir: build/aie2_${COLORTHRESHOLD_WIDTH}.mlir
@@ -35,7 +28,7 @@ build/%.cc.o: %.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -DBIT_WIDTH=8 -c $< -o ${@F}
 	
-build/aie2_${COLORTHRESHOLD_WIDTH}.mlir: ${srcdir}/${aie_py_src}
+build/aie2_${COLORTHRESHOLD_WIDTH}.mlir: ${srcdir}/aie2_colorThreshold.py
 	mkdir -p ${@D}
 	python3 $< ${COLORTHRESHOLD_WIDTH} ${COLORTHRESHOLD_HEIGHT} > $@
 

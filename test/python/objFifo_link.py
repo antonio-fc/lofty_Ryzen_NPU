@@ -11,7 +11,6 @@ from aie.dialects.aie import (
     object_fifo_link,
     tile,
     Device,
-    EndOp,
 )
 from aie.ir import InsertionPoint, Block
 
@@ -62,4 +61,3 @@ def link_example():
         of4 = object_fifo("of4", M, T0, 2, T.memref(64, T.i32()))
         of5 = object_fifo("of5", M, T1, 2, T.memref(64, T.i32()))
         object_fifo_link(of3, [of4, of5], [], [0, 128])
-        EndOp()

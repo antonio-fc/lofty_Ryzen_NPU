@@ -1,17 +1,56 @@
 module attributes {llvm.target_triple = "aie2"} {
-  llvm.mlir.global external @in0_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
-  llvm.mlir.global external @in0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
-  llvm.mlir.global external @in1_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2048 x bf16>
-  llvm.mlir.global external @in1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2048 x bf16>
-  llvm.mlir.global external @in2_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<3072 x bf16>
+  llvm.mlir.global external @in0_11_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_11_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_10_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_10_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_9_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_9_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_8_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_8_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_7_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_7_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_6_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_6_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_5_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_5_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_4_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_4_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_3_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_3_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_2_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_2_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_1_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_0_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in1_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_11_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_11_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_10_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_10_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_9_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_9_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_8_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_8_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_7_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_7_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_6_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_6_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_5_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_5_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_4_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_4_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_3_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_3_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_2_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_2_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_1_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_0_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.mlir.global external @in3_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<6 x bf16>
   llvm.mlir.global external @in3_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<6 x bf16>
-  llvm.mlir.global external @u_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @u_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @v_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @v_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @w_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @w_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.mlir.global external @out_buff_1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.mlir.global external @out_buff_0() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.func @debug_i32(i32) attributes {sym_visibility = "private"}
@@ -23,19 +62,35 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.func @llvm.aie2.release(i32, i32) attributes {sym_visibility = "private"}
   llvm.mlir.global external @out_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.mlir.global external @out() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @w_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @w() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @v_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @v() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @u_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
-  llvm.mlir.global external @u() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
   llvm.mlir.global external @in3_cons() {addr_space = 0 : i32} : !llvm.array<6 x bf16>
   llvm.mlir.global external @in3() {addr_space = 0 : i32} : !llvm.array<6 x bf16>
-  llvm.mlir.global external @in2_cons() {addr_space = 0 : i32} : !llvm.array<3072 x bf16>
-  llvm.mlir.global external @in2() {addr_space = 0 : i32} : !llvm.array<3072 x bf16>
-  llvm.mlir.global external @in1_cons() {addr_space = 0 : i32} : !llvm.array<2048 x bf16>
-  llvm.mlir.global external @in1() {addr_space = 0 : i32} : !llvm.array<2048 x bf16>
-  llvm.mlir.global external @in0_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in2_0_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_1_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_2_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_3_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_4_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_5_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_6_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_7_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_8_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_9_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_10_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2_11_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in2() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in1_cons() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in1() {addr_space = 0 : i32} : !llvm.array<1024 x bf16>
+  llvm.mlir.global external @in0_0_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_1_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_2_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_3_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_4_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_5_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_6_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_7_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_8_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_9_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_10_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_11_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
   llvm.mlir.global external @in0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
   llvm.func @vector_scale(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @passthrough(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
@@ -45,9 +100,99 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.func @sin_float_1024(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @cos_float_1024(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @vector_sub(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
+  llvm.func @core_2_5() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_2_4() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_2_3() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
   llvm.func @core_2_2() {
-    %0 = llvm.mlir.constant(48 : i32) : i32
-    %1 = llvm.mlir.constant(49 : i32) : i32
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
     %2 = llvm.mlir.constant(1 : i32) : i32
     %3 = llvm.mlir.constant(-1 : i32) : i32
     %4 = llvm.mlir.constant(2 : index) : i64
@@ -75,10 +220,250 @@ module attributes {llvm.target_triple = "aie2"} {
   ^bb5:  // pred: ^bb1
     llvm.return
   }
+  llvm.func @core_1_5() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_1_4() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_1_3() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(0 : index) : i64
+    %6 = llvm.mlir.constant(1 : index) : i64
+    %7 = llvm.mlir.constant(18 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%5 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%5 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %7 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %6 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
   llvm.func @core_1_2() {
-    %0 = llvm.mlir.addressof @v_cons_buff_1 : !llvm.ptr
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(18 : index) : i64
+    %6 = llvm.mlir.constant(0 : index) : i64
+    %7 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    %8 = llvm.mlir.constant(1 : index) : i64
+    llvm.br ^bb1(%6 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %7 : i64
+    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %5 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %8 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_0_5() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(18 : index) : i64
+    %5 = llvm.mlir.constant(2 : index) : i64
+    %6 = llvm.mlir.constant(0 : index) : i64
+    %7 = llvm.mlir.constant(1 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%6 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %4 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %5 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %7 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_0_4() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(18 : index) : i64
+    %5 = llvm.mlir.constant(2 : index) : i64
+    %6 = llvm.mlir.constant(0 : index) : i64
+    %7 = llvm.mlir.constant(1 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%6 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %4 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %5 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %7 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_0_3() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(18 : index) : i64
+    %5 = llvm.mlir.constant(2 : index) : i64
+    %6 = llvm.mlir.constant(0 : index) : i64
+    %7 = llvm.mlir.constant(1 : index) : i64
+    %8 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    llvm.br ^bb1(%6 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %8 : i64
+    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %4 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %5 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %7 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_0_2() {
+    %0 = llvm.mlir.constant(50 : i32) : i32
+    %1 = llvm.mlir.constant(51 : i32) : i32
+    %2 = llvm.mlir.constant(1 : i32) : i32
+    %3 = llvm.mlir.constant(-1 : i32) : i32
+    %4 = llvm.mlir.constant(2 : index) : i64
+    %5 = llvm.mlir.constant(18 : index) : i64
+    %6 = llvm.mlir.constant(0 : index) : i64
+    %7 = llvm.mlir.constant(9223372036854775807 : index) : i64
+    %8 = llvm.mlir.constant(1 : index) : i64
+    llvm.br ^bb1(%6 : i64)
+  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
+    %10 = llvm.icmp "slt" %9, %7 : i64
+    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
+  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
+    %12 = llvm.icmp "slt" %11, %5 : i64
+    llvm.cond_br %12, ^bb3, ^bb4
+  ^bb3:  // pred: ^bb2
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
+    %13 = llvm.add %11, %4 : i64
+    llvm.br ^bb2(%13 : i64)
+  ^bb4:  // pred: ^bb2
+    %14 = llvm.add %9, %8 : i64
+    llvm.br ^bb1(%14 : i64)
+  ^bb5:  // pred: ^bb1
+    llvm.return
+  }
+  llvm.func @core_3_2() {
+    %0 = llvm.mlir.addressof @in1_cons_buff_1 : !llvm.ptr
     %1 = llvm.mlir.addressof @out_buff_1 : !llvm.ptr
-    %2 = llvm.mlir.addressof @v_cons_buff_0 : !llvm.ptr
+    %2 = llvm.mlir.addressof @in1_cons_buff_0 : !llvm.ptr
     %3 = llvm.mlir.constant(32 : index) : i64
     %4 = llvm.mlir.constant(true) : i1
     %5 = llvm.mlir.addressof @out_buff_0 : !llvm.ptr
@@ -125,36 +510,6 @@ module attributes {llvm.target_triple = "aie2"} {
   ^bb4:  // pred: ^bb2
     %27 = llvm.add %18, %17 : i64
     llvm.br ^bb1(%27 : i64)
-  ^bb5:  // pred: ^bb1
-    llvm.return
-  }
-  llvm.func @core_0_2() {
-    %0 = llvm.mlir.constant(48 : i32) : i32
-    %1 = llvm.mlir.constant(49 : i32) : i32
-    %2 = llvm.mlir.constant(1 : i32) : i32
-    %3 = llvm.mlir.constant(-1 : i32) : i32
-    %4 = llvm.mlir.constant(2 : index) : i64
-    %5 = llvm.mlir.constant(18 : index) : i64
-    %6 = llvm.mlir.constant(0 : index) : i64
-    %7 = llvm.mlir.constant(9223372036854775807 : index) : i64
-    %8 = llvm.mlir.constant(1 : index) : i64
-    llvm.br ^bb1(%6 : i64)
-  ^bb1(%9: i64):  // 2 preds: ^bb0, ^bb4
-    %10 = llvm.icmp "slt" %9, %7 : i64
-    llvm.cond_br %10, ^bb2(%6 : i64), ^bb5
-  ^bb2(%11: i64):  // 2 preds: ^bb1, ^bb3
-    %12 = llvm.icmp "slt" %11, %5 : i64
-    llvm.cond_br %12, ^bb3, ^bb4
-  ^bb3:  // pred: ^bb2
-    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
-    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
-    llvm.call @llvm.aie2.acquire(%1, %3) : (i32, i32) -> ()
-    llvm.call @llvm.aie2.release(%0, %2) : (i32, i32) -> ()
-    %13 = llvm.add %11, %4 : i64
-    llvm.br ^bb2(%13 : i64)
-  ^bb4:  // pred: ^bb2
-    %14 = llvm.add %9, %8 : i64
-    llvm.br ^bb1(%14 : i64)
   ^bb5:  // pred: ^bb1
     llvm.return
   }

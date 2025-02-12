@@ -18,13 +18,6 @@ targetname = matrixAddOne
 devicename = npu
 col = 0
 
-aie_py_src=aie2.py
-use_alt?=0
-
-ifeq (${use_alt}, 1)
-aie_py_src=aie2_alt.py
-endif
-
 all: build/final.xclbin
 
 build/final.xclbin: build/aie.mlir
@@ -44,7 +37,7 @@ else
 	cp _build/${targetname} $@ 
 endif
 
-build/aie.mlir: ${srcdir}/${aie_py_src}
+build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< ${devicename} ${col} > $@
 

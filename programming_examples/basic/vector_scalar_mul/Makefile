@@ -19,13 +19,6 @@ data_size = 4096
 trace_size = 8192
 CHESS ?= true
 
-aie_py_src=aie2.py
-use_alt?=0
-
-ifeq (${use_alt}, 1)
-aie_py_src=aie2_alt.py
-endif
-
 all: build/final_${data_size}.xclbin build/insts_${data_size}.txt
 
 kristof: build/insts_${data_size}.txt
@@ -38,11 +31,11 @@ else
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}; 
 endif
 
-build/aie_${data_size}.mlir: ${srcdir}/${aie_py_src}
+build/aie_${data_size}.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< ${data_size} 0 > $@
 
-build/aie_trace_${data_size}.mlir: ${srcdir}/${aie_py_src}
+build/aie_trace_${data_size}.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< ${data_size} ${trace_size} > $@
 

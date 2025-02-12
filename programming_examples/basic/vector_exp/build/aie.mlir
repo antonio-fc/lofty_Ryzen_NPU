@@ -7,17 +7,17 @@ module {
     %tile_0_3 = aie.tile(0, 3)
     %tile_0_4 = aie.tile(0, 4)
     %tile_0_5 = aie.tile(0, 5)
-    aie.objectfifo @inA(%tile_0_0, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<4096xbf16>> 
-    aie.objectfifo @memA0(%tile_0_1, {%tile_0_2}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memA1(%tile_0_1, {%tile_0_3}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memA2(%tile_0_1, {%tile_0_4}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memA3(%tile_0_1, {%tile_0_5}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
+    aie.objectfifo @inA(%tile_0_0, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<4096xbf16>>
+    aie.objectfifo @memA0(%tile_0_1, {%tile_0_2}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memA1(%tile_0_1, {%tile_0_3}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memA2(%tile_0_1, {%tile_0_4}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memA3(%tile_0_1, {%tile_0_5}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
     aie.objectfifo.link [@inA] -> [@memA0, @memA1, @memA2, @memA3]([] [0, 1024, 2048, 3072])
-    aie.objectfifo @memC0(%tile_0_2, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memC1(%tile_0_3, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memC2(%tile_0_4, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @memC3(%tile_0_5, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>> 
-    aie.objectfifo @outC(%tile_0_1, {%tile_0_0}, 2 : i32) : !aie.objectfifo<memref<4096xbf16>> 
+    aie.objectfifo @memC0(%tile_0_2, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memC1(%tile_0_3, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memC2(%tile_0_4, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @memC3(%tile_0_5, {%tile_0_1}, 2 : i32) : !aie.objectfifo<memref<1024xbf16>>
+    aie.objectfifo @outC(%tile_0_1, {%tile_0_0}, 2 : i32) : !aie.objectfifo<memref<4096xbf16>>
     aie.objectfifo.link [@memC0, @memC1, @memC2, @memC3] -> [@outC]([0, 1024, 2048, 3072] [])
     %core_0_2 = aie.core(%tile_0_2) {
       %c0 = arith.constant 0 : index

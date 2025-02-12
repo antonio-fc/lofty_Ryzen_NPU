@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C800, LENGTH = 0x3800
+   data (!RX) : ORIGIN = 0x74C00, LENGTH = 0xB400
 }
 ENTRY(__start)
 SECTIONS
@@ -44,48 +44,24 @@ _sp_start_value_DM_stack = .;
 . = 0x40000;
 . += 0x10000;
 . = 0x50400;
-addA0_buff_0 = .;
-. += 0x800;
+of_main10_cons_buff_0 = .;
+. += 0xC00;
 . = 0x54000;
-addA0_buff_1 = .;
-. += 0x800;
-. = 0x50C00;
-m_cons_buff_0 = .;
-. += 0x4;
-. = 0x54800;
-m_cons_buff_1 = .;
-. += 0x4;
-. = 0x58000;
-v_cons_buff_0 = .;
-. += 0x800;
-. = 0x5C000;
-v_cons_buff_1 = .;
-. += 0x800;
+of_main10_cons_buff_1 = .;
+. += 0xC00;
 . = 0x60400;
-addA0_cons_buff_0 = .;
-. += 0x800;
+of_main21_cons_buff_0 = .;
+. += 0xC00;
 . = 0x64000;
-addA0_cons_buff_1 = .;
-. += 0x800;
+of_main21_cons_buff_1 = .;
+. += 0xC00;
 . = 0x70400;
-addA1_buff_0 = .;
-. += 0x800;
+of_main20_cons_buff_0 = .;
+. += 0xC00;
 . = 0x74000;
-addA1_buff_1 = .;
-. += 0x800;
-. = 0x70C00;
-n_cons_buff_0 = .;
-. += 0x4;
-. = 0x74800;
-n_cons_buff_1 = .;
-. += 0x4;
-. = 0x78000;
-w_cons_buff_0 = .;
-. += 0x800;
-. = 0x7C000;
-w_cons_buff_1 = .;
-. += 0x800;
+of_main20_cons_buff_1 = .;
+. += 0xC00;
   .bss : { *(.bss*) } > data
 }
-INPUT(scale.o)
+INPUT(passthrough.o)
 PROVIDE(main = core_2_2);

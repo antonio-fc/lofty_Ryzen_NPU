@@ -99,13 +99,13 @@ struct AIEObjectFifoRegisterProcessPass
 
   void runOnOperation() override {
     DeviceOp device = getOperation();
-    OpBuilder builder = OpBuilder::atBlockTerminator(device.getBody());
+    OpBuilder builder = OpBuilder::atBlockEnd(device.getBody());
     DenseMap<ObjectFifoCreateOp, std::queue<Value>> consumersPerFifo;
     //===----------------------------------------------------------------------===//
     // Generate access patterns
     //===----------------------------------------------------------------------===//
     for (auto registerOp : device.getOps<ObjectFifoRegisterProcessOp>()) {
-      builder.setInsertionPoint(device.getBody()->getTerminator());
+      builder.setInsertionPointToEnd(device.getBody());
       ObjectFifoCreateOp objFifo = registerOp.getObjectFifo();
       auto elementType =
           llvm::dyn_cast<AIEObjectFifoType>(objFifo.getElemType())

@@ -42,7 +42,6 @@ declare_mlir_python_sources(AIEPythonSources.Helpers
     helpers/*.py
     helpers/dialects/ext/*.py
     helpers/runtime/*.py
-    helpers/taplib/*.py
 )
 
 declare_mlir_dialect_python_bindings(
@@ -92,6 +91,7 @@ declare_mlir_python_sources(AIEPythonSources.Compiler
   ADD_TO_PARENT AIEPythonSources
   SOURCES_GLOB
     compiler/aiecc/*.py
+    compiler/util.py
 )
 
 if (AIE_ENABLE_XRT_PYTHON_BINDINGS)

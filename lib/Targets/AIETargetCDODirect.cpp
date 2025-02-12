@@ -142,8 +142,7 @@ translateToCDODirect(ModuleOp m, llvm::StringRef workDirPath,
 
   // things like XAIE_MEM_TILE_ROW_START and the missing
   // shim dma on tile (0,0) are hard-coded assumptions about NPU...
-  assert(targetModel.hasProperty(AIETargetModel::IsNPU) &&
-         "Only NPU currently supported");
+  assert(targetModel.isNPU() && "Only NPU currently supported");
 
   AIERTControl ctl(targetModel);
   if (failed(ctl.setIOBackend(aieSim, xaieDebug)))

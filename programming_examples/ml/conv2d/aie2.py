@@ -11,7 +11,6 @@ from aie.dialects.aie import *
 from aie.dialects.aiex import *
 from aie.extras.context import mlir_mod_ctx
 from aie.helpers.dialects.ext.scf import _for as range_
-import aie.utils.trace as trace_utils
 
 width = 32
 height = 32
@@ -33,10 +32,8 @@ bufOut = actOut * 2  # double buffer
 
 tensorSize = width * height * in_channels
 
-N_in_bytes = tensorSize  # Number of bytes of output data (1 byte/elem)
 
-
-def conv2dk1(trace_size: int):
+def conv2dk1():
     with mlir_mod_ctx() as ctx:
 
         @device(AIEDevice.npu1_1col)
@@ -88,11 +85,6 @@ def conv2dk1(trace_size: int):
             of_outOFL2L3 = object_fifo("outOFL2L3", MemTile, [ShimTile], 2, bufOut_ty)
             object_fifo_link(of_out_02_L2, of_outOFL2L3)
 
-            # Set up a packet-switched flow from core to shim for tracing information
-            tiles_to_trace = [ComputeTile2]
-            if trace_size > 0:
-                trace_utils.configure_packet_tracing_flow(tiles_to_trace, ShimTile)
-
             # Set up compute tiles
 
             rtp2 = buffer(
@@ -128,12 +120,6 @@ def conv2dk1(trace_size: int):
             # To/from AIE-array data movement
             @runtime_sequence(tensor_ty, weights_ty, tensor_ty)
             def sequence(I, W, O):
-
-                if trace_size > 0:
-                    trace_utils.configure_packet_tracing_aie2(
-                        tiles_to_trace, ShimTile, trace_size, N_in_bytes
-                    )
-
                 rtp2[0] = 10
 
                 npu_dma_memcpy_nd(
@@ -163,6 +149,4 @@ def conv2dk1(trace_size: int):
     print(ctx.module)
 
 
-if __name__ == "__main__":
-    trace_size = 0 if (len(sys.argv) != 2) else int(sys.argv[1])
-    conv2dk1(trace_size=trace_size)
+conv2dk1()

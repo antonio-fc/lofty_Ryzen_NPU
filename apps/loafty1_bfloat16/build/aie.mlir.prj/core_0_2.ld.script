@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C800, LENGTH = 0x3800
+   data (!RX) : ORIGIN = 0x7C018, LENGTH = 0x3FE8
 }
 ENTRY(__start)
 SECTIONS
@@ -46,43 +46,61 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the west. */
 . = 0x50000;
 . += 0x10000;
-. = 0x60400;
-of_sincosD_buff_0 = .;
-. += 0x800;
-. = 0x64000;
-of_sincosD_buff_1 = .;
-. += 0x800;
 . = 0x68000;
-of_scaleC_buff_0 = .;
-. += 0x800;
+in3_1_cons_buff_0 = .;
+. += 0xC;
 . = 0x6C000;
-of_scaleC_buff_1 = .;
-. += 0x800;
-. = 0x60C00;
-in0_cons_buff_0 = .;
-. += 0x4;
-. = 0x64800;
-in0_cons_buff_1 = .;
-. += 0x4;
-. = 0x70400;
-addB0_buff_0 = .;
-. += 0x800;
-. = 0x74000;
-addB0_buff_1 = .;
-. += 0x800;
-. = 0x70C00;
-l_cons_buff_0 = .;
-. += 0x4;
-. = 0x74800;
-l_cons_buff_1 = .;
-. += 0x4;
+in3_1_cons_buff_1 = .;
+. += 0xC;
+. = 0x60A00;
+in3_1_cons_buff_2 = .;
+. += 0xC;
+. = 0x64600;
+in3_1_cons_buff_3 = .;
+. += 0xC;
+. = 0x6800C;
+in3_1_cons_buff_4 = .;
+. += 0xC;
+. = 0x6C00C;
+in3_1_cons_buff_5 = .;
+. += 0xC;
+. = 0x60A0C;
+in3_1_cons_buff_6 = .;
+. += 0xC;
+. = 0x60400;
+of_main01_cons_buff_0 = .;
+. += 0x600;
+. = 0x64000;
+of_main01_cons_buff_1 = .;
+. += 0x600;
 . = 0x78000;
-u_cons_buff_0 = .;
-. += 0x800;
+in3_0_cons_buff_0 = .;
+. += 0xC;
 . = 0x7C000;
-u_cons_buff_1 = .;
-. += 0x800;
+in3_0_cons_buff_1 = .;
+. += 0xC;
+. = 0x70A00;
+in3_0_cons_buff_2 = .;
+. += 0xC;
+. = 0x74600;
+in3_0_cons_buff_3 = .;
+. += 0xC;
+. = 0x7800C;
+in3_0_cons_buff_4 = .;
+. += 0xC;
+. = 0x7C00C;
+in3_0_cons_buff_5 = .;
+. += 0xC;
+. = 0x70A0C;
+in3_0_cons_buff_6 = .;
+. += 0xC;
+. = 0x70400;
+of_main00_cons_buff_0 = .;
+. += 0x600;
+. = 0x74000;
+of_main00_cons_buff_1 = .;
+. += 0x600;
   .bss : { *(.bss*) } > data
 }
-INPUT(scale.o)
+INPUT(passthrough.o)
 PROVIDE(main = core_0_2);

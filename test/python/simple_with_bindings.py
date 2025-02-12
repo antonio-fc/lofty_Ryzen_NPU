@@ -45,4 +45,3 @@ def simple_with_bindings_example():
         with InsertionPoint(bb):
             buff[3] = buff[3] + 4
             end()
-        end()

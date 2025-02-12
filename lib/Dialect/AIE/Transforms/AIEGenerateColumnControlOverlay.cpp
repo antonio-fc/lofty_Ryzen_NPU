@@ -187,7 +187,7 @@ struct AIEGenerateColumnControlOverlayPass
   void runOnOperation() override {
     DeviceOp device = getOperation();
     const auto &targetModel = device.getTargetModel();
-    OpBuilder builder = OpBuilder::atBlockTerminator(device.getBody());
+    OpBuilder builder = OpBuilder::atBlockEnd(device.getBody());
 
     if (targetModel.getTargetArch() == AIEArch::AIE1)
       return; // Disable this pass for AIE1; AIE1 support NYI.
@@ -314,7 +314,7 @@ struct AIEGenerateColumnControlOverlayPass
     auto availableShimChans =
         getAvailableShimChans(device, shimTile, shimWireBundle, isShimMM2S);
 
-    builder.setInsertionPoint(device.getBody()->getTerminator());
+    builder.setInsertionPointToEnd(device.getBody());
     for (auto tOp : ctrlTiles) {
       if (tOp->hasAttr("controller_id"))
         ctrlPktFlowID =

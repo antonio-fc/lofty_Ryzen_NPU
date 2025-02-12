@@ -115,49 +115,55 @@ def loafty():
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[0], ct[0][1], 2, scalar_ty) # input: factor (2 * pi * f / SL)
-        of_in_vis = object_fifo("in1", st[3], mt[3], 2, tile_ty2)         # input: visibilities
-        of_in_baselines = object_fifo("in2", st[1], mt[1], 1, tile_ty3)  # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
+        main_compute_tiles = []
+        for i in range(3):
+            for j in range(4):
+                main_compute_tiles.append(ct[i][j])
+        of_in_factor = object_fifo("in0", st[0], main_compute_tiles, 2, scalar_ty) # input: factor (2 * pi * f / SL)
+        of_in_vis = object_fifo("in1", st[3], ct[3][0], 2, tile_ty)         # input: visibilities        
+        of_in_baselines = object_fifo("in2", st[1], main_compute_tiles, 2, tile_ty)  # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
         of_in_lmn = object_fifo("in3", st[1], mt[2], 2, scalar_ty3)      # input: baseline scale (lmn)
 
         
         # Distributing baselines
-        of_u = object_fifo("u", mt[1], ct[0][0], 2, tile_ty)
-        of_v = object_fifo("v", mt[1], ct[1][0], 2, tile_ty)
-        of_w = object_fifo("w", mt[1], ct[2][0], 2, tile_ty)
-        object_fifo_link(of_in_baselines, [of_u, of_v, of_w], [], [0, TSIZE, TSIZE*2])
-        of_u.set_repeat_count(2)
-        of_v.set_repeat_count(2)
-        of_w.set_repeat_count(2)
+        # of_u = object_fifo("u", mt[1], ct[0][0], 2, tile_ty)
+        # of_v = object_fifo("v", st[1], ct[1][0], 2, tile_ty)
+        # of_w = object_fifo("w", mt[1], ct[2][0], 2, tile_ty)
+        # object_fifo_link(of_in_baselines, [of_u, of_v, of_w], [], [0, TSIZE, TSIZE*2])
+        # of_u.set_repeat_count(2)
+        # of_v.set_repeat_count(2)
+        # of_w.set_repeat_count(2)
+        # of01 = object_fifo("of01", ct[3][0], ct[0][1], 2, tile_ty)
+        # of02 = object_fifo("of02", ct[3][0], ct[0][2], 2, tile_ty)
+        # of03 = object_fifo("of03", ct[3][0], ct[0][3], 2, tile_ty)
 
-        # Output
-        of_out = object_fifo("out", ct[1][0], st[2], 2, tile_ty) # from G
-
-        @core(ct[0][0], "passthrough.o") # Multiplying u * l
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    u = of_u.acquire(ObjectFifoPort.Consume, 1)
-
-                    of_u.release(ObjectFifoPort.Consume, 1)
+        # of11 = object_fifo("of11", ct[3][0], ct[1][1], 2, tile_ty)
         
-        @core(ct[1][0], "passthrough.o")  # Multiplying v * m
+        # Output
+        of_out = object_fifo("out", ct[3][0], st[3], 2, tile_ty) # from G
+
+        @core(ct[3][0], "passthrough.o") # Multiplying u * l
         def core_body():
             for _ in range_(ITER_KERNEL):
                 for _ in range_(ITER_M):
-                    v = of_v.acquire(ObjectFifoPort.Consume, 1)
-                    elem_out = of_out.acquire(ObjectFifoPort.Produce, 1) # 1024 x 32
-                    kernels['passthrough'](v, elem_out, TSIZE)
+                    vis = of_in_vis.acquire(ObjectFifoPort.Consume, 1)
+                    out = of_out.acquire(ObjectFifoPort.Produce, 1)
+                    kernels['passthrough'](vis, out, TSIZE)
                     of_out.release(ObjectFifoPort.Produce, 1)
-                    of_v.release(ObjectFifoPort.Consume, 1)
+                    of_in_vis.release(ObjectFifoPort.Consume, 1)
 
-        @core(ct[2][0], "passthrough.o")  # Multiplying w * n
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    w = of_w.acquire(ObjectFifoPort.Consume, 1)
+        for i in range(3):
+            for j in range(4):
+                @core(ct[i][j], "passthrough.o")  # Multiplying w * n
+                def core_body():
+                    for _ in range_(ITER_KERNEL):
+                        for _ in range_(ITER_M):
+                            w = of_in_baselines.acquire(ObjectFifoPort.Consume, 1)
+                            of_in_baselines.release(ObjectFifoPort.Consume, 1)
 
-                    of_w.release(ObjectFifoPort.Consume, 1)
+
+        
+                
 
 
 
@@ -169,7 +175,7 @@ def loafty():
             npu_dma_memcpy_nd(metadata=of_in_vis, bd_id=2, mem=vis, sizes=[1, 1, 1, MSIZE*2]) # input: visibilities
             npu_dma_memcpy_nd(metadata=of_in_baselines, bd_id=3, mem=baselines, sizes=[1, 1, 1, MSIZE*3]) # input: baselines
             npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=4, mem=lmn, sizes=[1, 1, 1, BSIZE*3]) # input: baseline scales
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, MSIZE*2]) # output
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, MSIZE]) # output
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 

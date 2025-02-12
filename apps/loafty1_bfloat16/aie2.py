@@ -88,8 +88,16 @@ def loafty():
     MSIZE = 9216 # 96x96
     BSIZE = 256*256 # 256X256
     TSIZE = 1024
-    ITER_M = 9
-    ITER_B = 9
+    NINPUTS = 5
+    COLS = [0, 1]
+    ROWS = [1, 2, 3]
+    NCOLS = len(COLS)
+    NROWS = len(ROWS)
+    NCORES = NCOLS * NROWS
+    INPUT_SIZE = int(MSIZE/2) # 9216/2
+    FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2
+    
+    MAIN_SIZE = int(FULL_INPUT_SIZE/NCORES) # (9216*5/2)/6
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
@@ -98,236 +106,95 @@ def loafty():
     # Device setup
     @device(AIEDevice.npu1_4col)
     def device_body():
-        tensor_ty = np.ndarray[(MSIZE,), dtype]
-        tensor_ty3 = np.ndarray[(MSIZE*3,), dtype]
         tile_ty = np.ndarray[(TSIZE,), dtype]
-        tile_ty2 = np.ndarray[(TSIZE*2,), dtype]
-        tile_ty3 = np.ndarray[(TSIZE*3,), dtype]
         scalar_ty = np.ndarray[(2,), dtype]
         scalar = np.ndarray[(1,), np.float32]
-        scalar_ty3 = np.ndarray[(6,), dtype]
+        full_input_ty = np.ndarray[(FULL_INPUT_SIZE,), dtype]
+        main_ct_ty = np.ndarray[(MAIN_SIZE,), dtype]
 
         # AIE Core Function declarations
         kernels = declaring_kernel_func(tile_ty, scalar_ty, scalar, dtype_k)
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
+        main_compute_tilesA = []
+        main_compute_tilesB = []
+        for i in COLS:
+            for j in ROWS:
+                main_compute_tilesA.append(ct[i][j])
+                main_compute_tilesB.append(ct[i+NCOLS][j])
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[0], ct[0][1], 2, scalar_ty) # input: factor (2 * pi * f / SL)
-        of_in_vis = object_fifo("in1", st[3], mt[3], 2, tile_ty2)         # input: visibilities
-        of_in_baselines = object_fifo("in2", st[1], mt[1], 2, tile_ty3)  # input: baselines (uvw) # Number of objects needs to be 1 or it doesnt work
-        of_in_lmn = object_fifo("in3", st[1], mt[2], 2, scalar_ty3)      # input: baseline scale (lmn)
+        of_in_factor = object_fifo("in0", st[0], main_compute_tilesA + main_compute_tilesB, NCORES*2+1, scalar_ty)
+        of_in_mainA = object_fifo("in1", st[1], mt[1], 1, full_input_ty)       
+        of_in_mainB = object_fifo("in2", st[2], mt[2], 1, full_input_ty)
 
-        # Distributing visibilities (real and imaginary)
-        of_visR = object_fifo("visR", mt[3], ct[3][2], 2, tile_ty)
-        of_visC = object_fifo("visC", mt[3], ct[3][3], 2, tile_ty)
-        object_fifo_link(of_in_vis, [of_visR, of_visC], [], [0, TSIZE])
+        # Distribution of inputs mainA and mainB
+        main_in_fifosA = []
+        main_in_fifosB = []
+        main_dist_offsets = []
         
-        # Distributing baselines
-        of_u = object_fifo("u", mt[1], ct[0][0], 2, tile_ty)
-        of_v = object_fifo("v", mt[1], ct[1][0], 2, tile_ty)
-        of_w = object_fifo("w", mt[1], ct[2][0], 2, tile_ty)
-        object_fifo_link(of_in_baselines, [of_u, of_v, of_w], [], [0, TSIZE, TSIZE*2])
+        for i in COLS:
+            for j in ROWS:
+                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[1], ct[i][j], 2, main_ct_ty))
+                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
+                main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
+                
+        object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
+        object_fifo_link(of_in_mainB, main_in_fifosB, [], main_dist_offsets)
 
-        # Distributing baseline scales
-        of_l = object_fifo("l", mt[2], ct[0][0], 2, scalar_ty)
-        of_m = object_fifo("m", mt[2], ct[1][0], 2, scalar_ty)
-        of_n = object_fifo("n", mt[2], ct[2][0], 2, scalar_ty)
-        object_fifo_link(of_in_lmn, [of_l, of_m, of_n], [], [0, 2, 4])
-
-        # INTERNAL MOVEMENTS
-
-        # Adding v*m and w*n [A]
-        of_addA0 = object_fifo("addA0", ct[1][0], ct[2][1], 2, tile_ty) # from v * m
-        of_addA1 = object_fifo("addA1", ct[2][0], ct[2][1], 2, tile_ty) # from w * n
+        # Join of processed inputs mainA and mainB
+        main_out_fifosA = []
+        main_out_fifosB = []
+        main_dist_offsets = []
         
-        # Adding u*l and A [B]
-        of_addB0 = object_fifo("addB0", ct[0][0], ct[1][1], 2, tile_ty) # from u * l
-        of_addB1 = object_fifo("addB1", ct[2][1], ct[1][1], 2, tile_ty) # from A
+        # for i in COLS:
+        #     for j in ROWS:
+        #         main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[3], 2, main_ct_ty))
+        #         # main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
+        #         main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
 
-        # Scaling B by factor [C]
-        of_scaleC = object_fifo("of_scaleC", ct[1][1], ct[0][1], 2, tile_ty) # from B
-
-        # Applying sinecosine to C [D]
-        of_sincosD = object_fifo("of_sincosD", ct[0][1], [ct[2][2], ct[2][3]], 3, tile_ty) # from C
-
-        # Multiplying D with the visibilities [E]
-        of_multEr = object_fifo("of_multEr", ct[2][2], ct[3][2], 2, tile_ty) # from D
-        of_multEc = object_fifo("of_multEc", ct[2][3], ct[3][3], 2, tile_ty) # from D
-
-        # Subtacting Er and Ec [F]
-        of_subFr = object_fifo("of_subFr", ct[3][2], ct[3][1], 2, tile_ty) # from Er
-        of_subFc = object_fifo("of_subFc", ct[3][3], ct[3][1], 2, tile_ty) # from Ec
-
-        # Averaging F [G]
-        of_mean = object_fifo("of_mean", ct[3][1], ct[3][0], 2, tile_ty) # from F
-          
+        # of_out_mainA = object_fifo("out1", mt[3], ct[0][0], 1, full_input_ty)      
+        
+        # object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
+        # object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
+        
         # Output
-        of_out = object_fifo("out", ct[3][0], st[2], 2, scalar_ty) # from G
+        of_out = object_fifo("out", ct[3][0], st[3], 2, tile_ty)
 
-        @core(ct[0][0], "scale.o") # Multiplying u * l
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                l = of_l.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    u = of_u.acquire(ObjectFifoPort.Consume, 1)
-                    elem_out = of_addB0.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['scale'](u, elem_out, l, TSIZE)
-                    of_addB0.release(ObjectFifoPort.Produce, 1)
-                    of_u.release(ObjectFifoPort.Consume, 1)
-                of_l.release(ObjectFifoPort.Consume, 1)
-        
-        @core(ct[1][0], "scale.o")  # Multiplying v * m
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                m = of_m.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    v = of_v.acquire(ObjectFifoPort.Consume, 1)
-                    elem_out = of_addA0.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['scale'](v, elem_out, m, TSIZE)
-                    of_addA0.release(ObjectFifoPort.Produce, 1)
-                    of_v.release(ObjectFifoPort.Consume, 1)
-                of_m.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[2][0], "scale.o")  # Multiplying w * n
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                n = of_n.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    w = of_w.acquire(ObjectFifoPort.Consume, 1)
-                    elem_out = of_addA1.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['scale'](w, elem_out, n, TSIZE)
-                    of_addA1.release(ObjectFifoPort.Produce, 1)
-                    of_w.release(ObjectFifoPort.Consume, 1)
-                of_n.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[2][1], "vector_add.o")  # Adding (v*m) + (w*n) [A]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    A0 = of_addA0.acquire(ObjectFifoPort.Consume, 1)
-                    A1 = of_addA1.acquire(ObjectFifoPort.Consume, 1)
-                    add_out = of_addB1.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['add'](A0, A1, add_out, TSIZE)
-                    of_addB1.release(ObjectFifoPort.Produce, 1)
-                    of_addA0.release(ObjectFifoPort.Consume, 1)
-                    of_addA1.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[1][1], "vector_add.o")  # Adding (u*l) + A [B]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    B0 = of_addB0.acquire(ObjectFifoPort.Consume, 1)
-                    B1 = of_addB1.acquire(ObjectFifoPort.Consume, 1)
-                    add_out = of_scaleC.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['add'](B0, B1, add_out, TSIZE)
-                    of_scaleC.release(ObjectFifoPort.Produce, 1)
-                    of_addB0.release(ObjectFifoPort.Consume, 1)
-                    of_addB1.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[0][1], "scale.o") # Multiplying B * factor [C]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                factor = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    obj_in = of_scaleC.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_sincosD.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['scale'](obj_in, obj_out, factor, TSIZE)
-                    of_sincosD.release(ObjectFifoPort.Produce, 1)
-                    of_scaleC.release(ObjectFifoPort.Consume, 1)
-                of_in_factor.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[2][3], "kernels.a") # Applying sine to C [Dc]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in = of_sincosD.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_multEc.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['sin'](obj_in, obj_out, TSIZE)
-                    of_multEc.release(ObjectFifoPort.Produce, 1)
-                    of_sincosD.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[2][2], "kernels.a") # Applying cosine to C [Dr]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in = of_sincosD.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_multEr.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['cos'](obj_in, obj_out, TSIZE)
-                    of_multEr.release(ObjectFifoPort.Produce, 1)
-                    of_sincosD.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[3][3], "vector_mult.o") # Multiplying Dr with the real visibilities [Er]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in0 = of_multEc.acquire(ObjectFifoPort.Consume, 1)
-                    obj_in1 = of_visC.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_subFc.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['mult'](obj_in0, obj_in1, obj_out, TSIZE)
-                    of_subFc.release(ObjectFifoPort.Produce, 1)
-                    of_multEc.release(ObjectFifoPort.Consume, 1)
-                    of_visC.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[3][2], "vector_mult.o") # Multiplying Dr with the imaginary visibilities [Ec]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in0 = of_multEr.acquire(ObjectFifoPort.Consume, 1)
-                    obj_in1 = of_visR.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_subFr.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['mult'](obj_in0, obj_in1, obj_out, TSIZE)
-                    of_subFr.release(ObjectFifoPort.Produce, 1)
-                    of_multEr.release(ObjectFifoPort.Consume, 1)
-                    of_visR.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[3][1], "vector_sub.o") # Subtacting Er and Ec [F]
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in0 = of_subFr.acquire(ObjectFifoPort.Consume, 1)
-                    obj_in1 = of_subFc.acquire(ObjectFifoPort.Consume, 1)
-                    obj_out = of_mean.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['sub'](obj_in0, obj_in1, obj_out, TSIZE)
-                    of_mean.release(ObjectFifoPort.Produce, 1)
-                    of_subFr.release(ObjectFifoPort.Consume, 1)
-                    of_subFc.release(ObjectFifoPort.Consume, 1)
-
-        @core(ct[3][0], "mean.o") 
+        @core(ct[3][0], "passthrough.o")
         def core_body():
             for _ in range_(ITER_KERNEL):
                 mean_out = of_out.acquire(ObjectFifoPort.Produce, 1) # object size: 2
-
-                # Acquiring one at the beginning to be able to call the initializing version of the kernel
-                mean_in = of_mean.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-                kernels['mean'](mean_in, mean_out, 0, 0) # initializing the sum
-                kernels['mean'](mean_in, mean_out, TSIZE, 1)
-                of_mean.release(ObjectFifoPort.Consume, 1)
-                
-                for _ in range_(2, ITER_M):
-                    mean_in = of_mean.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-                    kernels['mean'](mean_in, mean_out, TSIZE, 1)
-                    of_mean.release(ObjectFifoPort.Consume, 1)
-
-                # Acquiring one at the end to be able to call the division version of the kernel
-                mean_in = of_mean.acquire(ObjectFifoPort.Consume, 1) # object size: 1024
-                kernels['mean'](mean_in, mean_out, TSIZE, 1)
-                kernels['mean'](mean_in, mean_out, ITER_M * TSIZE, 2) # dividing the sum to get the final mean
-                of_mean.release(ObjectFifoPort.Consume, 1)
                 
                 of_out.release(ObjectFifoPort.Produce, 1)
 
+        for i in COLS:
+            for j in ROWS:
+                obf_fifoA = main_in_fifosA[i*NROWS + j - 1]
+                obf_fifoB = main_in_fifosB[i*NROWS + j - 1]
+                @core(ct[i][j], "passthrough.o")  # Main CTs A
+                def core_body():
+                    for _ in range_(ITER_KERNEL):
+                        inputs = obf_fifoA.acquire(ObjectFifoPort.Consume, 1)
+                        
+                        obf_fifoA.release(ObjectFifoPort.Consume, 1)
+
+                @core(ct[i+NCOLS][j], "passthrough.o")  # Main CTs B
+                def core_body():
+                    for _ in range_(ITER_KERNEL):
+                        inputs = obf_fifoB.acquire(ObjectFifoPort.Consume, 1)
+                        
+                        obf_fifoB.release(ObjectFifoPort.Consume, 1)
 
                     
         # To/from AIE-array data movement
-        @runtime_sequence(scalar_ty, tensor_ty, tensor_ty3, scalar_ty, tensor_ty)
-        def sequence(factor, vis, baselines, lmn, output):
-            npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, 2]) # input: factor (2 * pi * f / SL)
-            npu_dma_memcpy_nd(metadata=of_in_vis, bd_id=2, mem=vis, sizes=[1, 1, 1, MSIZE*2]) # input: visibilities
-            npu_dma_memcpy_nd(metadata=of_in_baselines, bd_id=3, mem=baselines, sizes=[1, 1, 1, MSIZE*3]) # input: baselines
-            npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=4, mem=lmn, sizes=[1, 1, 1, BSIZE*3]) # input: baseline scales
+        @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
+        def sequence(factor, mainA, mainB, output):
+            npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, 2])
+            npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
+            npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
             npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, 2]) # output
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)

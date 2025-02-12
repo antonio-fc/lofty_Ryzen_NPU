@@ -57,10 +57,10 @@ RM = /home/mliraie/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /notebooks/my_mlir-aie/programming_examples/basic/vector_exp
+CMAKE_SOURCE_DIR = /notebooks/mlir-aie/programming_examples/basic/vector_exp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /notebooks/my_mlir-aie/programming_examples/basic/vector_exp/_build
+CMAKE_BINARY_DIR = /notebooks/mlir-aie/programming_examples/basic/vector_exp/_build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/my_mlir-aie/programming_examples/basic/vector_exp/_build/CMakeFiles /notebooks/my_mlir-aie/programming_examples/basic/vector_exp/_build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/mlir-aie/programming_examples/basic/vector_exp/_build/CMakeFiles /notebooks/mlir-aie/programming_examples/basic/vector_exp/_build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/my_mlir-aie/programming_examples/basic/vector_exp/_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/mlir-aie/programming_examples/basic/vector_exp/_build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,29 +129,29 @@ testExp/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/build
 .PHONY : testExp/fast
 
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.o: notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.o
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.o: notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.o
 
 # target to build an object file
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.o
 
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.i: notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.i
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.i: notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.i
 
 # target to preprocess a source file
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.i
 
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.s: notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.s
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.s: notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.s
 
 # target to generate assembly for a file
-notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
-.PHONY : notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
+notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testExp.dir/build.make CMakeFiles/testExp.dir/notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
+.PHONY : notebooks/mlir-aie/runtime_lib/test_lib/test_utils.cpp.s
 
 test.o: test.cpp.o
 .PHONY : test.o
@@ -186,9 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... testExp"
-	@echo "... notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.o"
-	@echo "... notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.i"
-	@echo "... notebooks/my_mlir-aie/runtime_lib/test_lib/test_utils.s"
+	@echo "... notebooks/mlir-aie/runtime_lib/test_lib/test_utils.o"
+	@echo "... notebooks/mlir-aie/runtime_lib/test_lib/test_utils.i"
+	@echo "... notebooks/mlir-aie/runtime_lib/test_lib/test_utils.s"
 	@echo "... test.o"
 	@echo "... test.i"
 	@echo "... test.s"

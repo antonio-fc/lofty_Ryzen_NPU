@@ -101,7 +101,7 @@ def externalBufferOp():
 # CHECK-LABEL: objFifo
 # CHECK: %[[VAL0:.*]] = aie.tile(6, 6)
 # CHECK: %[[VAL1:.*]] = aie.tile(2, 2)
-# CHECK: aie.objectfifo @of0(%[[VAL0]] dimensionsToStream [<size = 1, stride = 2>], {%[[VAL1]] dimensionsFromStream [<size = 1, stride = 2>]}, 2 : i32) {via_DMA = true} : !aie.objectfifo<memref<4xf16>> = [dense<[0.000000e+00, 1.000000e+00, 2.000000e+00, 3.000000e+00]> : memref<4xf16>, dense<[0.000000e+00, 1.000000e+00, 2.000000e+00, 3.000000e+00]> : memref<4xf16>]
+# CHECK: aie.objectfifo @of0(%[[VAL0]] dimensionsToStream [<size = 1, stride = 2>], {%[[VAL1]] dimensionsFromStream [<size = 1, stride = 2>]}, 2 : i32) {via_DMA = true} : !aie.objectfifo<memref<12xf16>>
 @construct_and_print_module
 def objFifo():
     dev = Device(AIEDevice.xcvc1902)
@@ -114,11 +114,10 @@ def objFifo():
             tile0,
             tile1,
             2,
-            np.ndarray[(4,), np.dtype[np.float16]],
+            np.ndarray[(12,), np.dtype[np.float16]],
             [bd_dim_layout(size=1, stride=2)],
             [[bd_dim_layout(size=1, stride=2)]],
             via_DMA=True,
-            initValues=[np.arange(4, dtype=np.float16), np.arange(4, dtype=np.float16)],
         )
         end()
 
@@ -162,7 +161,6 @@ def objFifoAcquire():
         with InsertionPoint(bb):
             acq = of0.acquire(port=ObjectFifoPort.Consume, num_elem=1)
             end()
-        end()
 
 
 # CHECK-LABEL: objFifoSubviewAccess
@@ -186,7 +184,6 @@ def objFifoSubviewAccess():
         with InsertionPoint(bb):
             acq = of0.acquire(ObjectFifoPort.Consume, 1)
             end()
-        end()
 
 
 # CHECK-LABEL: objFifoRelease
@@ -207,7 +204,6 @@ def objFifoRelease():
         with InsertionPoint(bb):
             acq = of0.release(ObjectFifoPort.Produce, 1)
             end()
-        end()
 
 
 # CHECK-LABEL: cascadeFlowOp

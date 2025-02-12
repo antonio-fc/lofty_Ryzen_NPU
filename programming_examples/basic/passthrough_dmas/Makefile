@@ -18,19 +18,12 @@ devicename ?= npu
 targetname = passThroughDMAs
 LENGTH ?= 4096
 
-aie_py_src=aie2.py
-use_alt?=0
-
-ifeq (${use_alt}, 1)
-aie_py_src=aie2_alt.py
-endif
-
-build/aie.mlir: ${srcdir}/${aie_py_src}
+build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< ${LENGTH} ${devicename} ${col} > $@
 
 .PHONY: inst/insts.txt
-inst/insts.txt: ${srcdir}/${aie_py_src}
+inst/insts.txt: ${srcdir}/aie2.py
 	rm -rf inst
 	mkdir -p inst 
 	python3 $< ${LENGTH} > inst/aie.mlir

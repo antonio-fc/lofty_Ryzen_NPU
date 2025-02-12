@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C800, LENGTH = 0x3800
+   data (!RX) : ORIGIN = 0x72400, LENGTH = 0xDC00
 }
 ENTRY(__start)
 SECTIONS
@@ -43,13 +43,13 @@ _sp_start_value_DM_stack = .;
 . = 0x40400;
 memC0_buff_0 = .;
 . += 0x800;
-. = 0x44000;
+. = 0x40C00;
 memC0_buff_1 = .;
 . += 0x800;
-. = 0x48000;
+. = 0x41400;
 memA0_cons_buff_0 = .;
 . += 0x800;
-. = 0x4C000;
+. = 0x41C00;
 memA0_cons_buff_1 = .;
 . += 0x800;
 /* No tile with memory exists to the west. */
@@ -58,25 +58,25 @@ memA0_cons_buff_1 = .;
 . = 0x60400;
 memC2_buff_0 = .;
 . += 0x800;
-. = 0x64000;
+. = 0x60C00;
 memC2_buff_1 = .;
 . += 0x800;
-. = 0x68000;
+. = 0x61400;
 memA2_cons_buff_0 = .;
 . += 0x800;
-. = 0x6C000;
+. = 0x61C00;
 memA2_cons_buff_1 = .;
 . += 0x800;
 . = 0x70400;
 memC1_buff_0 = .;
 . += 0x800;
-. = 0x74000;
+. = 0x70C00;
 memC1_buff_1 = .;
 . += 0x800;
-. = 0x78000;
+. = 0x71400;
 memA1_cons_buff_0 = .;
 . += 0x800;
-. = 0x7C000;
+. = 0x71C00;
 memA1_cons_buff_1 = .;
 . += 0x800;
   .bss : { *(.bss*) } > data

@@ -25,15 +25,18 @@ using namespace mlir;
 using namespace xilinx;
 using namespace xilinx::AIEX;
 
-namespace {
+struct DMAConfigureTaskForOpPattern : RewritePattern {
 
-struct DMAConfigureTaskForOpPattern
-    : public mlir::OpRewritePattern<DMAConfigureTaskForOp> {
+  DMAConfigureTaskForOpPattern(MLIRContext *ctx)
+      : RewritePattern(DMAConfigureTaskForOp::getOperationName(),
+                       PatternBenefit(1), ctx) {}
 
-  using OpRewritePattern::OpRewritePattern;
-
-  LogicalResult matchAndRewrite(DMAConfigureTaskForOp op,
+  LogicalResult matchAndRewrite(Operation *op_any,
                                 PatternRewriter &rewriter) const override {
+    DMAConfigureTaskForOp op = llvm::dyn_cast<DMAConfigureTaskForOp>(op_any);
+    if (!op) {
+      return failure();
+    }
     AIE::DeviceOp device = op->getParentOfType<AIE::DeviceOp>();
 
     AIE::ShimDMAAllocationOp alloc_op =
@@ -64,14 +67,19 @@ struct AIESubstituteShimDMAAllocationsPass
 
     // Convert DMAConfigureTaskForOps that reference shim DMA allocations
     // to regular DMAConfigureTaskOps
+    ConversionTarget target(getContext());
+    target.addLegalDialect<AIEXDialect>();
+    target.addIllegalOp<DMAConfigureTaskForOp>();
     RewritePatternSet patterns(&getContext());
     patterns.insert<DMAConfigureTaskForOpPattern>(&getContext());
 
-    (void)applyPatternsAndFoldGreedily(device, std::move(patterns));
+    GreedyRewriteConfig rewriter_config = GreedyRewriteConfig();
+    if (failed(applyPatternsAndFoldGreedily(device, std::move(patterns),
+                                            rewriter_config))) {
+      signalPassFailure();
+    }
   }
 };
-
-} // namespace
 
 std::unique_ptr<OperationPass<AIE::DeviceOp>>
 AIEX::createAIESubstituteShimDMAAllocationsPass() {

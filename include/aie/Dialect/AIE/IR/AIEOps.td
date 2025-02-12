@@ -28,7 +28,7 @@ class AIE_Op<string mnemonic, list<Trait> traits = []> :
 
 def AIE_DeviceOp: AIE_Op<"device", [
     AIETarget, HasParent<"mlir::ModuleOp">,
-    SymbolTable, SingleBlockImplicitTerminator<"EndOp">, IsolatedFromAbove
+    SymbolTable, SingleBlock, NoTerminator, IsolatedFromAbove
   ]> {
   let summary = "Define an AIE design targetting a complete device";
   let description = [{
@@ -63,6 +63,7 @@ def AIE_DeviceOp: AIE_Op<"device", [
   let extraClassDeclaration = [{
     const xilinx::AIE::AIETargetModel &getTargetModel();
   }];
+  let hasVerifier = 1;
 }
 
 def AIE_TileOp: AIE_Op<"tile", [
@@ -897,8 +898,8 @@ def AIE_DMABDOp: AIE_Op<"dma_bd", []> {
     int32_t getBufferElementTypeWidthInBytes() {
       return getBuffer().getType().getElementTypeBitWidth() / 8;
     }
-    uint32_t getLenInBytes() {
-      if (std::optional<uint32_t> len = getLen(); len.has_value())
+    int32_t getLenInBytes() {
+      if (std::optional<int32_t> len = getLen(); len.has_value())
         return len.value() * getBufferElementTypeWidthInBytes();
       else
         return getBuffer().getType().getNumElements() * getBufferElementTypeWidthInBytes();
@@ -1045,8 +1046,10 @@ def AIE_DMAOp: AIE_Op<"dma", [
   }];
 }
 
+// MemOps are not actually Callable, but we want to inline code into them, so we have to
+// implement CallableOpInterface
 def AIE_MemOp: AIE_Op<"mem", [
-    TileElement, FlowEndPoint,
+    TileElement, FlowEndPoint, CallableOpInterface,
     IsCoreTile, HasValidBDs, HasValidDMAChannels,
     DeclareOpInterfaceMethods<InferTypeOpInterface>
   ]>, Results<(outs Index)> {
@@ -1081,12 +1084,19 @@ def AIE_MemOp: AIE_Op<"mem", [
     int colIndex();
     int rowIndex();
     TileOp getTileOp();
+    int maxSizeInBytes() { return 32768; }
+    // CallableOpInterface
+    mlir::Region *getCallableRegion();
+    llvm::ArrayRef<mlir::Type> getArgumentTypes() { return getOperand().getType(); }
+    llvm::ArrayRef<mlir::Type> getResultTypes() { return getType(); }
     using ::xilinx::AIE::TileElement::Trait<MemOp>::getAsmResultNames;
   }];
 }
 
+// This op is not actually Callable, but we want to inline code into them, so we have to
+// implement CallableOpInterface
 def AIE_MemTileDMAOp: AIE_Op<"memtile_dma", [
-    TileElement, FlowEndPoint,
+    TileElement, FlowEndPoint, CallableOpInterface,
     IsMemTile, HasValidBDs, HasValidDMAChannels,
     DeclareOpInterfaceMethods<InferTypeOpInterface>
   ]>, Results<(outs Index)> {
@@ -1125,6 +1135,10 @@ def AIE_MemTileDMAOp: AIE_Op<"memtile_dma", [
     int colIndex();
     int rowIndex();
     TileOp getTileOp();
+    // CallableOpInterface
+    mlir::Region *getCallableRegion();
+    llvm::ArrayRef<mlir::Type> getArgumentTypes() { return getOperand().getType(); }
+    llvm::ArrayRef<mlir::Type> getResultTypes() { return getType(); }
     using ::xilinx::AIE::TileElement::Trait<MemTileDMAOp>::getAsmResultNames;
   }];
 }
@@ -1674,10 +1688,8 @@ def AIE_ObjectFifoCreateOp: AIE_Op<"objectfifo", [HasParent<"DeviceOp">, Symbol]
         // via_shared_mem==0 means use producer tile's memory module
         // via_shared_mem==1 means use consumer tile's memory module
         OptionalAttr<AIEI32Attr>:$via_shared_mem,
-        // repeat_count==1 means "do it once"
-        OptionalAttr<ConfinedAttr<AIEI32Attr, [IntMinValue<1>]>>:$repeat_count,
-        InitValuesArrayAttr:$initValues,
-        OptionalAttr<BDPadLayoutArrayAttr>:$padDimensions
+        // memtile_repeat==0 means "do it once" and don't repeat
+        OptionalAttr<AIEI32Attr>:$memtile_repeat
   );
 
   let assemblyFormat = [{
@@ -1690,7 +1702,6 @@ def AIE_ObjectFifoCreateOp: AIE_Op<"objectfifo", [HasParent<"DeviceOp">, Symbol]
         `,`
         $elemNumber
     `)` attr-dict `:` $elemType
-    custom<ObjectFifoInitValues>(ref($elemNumber), ref($elemType), $initValues)
   }];
 
   let hasVerifier = 1;
@@ -1717,8 +1728,7 @@ def AIE_ObjectFifoCreateOp: AIE_Op<"objectfifo", [HasParent<"DeviceOp">, Symbol]
     OpBuilder<(ins "mlir::StringAttr":$sym_name, "mlir::Value":$producerTile,
                    "mlir::ValueRange":$consumerTiles, "mlir::Attribute":$elemNumber, "mlir::Type":$elem_type,
                    CArg<"llvm::ArrayRef<AIE::BDDimLayoutAttr>", "{}">:$dimensionsToStream,
-                   CArg<"llvm::ArrayRef<AIE::BDDimLayoutArrayAttr>", "{}">:$dimensionsFromStreamPerConsumer,
-                   CArg<"llvm::ArrayRef<AIE::BDPadLayoutArrayAttr>", "{}">:$padDimensions), [{
+                   CArg<"llvm::ArrayRef<AIE::BDDimLayoutArrayAttr>", "{}">:$dimensionsFromStreamPerConsumer), [{
       odsState.addOperands(producerTile);
       odsState.addOperands(consumerTiles);
       odsState.addAttribute(getSymNameAttrName(odsState.name), sym_name);
