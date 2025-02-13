@@ -117,12 +117,13 @@ def loafty():
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
+        
         main_compute_tilesA = []
         main_compute_tilesB = []
         for i in COLS:
             for j in ROWS:
                 main_compute_tilesA.append(ct[i][j])
-                main_compute_tilesB.append(ct[i+NCOLS][j])
+                # main_compute_tilesB.append(ct[i+NCOLS][j])
 
         # AIE-array data movement with object fifos
         # Inputs
@@ -138,26 +139,26 @@ def loafty():
         for i in COLS:
             for j in ROWS:
                 main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[1], ct[i][j], 2, main_ct_ty))
-                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
+                # main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
                 
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
-        object_fifo_link(of_in_mainB, main_in_fifosB, [], main_dist_offsets)
+        # object_fifo_link(of_in_mainB, main_in_fifosB, [], main_dist_offsets)
 
         # Join of processed inputs mainA and mainB
         main_out_fifosA = []
         main_out_fifosB = []
         main_dist_offsets = []
         
-        # for i in COLS:
-        #     for j in ROWS:
-        #         main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[3], 2, main_ct_ty))
-        #         # main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
-        #         main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
+        for i in COLS:
+            for j in ROWS:
+                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[3], 2, main_ct_ty))
+                # main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
+                main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
 
-        # of_out_mainA = object_fifo("out1", mt[3], ct[0][0], 1, full_input_ty)      
+        of_out_mainA = object_fifo("out1", mt[3], ct[2][0], 1, full_input_ty)      
         
-        # object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
+        object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
         # object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
         
         # Output
@@ -173,7 +174,7 @@ def loafty():
         for i in COLS:
             for j in ROWS:
                 obf_fifoA = main_in_fifosA[i*NROWS + j - 1]
-                obf_fifoB = main_in_fifosB[i*NROWS + j - 1]
+                # obf_fifoB = main_in_fifosB[i*NROWS + j - 1]
                 @core(ct[i][j], "passthrough.o")  # Main CTs A
                 def core_body():
                     for _ in range_(ITER_KERNEL):
@@ -181,12 +182,12 @@ def loafty():
                         
                         obf_fifoA.release(ObjectFifoPort.Consume, 1)
 
-                @core(ct[i+NCOLS][j], "passthrough.o")  # Main CTs B
-                def core_body():
-                    for _ in range_(ITER_KERNEL):
-                        inputs = obf_fifoB.acquire(ObjectFifoPort.Consume, 1)
+                # @core(ct[i+NCOLS][j], "passthrough.o")  # Main CTs B
+                # def core_body():
+                #     for _ in range_(ITER_KERNEL):
+                #         inputs = obf_fifoB.acquire(ObjectFifoPort.Consume, 1)
                         
-                        obf_fifoB.release(ObjectFifoPort.Consume, 1)
+                #         obf_fifoB.release(ObjectFifoPort.Consume, 1)
 
                     
         # To/from AIE-array data movement
