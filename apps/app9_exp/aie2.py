@@ -46,7 +46,7 @@ def my_eltwise_exp():
         # Type used in the memory tile which aggregates across the 4 cores
         A_memTile_ty = np.ndarray[(n * n_cores,), np.dtype[bfloat16]]
         C_memTile_ty = np.ndarray[(n * n_cores,), np.dtype[bfloat16]]
-d
+
         # AIE Core Function declarations
 
         exp_bf16_1024 = external_func("exp_bf16_1024", inputs=[tile_ty, tile_ty])
@@ -98,15 +98,14 @@ d
             # Compute tile i
             @core(cores[i], "kernels.a")
             def core_body():
-                for _ in range_(0xFFFFFFFF):
-                    for _ in range_(tiles):
-                        elem_out = outC_fifos[i].acquire(ObjectFifoPort.Produce, 1)
-                        elem_in_a = inA_fifos[i].acquire(ObjectFifoPort.Consume, 1)
+                for _ in range_(tiles):
+                    elem_out = outC_fifos[i].acquire(ObjectFifoPort.Produce, 1)
+                    elem_in_a = inA_fifos[i].acquire(ObjectFifoPort.Consume, 1)
 
-                        exp_bf16_1024(elem_in_a, elem_out)
+                    exp_bf16_1024(elem_in_a, elem_out)
 
-                        inA_fifos[i].release(ObjectFifoPort.Consume, 1)
-                        outC_fifos[i].release(ObjectFifoPort.Produce, 1)
+                    inA_fifos[i].release(ObjectFifoPort.Consume, 1)
+                    outC_fifos[i].release(ObjectFifoPort.Produce, 1)
 
         # To/from AIE-array data movement
         tensor_ty = np.ndarray[(N,), np.dtype[bfloat16]]

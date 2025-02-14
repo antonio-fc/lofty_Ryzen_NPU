@@ -50,7 +50,7 @@ def main(opts):
     INOUT2_SIZE = INOUT2_VOLUME * 2
     FULL_INPUT_SIZE = FULL_INPUT_VOL * 2
 
-    OUT_SIZE = INOUT1_SIZE
+    OUT_SIZE = FULL_INPUT_VOL*2
     OUT_DATATYPE = INOUT1_DATATYPE
 
     # ------------------------------------------------------
@@ -194,29 +194,14 @@ def main(opts):
         if opts.verify:
             if opts.verbosity >= 1:
                 print("Verifying results ...")
-            # ref = np.arange(1, INOUT0_VOLUME + 1, dtype=INOUT0_DATATYPE) * inout0
-            # e = np.equal(output_buffer, ref)
-            # errors = errors + np.size(e) - np.count_nonzero(e)
-        # My own error check
+                
         errors = 0
-        # print(f"weird thing: {np.count_nonzero(e)}")
-        # for j in range(0, INOUT2_VOLUME):
-        #     a = ref[j]
-        #     b = entire_buffer[j]
-        #     # print(f"correct: {a}, result: {b}, equal: {a == b}")
-        #     if a != b:
-        #         errors = errors + 1
-        # print(f"errors in iter {i}: {errors}")
+        
         if i == num_iter-1:
             print("\nOutput from distributed input 1/3:")
-            # output_buffer = output_buffer.reshape(9, 1024)
-            # for i in output_buffer.reshape(9, 1024):
-            print(f"Output: {output_buffer}")
-            # for x in output_buffer[0]:
-            #     print(x)
-            # print("\nExpected output from distributed input 1/3")
-            # for x in inout2a:
-            #     print(x)
+            print(output_buffer.shape)
+            for x in output_buffer.reshape(NINPUTS, INPUT_VOL):
+                print(x)
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
         npu_time_min = min(npu_time_min, npu_time)

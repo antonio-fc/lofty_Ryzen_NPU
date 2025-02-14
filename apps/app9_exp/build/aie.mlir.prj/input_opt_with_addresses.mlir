@@ -60,43 +60,35 @@ module attributes {llvm.target_triple = "aie2"} {
     %9 = llvm.mlir.constant(50 : i32) : i32
     %10 = llvm.mlir.constant(1 : i32) : i32
     %11 = llvm.mlir.constant(-1 : i32) : i32
-    %12 = llvm.mlir.constant(16 : index) : i64
-    %13 = llvm.mlir.constant(2 : index) : i64
-    %14 = llvm.mlir.constant(0 : index) : i64
-    %15 = llvm.mlir.constant(1 : index) : i64
-    %16 = llvm.mlir.constant(4294967295 : index) : i64
-    llvm.br ^bb1(%14 : i64)
-  ^bb1(%17: i64):  // 2 preds: ^bb0, ^bb4
-    %18 = llvm.icmp "slt" %17, %16 : i64
-    llvm.cond_br %18, ^bb2(%14 : i64), ^bb5
-  ^bb2(%19: i64):  // 2 preds: ^bb1, ^bb3
-    %20 = llvm.icmp "slt" %19, %12 : i64
-    llvm.cond_br %20, ^bb3, ^bb4
-  ^bb3:  // pred: ^bb2
+    %12 = llvm.mlir.constant(2 : index) : i64
+    %13 = llvm.mlir.constant(0 : index) : i64
+    %14 = llvm.mlir.constant(16 : index) : i64
+    llvm.br ^bb1(%13 : i64)
+  ^bb1(%15: i64):  // 2 preds: ^bb0, ^bb2
+    %16 = llvm.icmp "slt" %15, %14 : i64
+    llvm.cond_br %16, ^bb2, ^bb3
+  ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %21 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%21, %3 : !llvm.ptr, i64)] : i1
-    %22 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%22, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%22, %21) : (!llvm.ptr, !llvm.ptr) -> ()
+    %17 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%17, %3 : !llvm.ptr, i64)] : i1
+    %18 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%18, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%18, %17) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %23 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%23, %3 : !llvm.ptr, i64)] : i1
-    %24 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%24, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%24, %23) : (!llvm.ptr, !llvm.ptr) -> ()
+    %19 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%19, %3 : !llvm.ptr, i64)] : i1
+    %20 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%20, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%20, %19) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
-    %25 = llvm.add %19, %13 : i64
-    llvm.br ^bb2(%25 : i64)
-  ^bb4:  // pred: ^bb2
-    %26 = llvm.add %17, %15 : i64
-    llvm.br ^bb1(%26 : i64)
-  ^bb5:  // pred: ^bb1
+    %21 = llvm.add %15, %12 : i64
+    llvm.br ^bb1(%21 : i64)
+  ^bb3:  // pred: ^bb1
     llvm.return
   }
   llvm.func @core_0_4() {
@@ -112,43 +104,35 @@ module attributes {llvm.target_triple = "aie2"} {
     %9 = llvm.mlir.constant(50 : i32) : i32
     %10 = llvm.mlir.constant(1 : i32) : i32
     %11 = llvm.mlir.constant(-1 : i32) : i32
-    %12 = llvm.mlir.constant(16 : index) : i64
-    %13 = llvm.mlir.constant(2 : index) : i64
-    %14 = llvm.mlir.constant(0 : index) : i64
-    %15 = llvm.mlir.constant(1 : index) : i64
-    %16 = llvm.mlir.constant(4294967295 : index) : i64
-    llvm.br ^bb1(%14 : i64)
-  ^bb1(%17: i64):  // 2 preds: ^bb0, ^bb4
-    %18 = llvm.icmp "slt" %17, %16 : i64
-    llvm.cond_br %18, ^bb2(%14 : i64), ^bb5
-  ^bb2(%19: i64):  // 2 preds: ^bb1, ^bb3
-    %20 = llvm.icmp "slt" %19, %12 : i64
-    llvm.cond_br %20, ^bb3, ^bb4
-  ^bb3:  // pred: ^bb2
+    %12 = llvm.mlir.constant(2 : index) : i64
+    %13 = llvm.mlir.constant(0 : index) : i64
+    %14 = llvm.mlir.constant(16 : index) : i64
+    llvm.br ^bb1(%13 : i64)
+  ^bb1(%15: i64):  // 2 preds: ^bb0, ^bb2
+    %16 = llvm.icmp "slt" %15, %14 : i64
+    llvm.cond_br %16, ^bb2, ^bb3
+  ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %21 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%21, %3 : !llvm.ptr, i64)] : i1
-    %22 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%22, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%22, %21) : (!llvm.ptr, !llvm.ptr) -> ()
+    %17 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%17, %3 : !llvm.ptr, i64)] : i1
+    %18 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%18, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%18, %17) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %23 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%23, %3 : !llvm.ptr, i64)] : i1
-    %24 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%24, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%24, %23) : (!llvm.ptr, !llvm.ptr) -> ()
+    %19 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%19, %3 : !llvm.ptr, i64)] : i1
+    %20 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%20, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%20, %19) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
-    %25 = llvm.add %19, %13 : i64
-    llvm.br ^bb2(%25 : i64)
-  ^bb4:  // pred: ^bb2
-    %26 = llvm.add %17, %15 : i64
-    llvm.br ^bb1(%26 : i64)
-  ^bb5:  // pred: ^bb1
+    %21 = llvm.add %15, %12 : i64
+    llvm.br ^bb1(%21 : i64)
+  ^bb3:  // pred: ^bb1
     llvm.return
   }
   llvm.func @core_0_3() {
@@ -164,43 +148,35 @@ module attributes {llvm.target_triple = "aie2"} {
     %9 = llvm.mlir.constant(50 : i32) : i32
     %10 = llvm.mlir.constant(1 : i32) : i32
     %11 = llvm.mlir.constant(-1 : i32) : i32
-    %12 = llvm.mlir.constant(16 : index) : i64
-    %13 = llvm.mlir.constant(2 : index) : i64
-    %14 = llvm.mlir.constant(0 : index) : i64
-    %15 = llvm.mlir.constant(1 : index) : i64
-    %16 = llvm.mlir.constant(4294967295 : index) : i64
-    llvm.br ^bb1(%14 : i64)
-  ^bb1(%17: i64):  // 2 preds: ^bb0, ^bb4
-    %18 = llvm.icmp "slt" %17, %16 : i64
-    llvm.cond_br %18, ^bb2(%14 : i64), ^bb5
-  ^bb2(%19: i64):  // 2 preds: ^bb1, ^bb3
-    %20 = llvm.icmp "slt" %19, %12 : i64
-    llvm.cond_br %20, ^bb3, ^bb4
-  ^bb3:  // pred: ^bb2
+    %12 = llvm.mlir.constant(2 : index) : i64
+    %13 = llvm.mlir.constant(0 : index) : i64
+    %14 = llvm.mlir.constant(16 : index) : i64
+    llvm.br ^bb1(%13 : i64)
+  ^bb1(%15: i64):  // 2 preds: ^bb0, ^bb2
+    %16 = llvm.icmp "slt" %15, %14 : i64
+    llvm.cond_br %16, ^bb2, ^bb3
+  ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %21 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%21, %3 : !llvm.ptr, i64)] : i1
-    %22 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%22, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%22, %21) : (!llvm.ptr, !llvm.ptr) -> ()
+    %17 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%17, %3 : !llvm.ptr, i64)] : i1
+    %18 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%18, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%18, %17) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %23 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%23, %3 : !llvm.ptr, i64)] : i1
-    %24 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%24, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%24, %23) : (!llvm.ptr, !llvm.ptr) -> ()
+    %19 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%19, %3 : !llvm.ptr, i64)] : i1
+    %20 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%20, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%20, %19) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
-    %25 = llvm.add %19, %13 : i64
-    llvm.br ^bb2(%25 : i64)
-  ^bb4:  // pred: ^bb2
-    %26 = llvm.add %17, %15 : i64
-    llvm.br ^bb1(%26 : i64)
-  ^bb5:  // pred: ^bb1
+    %21 = llvm.add %15, %12 : i64
+    llvm.br ^bb1(%21 : i64)
+  ^bb3:  // pred: ^bb1
     llvm.return
   }
   llvm.func @core_0_2() {
@@ -216,43 +192,35 @@ module attributes {llvm.target_triple = "aie2"} {
     %9 = llvm.mlir.constant(50 : i32) : i32
     %10 = llvm.mlir.constant(1 : i32) : i32
     %11 = llvm.mlir.constant(-1 : i32) : i32
-    %12 = llvm.mlir.constant(2 : index) : i64
+    %12 = llvm.mlir.constant(0 : index) : i64
     %13 = llvm.mlir.constant(16 : index) : i64
-    %14 = llvm.mlir.constant(0 : index) : i64
-    %15 = llvm.mlir.constant(4294967295 : index) : i64
-    %16 = llvm.mlir.constant(1 : index) : i64
-    llvm.br ^bb1(%14 : i64)
-  ^bb1(%17: i64):  // 2 preds: ^bb0, ^bb4
-    %18 = llvm.icmp "slt" %17, %15 : i64
-    llvm.cond_br %18, ^bb2(%14 : i64), ^bb5
-  ^bb2(%19: i64):  // 2 preds: ^bb1, ^bb3
-    %20 = llvm.icmp "slt" %19, %13 : i64
-    llvm.cond_br %20, ^bb3, ^bb4
-  ^bb3:  // pred: ^bb2
+    %14 = llvm.mlir.constant(2 : index) : i64
+    llvm.br ^bb1(%12 : i64)
+  ^bb1(%15: i64):  // 2 preds: ^bb0, ^bb2
+    %16 = llvm.icmp "slt" %15, %13 : i64
+    llvm.cond_br %16, ^bb2, ^bb3
+  ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %21 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%21, %3 : !llvm.ptr, i64)] : i1
-    %22 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%22, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%22, %21) : (!llvm.ptr, !llvm.ptr) -> ()
+    %17 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%17, %3 : !llvm.ptr, i64)] : i1
+    %18 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%18, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%18, %17) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%9, %11) : (i32, i32) -> ()
     llvm.call @llvm.aie2.acquire(%8, %11) : (i32, i32) -> ()
-    %23 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%23, %3 : !llvm.ptr, i64)] : i1
-    %24 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
-    llvm.intr.assume %4 ["align"(%24, %3 : !llvm.ptr, i64)] : i1
-    llvm.call @exp_bf16_1024(%24, %23) : (!llvm.ptr, !llvm.ptr) -> ()
+    %19 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%19, %3 : !llvm.ptr, i64)] : i1
+    %20 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<1024 x bf16>
+    llvm.intr.assume %4 ["align"(%20, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @exp_bf16_1024(%20, %19) : (!llvm.ptr, !llvm.ptr) -> ()
     llvm.call @llvm.aie2.release(%7, %10) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %10) : (i32, i32) -> ()
-    %25 = llvm.add %19, %12 : i64
-    llvm.br ^bb2(%25 : i64)
-  ^bb4:  // pred: ^bb2
-    %26 = llvm.add %17, %16 : i64
-    llvm.br ^bb1(%26 : i64)
-  ^bb5:  // pred: ^bb1
+    %21 = llvm.add %15, %14 : i64
+    llvm.br ^bb1(%21 : i64)
+  ^bb3:  // pred: ^bb1
     llvm.return
   }
 }

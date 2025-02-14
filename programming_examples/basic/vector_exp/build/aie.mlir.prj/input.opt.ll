@@ -1,4 +1,4 @@
-; ModuleID = '/notebooks/mlir-aie/programming_examples/basic/vector_exp/build/aie.mlir.prj/input.ll'
+; ModuleID = '/notebooks/my_mlir-aie/programming_examples/basic/vector_exp/build/aie.mlir.prj/input.ll'
 source_filename = "LLVMDialectModule"
 target datalayout = "e-m:e-p:20:32-i1:8:32-i8:8:32-i16:16:32-i32:32:32-f32:32:32-i64:32-f64:32-a:0:32-n32"
 target triple = "aie2"
@@ -29,422 +29,466 @@ declare void @llvm.aie2.release(i32, i32) #0
 declare void @exp_bf16_1024(ptr, ptr) local_unnamed_addr
 
 define void @core_0_5() local_unnamed_addr {
-  %1 = and i64 ptrtoint (ptr @memC3_buff_0 to i64), 30
-  %2 = icmp eq i64 %1, 0
-  %3 = and i64 ptrtoint (ptr @memA3_cons_buff_0 to i64), 30
-  %4 = icmp eq i64 %3, 0
-  %5 = and i64 ptrtoint (ptr @memC3_buff_1 to i64), 30
-  %6 = icmp eq i64 %5, 0
-  %7 = and i64 ptrtoint (ptr @memA3_cons_buff_1 to i64), 30
-  %8 = icmp eq i64 %7, 0
-  br label %.preheader
-
-.preheader:                                       ; preds = %0, %.preheader
-  %9 = phi i64 [ 0, %0 ], [ %10, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %2)
-  tail call void @llvm.assume(i1 %4)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %6)
-  tail call void @llvm.assume(i1 %8)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_0, ptr nonnull @memC3_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC3_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA3_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA3_cons_buff_1, ptr nonnull @memC3_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
-  %10 = add nuw nsw i64 %9, 1
-  %11 = icmp ult i64 %9, 4294967294
-  br i1 %11, label %.preheader, label %12
-
-12:                                               ; preds = %.preheader
   ret void
 }
 
 define void @core_0_4() local_unnamed_addr {
-  %1 = and i64 ptrtoint (ptr @memC2_buff_0 to i64), 30
-  %2 = icmp eq i64 %1, 0
-  %3 = and i64 ptrtoint (ptr @memA2_cons_buff_0 to i64), 30
-  %4 = icmp eq i64 %3, 0
-  %5 = and i64 ptrtoint (ptr @memC2_buff_1 to i64), 30
-  %6 = icmp eq i64 %5, 0
-  %7 = and i64 ptrtoint (ptr @memA2_cons_buff_1 to i64), 30
-  %8 = icmp eq i64 %7, 0
-  br label %.preheader
-
-.preheader:                                       ; preds = %0, %.preheader
-  %9 = phi i64 [ 0, %0 ], [ %10, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %2)
-  tail call void @llvm.assume(i1 %4)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %6)
-  tail call void @llvm.assume(i1 %8)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_0, ptr nonnull @memC2_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC2_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA2_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA2_cons_buff_1, ptr nonnull @memC2_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
-  %10 = add nuw nsw i64 %9, 1
-  %11 = icmp ult i64 %9, 4294967294
-  br i1 %11, label %.preheader, label %12
-
-12:                                               ; preds = %.preheader
   ret void
 }
 
 define void @core_0_3() local_unnamed_addr {
-  %1 = and i64 ptrtoint (ptr @memC1_buff_0 to i64), 30
-  %2 = icmp eq i64 %1, 0
-  %3 = and i64 ptrtoint (ptr @memA1_cons_buff_0 to i64), 30
-  %4 = icmp eq i64 %3, 0
-  %5 = and i64 ptrtoint (ptr @memC1_buff_1 to i64), 30
-  %6 = icmp eq i64 %5, 0
-  %7 = and i64 ptrtoint (ptr @memA1_cons_buff_1 to i64), 30
-  %8 = icmp eq i64 %7, 0
-  br label %.preheader
-
-.preheader:                                       ; preds = %0, %.preheader
-  %9 = phi i64 [ 0, %0 ], [ %10, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %2)
-  tail call void @llvm.assume(i1 %4)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %6)
-  tail call void @llvm.assume(i1 %8)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_0, ptr nonnull @memC1_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC1_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA1_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA1_cons_buff_1, ptr nonnull @memC1_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
-  %10 = add nuw nsw i64 %9, 1
-  %11 = icmp ult i64 %9, 4294967294
-  br i1 %11, label %.preheader, label %12
-
-12:                                               ; preds = %.preheader
   ret void
 }
 
 define void @core_0_2() local_unnamed_addr {
-  %1 = and i64 ptrtoint (ptr @memC0_buff_0 to i64), 30
-  %2 = icmp eq i64 %1, 0
-  %3 = and i64 ptrtoint (ptr @memA0_cons_buff_0 to i64), 30
-  %4 = icmp eq i64 %3, 0
-  %5 = and i64 ptrtoint (ptr @memC0_buff_1 to i64), 30
-  %6 = icmp eq i64 %5, 0
-  %7 = and i64 ptrtoint (ptr @memA0_cons_buff_1 to i64), 30
-  %8 = icmp eq i64 %7, 0
-  br label %.preheader
-
-.preheader:                                       ; preds = %0, %.preheader
-  %9 = phi i64 [ 0, %0 ], [ %10, %.preheader ]
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %2)
-  tail call void @llvm.assume(i1 %4)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.assume(i1 %6)
-  tail call void @llvm.assume(i1 %8)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_0, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_0, ptr nonnull @memC0_buff_0)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
   tail call void @llvm.aie2.acquire(i32 50, i32 -1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @memC0_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @memA0_cons_buff_1, i64 32) ]
   tail call void @exp_bf16_1024(ptr nonnull @memA0_cons_buff_1, ptr nonnull @memC0_buff_1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 51, i32 1)
-  %10 = add nuw nsw i64 %9, 1
-  %11 = icmp ult i64 %9, 4294967294
-  br i1 %11, label %.preheader, label %12
-
-12:                                               ; preds = %.preheader
   ret void
 }
 

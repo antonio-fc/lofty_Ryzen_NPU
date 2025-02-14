@@ -66,45 +66,50 @@ def main(opts):
     # ------------------------------------------------------
     # Initialize run configs
     # ------------------------------------------------------
-
+    num_iter = opts.iters + opts.warmup_iters
+    npu_time_total = 0
+    npu_time_min = 9999999
+    npu_time_max = 0
+    errors = 0
 
     # ------------------------------------------------------
     # Main run loop
     # ------------------------------------------------------
     # Run kernel
-    if opts.verbosity >= 1:
-        print("Running Kernel.")
-    start = time.time_ns()
-    opcode = 3
-    h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1) # only 1 input and 1 output
-    h.wait()
-    stop = time.time_ns()
-    bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
-
-    entire_buffer = bo_inout1.read(OUT_SIZE, 0).view(bfloat16)
-    output_buffer = entire_buffer[:INOUT1_VOLUME]
-    trace_buffer = entire_buffer[INOUT1_VOLUME:]
-    write_out_trace(trace_buffer, "trace.txt")
-
-    refs = np.exp(inout0)
-    for i in range(10):
-        val = inout0[i]
-        exp = refs[i]
-        print(f"e^{val} = {exp} (ref)")
-
-    for i in range(10):
-        val = output_buffer[i]
-        ref = refs[i]
-        if(np.isinf(val) or np.isinf(ref)):
-            print(f"Inf (npu: {val}, ref: {ref})")
-        elif(np.isnan(val) or np.isnan(val)):
-            print("NaN")
-        else:
-            print(f"Output (npu: {val}, ref: {ref})")
-    
-    if opts.verify:
+    for i in range(num_iter):
         if opts.verbosity >= 1:
-            print("Verifying results ...")
+            print("Running Kernel.")
+        start = time.time_ns()
+        opcode = 3
+        h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1) # only 1 input and 1 output
+        h.wait()
+        stop = time.time_ns()
+        bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
+    
+        entire_buffer = bo_inout1.read(OUT_SIZE, 0).view(bfloat16)
+        output_buffer = entire_buffer[:INOUT1_VOLUME]
+        trace_buffer = entire_buffer[INOUT1_VOLUME:]
+        write_out_trace(trace_buffer, "trace.txt")
+    
+        refs = np.exp(inout0)
+        for i in range(10):
+            val = inout0[i]
+            exp = refs[i]
+            print(f"e^{val} = {exp} (ref)")
+    
+        for i in range(10):
+            val = output_buffer[i]
+            ref = refs[i]
+            if(np.isinf(val) or np.isinf(ref)):
+                print(f"Inf (npu: {val}, ref: {ref})")
+            elif(np.isnan(val) or np.isnan(val)):
+                print("NaN")
+            else:
+                print(f"Output (npu: {val}, ref: {ref})")
+        
+        if opts.verify:
+            if opts.verbosity >= 1:
+                print("Verifying results ...")
 
     
     # ------------------------------------------------------

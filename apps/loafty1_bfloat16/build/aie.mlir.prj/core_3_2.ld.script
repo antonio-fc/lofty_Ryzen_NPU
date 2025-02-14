@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x74800, LENGTH = 0xB800
+   data (!RX) : ORIGIN = 0x75E00, LENGTH = 0xA200
 }
 ENTRY(__start)
 SECTIONS
@@ -43,12 +43,24 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the south. */
 . = 0x40000;
 . += 0x10000;
+. = 0x60400;
+of_out_mainB31_buff_0 = .;
+. += 0x1E00;
+. = 0x64000;
+of_out_mainB31_buff_1 = .;
+. += 0x1E00;
+. = 0x68000;
+of_in_mainB31_cons_buff_0 = .;
+. += 0x1E00;
+. = 0x6C000;
+of_in_mainB31_cons_buff_1 = .;
+. += 0x1E00;
 . = 0x70400;
 out_buff_0 = .;
-. += 0x800;
+. += 0x1E00;
 . = 0x74000;
 out_buff_1 = .;
-. += 0x800;
+. += 0x1E00;
   .bss : { *(.bss*) } > data
 }
 INPUT(passthrough.o)

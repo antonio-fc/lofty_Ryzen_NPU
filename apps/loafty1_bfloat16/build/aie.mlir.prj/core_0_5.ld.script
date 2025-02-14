@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C00C, LENGTH = 0x3FF4
+   data (!RX) : ORIGIN = 0x7C600, LENGTH = 0x3A00
 }
 ENTRY(__start)
 SECTIONS
@@ -41,49 +41,22 @@ SECTIONS
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x40400;
-of_in_mainA02_cons_buff_0 = .;
-. += 0x1E00;
+of_out_mainA02_buff_0 = .;
+. += 0x600;
 . = 0x44000;
-of_in_mainA02_cons_buff_1 = .;
-. += 0x1E00;
+of_out_mainA02_buff_1 = .;
+. += 0x600;
 . = 0x48000;
+of_in_mainA02_cons_buff_0 = .;
+. += 0x600;
+. = 0x4C000;
+of_in_mainA02_cons_buff_1 = .;
+. += 0x600;
+. = 0x40A00;
 in0_1_cons_buff_0 = .;
 . += 0x4;
-. = 0x4C000;
+. = 0x44600;
 in0_1_cons_buff_1 = .;
-. += 0x4;
-. = 0x42200;
-in0_1_cons_buff_2 = .;
-. += 0x4;
-. = 0x45E00;
-in0_1_cons_buff_3 = .;
-. += 0x4;
-. = 0x48004;
-in0_1_cons_buff_4 = .;
-. += 0x4;
-. = 0x4C004;
-in0_1_cons_buff_5 = .;
-. += 0x4;
-. = 0x42204;
-in0_1_cons_buff_6 = .;
-. += 0x4;
-. = 0x45E04;
-in0_1_cons_buff_7 = .;
-. += 0x4;
-. = 0x48008;
-in0_1_cons_buff_8 = .;
-. += 0x4;
-. = 0x4C008;
-in0_1_cons_buff_9 = .;
-. += 0x4;
-. = 0x42208;
-in0_1_cons_buff_10 = .;
-. += 0x4;
-. = 0x45E08;
-in0_1_cons_buff_11 = .;
-. += 0x4;
-. = 0x4800C;
-in0_1_cons_buff_12 = .;
 . += 0x4;
 /* No tile with memory exists to the west. */
 . = 0x50000;
@@ -92,49 +65,22 @@ in0_1_cons_buff_12 = .;
 . = 0x60000;
 . += 0x10000;
 . = 0x70400;
-of_in_mainA03_cons_buff_0 = .;
-. += 0x1E00;
+of_out_mainA03_buff_0 = .;
+. += 0x600;
 . = 0x74000;
-of_in_mainA03_cons_buff_1 = .;
-. += 0x1E00;
+of_out_mainA03_buff_1 = .;
+. += 0x600;
 . = 0x78000;
+of_in_mainA03_cons_buff_0 = .;
+. += 0x600;
+. = 0x7C000;
+of_in_mainA03_cons_buff_1 = .;
+. += 0x600;
+. = 0x70A00;
 in0_2_cons_buff_0 = .;
 . += 0x4;
-. = 0x7C000;
+. = 0x74600;
 in0_2_cons_buff_1 = .;
-. += 0x4;
-. = 0x72200;
-in0_2_cons_buff_2 = .;
-. += 0x4;
-. = 0x75E00;
-in0_2_cons_buff_3 = .;
-. += 0x4;
-. = 0x78004;
-in0_2_cons_buff_4 = .;
-. += 0x4;
-. = 0x7C004;
-in0_2_cons_buff_5 = .;
-. += 0x4;
-. = 0x72204;
-in0_2_cons_buff_6 = .;
-. += 0x4;
-. = 0x75E04;
-in0_2_cons_buff_7 = .;
-. += 0x4;
-. = 0x78008;
-in0_2_cons_buff_8 = .;
-. += 0x4;
-. = 0x7C008;
-in0_2_cons_buff_9 = .;
-. += 0x4;
-. = 0x72208;
-in0_2_cons_buff_10 = .;
-. += 0x4;
-. = 0x75E08;
-in0_2_cons_buff_11 = .;
-. += 0x4;
-. = 0x7800C;
-in0_2_cons_buff_12 = .;
 . += 0x4;
   .bss : { *(.bss*) } > data
 }

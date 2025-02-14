@@ -94,15 +94,14 @@ def my_eltwise_exp():
             # Compute tile i
             @core(cores[i], "kernels.a")
             def core_body():
-                for _ in range_(0xFFFFFFFF):
-                    for _ in range_(tiles):
-                        elem_out = outC_fifos[i].acquire(ObjectFifoPort.Produce, 1)
-                        elem_in_a = inA_fifos[i].acquire(ObjectFifoPort.Consume, 1)
+                for _ in range_(tiles):
+                    elem_out = outC_fifos[i].acquire(ObjectFifoPort.Produce, 1)
+                    elem_in_a = inA_fifos[i].acquire(ObjectFifoPort.Consume, 1)
 
-                        exp_bf16_1024(elem_in_a, elem_out)
+                    exp_bf16_1024(elem_in_a, elem_out)
 
-                        inA_fifos[i].release(ObjectFifoPort.Consume, 1)
-                        outC_fifos[i].release(ObjectFifoPort.Produce, 1)
+                    inA_fifos[i].release(ObjectFifoPort.Consume, 1)
+                    outC_fifos[i].release(ObjectFifoPort.Produce, 1)
 
         # To/from AIE-array data movement
         tensor_ty = np.ndarray[(N,), np.dtype[bfloat16]]
