@@ -32,7 +32,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
     for(int t = 0; t < CV; t++) // for each pixel/lmn
     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
         // Check if calculations can be skipped
-        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) {
+        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
             return;
         }
         
@@ -56,7 +56,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
             auto A = aie::mul(baseAdd, freq);
 
             // Trig
-            auto cos = cos_bfloat16(A);
+            auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
             auto sin = sin_bfloat16(A);
 
             // Mult with visibilities and subtract
@@ -72,7 +72,8 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
 
         // Final reduction
         aie::vector<float, VEC_SIZE> sum = acc.to_vector<float>(0);
-        out[t] = aie::reduce_add(sum);
+        bfloat16 res = aie::reduce_add(sum);
+        out[t] = res;
     }
 }
 // void sin_float_1024(bfloat16 *a_in, bfloat16 *c_out) {

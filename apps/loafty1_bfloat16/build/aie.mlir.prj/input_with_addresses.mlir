@@ -73,6 +73,7 @@ module {
     memref.global "public" @in0_5_cons : memref<96xbf16>
     memref.global "public" @in0 : memref<96xbf16>
     func.func private @passthrough(memref<768xbf16>, memref<768xbf16>, i32)
+    func.func private @mean(memref<192xbf16>, memref<192xbf16>, memref<32xbf16>, i32)
     func.func private @main_kernel(bf16, memref<96xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<32xbf16>, i32)
     %shim_noc_tile_0_0 = aie.tile(0, 0) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 15>}
     %mem_tile_0_1 = aie.tile(0, 1) {controller_id = #aie.packet_info<pkt_type = 0, pkt_id = 26>}
@@ -371,11 +372,11 @@ module {
     aie.flow(%tile_1_2, DMA : 0, %shim_noc_tile_1_0, DMA : 0)
     %core_1_2 = aie.core(%tile_1_2) {
       %c0 = arith.constant 0 : index
-      %c14 = arith.constant 14 : index
+      %c9223372036854775807 = arith.constant 9223372036854775807 : index
       %c1 = arith.constant 1 : index
       cf.br ^bb1(%c0 : index)
     ^bb1(%0: index):  // 2 preds: ^bb0, ^bb5
-      %1 = arith.cmpi slt, %0, %c14 : index
+      %1 = arith.cmpi slt, %0, %c9223372036854775807 : index
       cf.cond_br %1, ^bb2, ^bb6
     ^bb2:  // pred: ^bb1
       %c0_0 = arith.constant 0 : index
@@ -390,12 +391,16 @@ module {
       aie.use_lock(%out1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%out2_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
+      %c32_i32 = arith.constant 32 : i32
+      func.call @mean(%out1_cons_buff_0, %out2_cons_buff_0, %out_buff_0, %c32_i32) : (memref<192xbf16>, memref<192xbf16>, memref<32xbf16>, i32) -> ()
       aie.use_lock(%out_cons_lock, Release, 1)
       aie.use_lock(%out1_cons_prod_lock, Release, 1)
       aie.use_lock(%out2_cons_prod_lock, Release, 1)
       aie.use_lock(%out1_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%out2_cons_cons_lock, AcquireGreaterEqual, 1)
       aie.use_lock(%out_prod_lock, AcquireGreaterEqual, 1)
+      %c32_i32_2 = arith.constant 32 : i32
+      func.call @mean(%out1_cons_buff_1, %out2_cons_buff_1, %out_buff_1, %c32_i32_2) : (memref<192xbf16>, memref<192xbf16>, memref<32xbf16>, i32) -> ()
       aie.use_lock(%out_cons_lock, Release, 1)
       aie.use_lock(%out1_cons_prod_lock, Release, 1)
       aie.use_lock(%out2_cons_prod_lock, Release, 1)
@@ -406,7 +411,7 @@ module {
       cf.br ^bb1(%5 : index)
     ^bb6:  // pred: ^bb1
       aie.end
-    } {link_with = "passthrough.o"}
+    } {link_with = "mean.o"}
     %core_0_3 = aie.core(%tile_0_3) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index

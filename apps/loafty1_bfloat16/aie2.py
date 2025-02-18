@@ -14,19 +14,24 @@ from aie.dialects.aiex import *
 from aie.helpers.dialects.ext.scf import _for as range_
 from aie.extras.context import mlir_mod_ctx
 
-def declaring_kernel_func(out_ty, factor_ty, tile_ty, dtype):
+def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
     # kernel for passthrough (scalar)
     name0 = "passthrough"
     kernel0 = external_func("passthrough",
         inputs=[tile_ty, tile_ty, dtype],
     )
-    name1 = "main"
-    kernel1 = external_func("main_kernel",
+    name1 = "mean"
+    kernel1 = external_func("mean",
+        inputs=[join_ty, join_ty, out_ty, dtype],
+    )
+    name2 = "main"
+    kernel2 = external_func("main_kernel",
         inputs=[bfloat16, factor_ty, tile_ty, tile_ty, tile_ty, tile_ty, tile_ty, out_ty, dtype],
     )
     return {
         name0: kernel0,
         name1: kernel1,
+        name2: kernel2,
     }
 
 def declaring_tiles(n_cols, n_comp):
@@ -83,7 +88,7 @@ def loafty():
 
         # AIE Core Function declarations
 
-        kernels = declaring_kernel_func(out_ty, factor_ty, main_ct_ty, dtype_k)
+        kernels = declaring_kernel_func(out_ty, factor_ty, main_ct_ty, join_ty, dtype_k)
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
@@ -139,14 +144,14 @@ def loafty():
 
         # Declaring the cores
 
-        @core(ct[1][0], "passthrough.o")
+        @core(ct[1][0], "mean.o")
         def core_body():
-            for _ in range_(14): # this needs to be at least the number of iterations in the test file
+            for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
                 for _ in range_(ITERS):
                     inputA = of_out_mainA.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
                     inputB = of_out_mainB.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
                     output = of_out.acquire(ObjectFifoPort.Produce, 1) # OUT_SIZE
-
+                    kernels['mean'](inputA, inputB, output, OUT_SIZE)
                     of_out.release(ObjectFifoPort.Produce, 1)
                     of_out_mainA.release(ObjectFifoPort.Consume, 1)
                     of_out_mainB.release(ObjectFifoPort.Consume, 1)
@@ -194,7 +199,7 @@ def loafty():
             npu_dma_memcpy_nd(metadata=of_in_factorB, bd_id=4, mem=factorB, sizes=[1, 1, 1, FACTOR_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
             npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, OUT_SIZE*ITERS]) # output
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, OUT_SIZE*ITERS]) # output (size = BSIZE)
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 

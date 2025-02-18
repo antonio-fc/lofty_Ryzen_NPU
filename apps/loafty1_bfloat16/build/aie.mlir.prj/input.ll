@@ -225,6 +225,8 @@ declare void @llvm.aie2.release(i32, i32)
 
 declare void @passthrough(ptr, ptr, i32)
 
+declare void @mean(ptr, ptr, ptr, i32)
+
 declare void @main_kernel(bfloat, ptr, ptr, ptr, ptr, ptr, ptr, ptr, i32)
 
 define void @core_3_5() {
@@ -3952,7 +3954,7 @@ define void @core_1_2() {
 
 1:                                                ; preds = %9, %0
   %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
-  %3 = icmp slt i64 %2, 14
+  %3 = icmp slt i64 %2, 9223372036854775807
   br i1 %3, label %4, label %11
 
 4:                                                ; preds = %7, %1
@@ -3964,12 +3966,20 @@ define void @core_1_2() {
   call void @llvm.aie2.acquire(i32 49, i32 -1)
   call void @llvm.aie2.acquire(i32 51, i32 -1)
   call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
+  call void @mean(ptr @out1_cons_buff_0, ptr @out2_cons_buff_0, ptr @out_buff_0, i32 32)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
   call void @llvm.aie2.acquire(i32 49, i32 -1)
   call void @llvm.aie2.acquire(i32 51, i32 -1)
   call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
+  call void @mean(ptr @out1_cons_buff_1, ptr @out2_cons_buff_1, ptr @out_buff_1, i32 32)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)

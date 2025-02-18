@@ -123,12 +123,20 @@ target triple = "aie2"
 @of_out_mainA13_buff_0 = external global [32 x bfloat]
 @of_out_mainB33_buff_1 = external global [32 x bfloat]
 @of_out_mainB33_buff_0 = external global [32 x bfloat]
+@out1_cons_buff_1 = external global [192 x bfloat]
+@out1_cons_buff_0 = external global [192 x bfloat]
+@out2_cons_buff_1 = external global [192 x bfloat]
+@out2_cons_buff_0 = external global [192 x bfloat]
+@out_buff_1 = external global [32 x bfloat]
+@out_buff_0 = external global [32 x bfloat]
 
 ; Function Attrs: nounwind
 declare void @llvm.aie2.acquire(i32, i32) #0
 
 ; Function Attrs: nounwind
 declare void @llvm.aie2.release(i32, i32) #0
+
+declare void @mean(ptr, ptr, ptr, i32) local_unnamed_addr
 
 declare void @main_kernel(bfloat, ptr, ptr, ptr, ptr, ptr, ptr, ptr, i32) local_unnamed_addr
 
@@ -9696,12 +9704,11 @@ define void @core_0_3() local_unnamed_addr {
   ret void
 }
 
-; Function Attrs: nounwind
-define void @core_1_2() local_unnamed_addr #0 {
+define void @core_1_2() local_unnamed_addr {
   br label %.preheader
 
-.preheader:                                       ; preds = %13, %0
-  %1 = phi i64 [ 0, %0 ], [ %14, %13 ]
+.preheader:                                       ; preds = %0, %7
+  %1 = phi i64 [ 0, %0 ], [ %8, %7 ]
   br label %2
 
 2:                                                ; preds = %2, %.preheader
@@ -9709,36 +9716,60 @@ define void @core_1_2() local_unnamed_addr #0 {
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9746,84 +9777,33 @@ define void @core_1_2() local_unnamed_addr #0 {
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   tail call void @llvm.aie2.acquire(i32 49, i32 -1)
   tail call void @llvm.aie2.acquire(i32 51, i32 -1)
   tail call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   %5 = add nuw nsw i64 %3, 8
   %6 = icmp ult i64 %4, 2046
-  br i1 %6, label %2, label %.preheader.1
+  br i1 %6, label %2, label %7
 
-.preheader.1:                                     ; preds = %2
-  %7 = or disjoint i64 %1, 1
-  br label %8
+7:                                                ; preds = %2
+  %8 = add nuw nsw i64 %1, 1
+  %.not = icmp eq i64 %8, 9223372036854775807
+  br i1 %.not, label %9, label %.preheader
 
-8:                                                ; preds = %8, %.preheader.1
-  %9 = phi i64 [ 0, %.preheader.1 ], [ %11, %8 ]
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  %10 = or disjoint i64 %9, 6
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  tail call void @llvm.aie2.acquire(i32 49, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 51, i32 -1)
-  tail call void @llvm.aie2.acquire(i32 52, i32 -1)
-  tail call void @llvm.aie2.release(i32 53, i32 1)
-  tail call void @llvm.aie2.release(i32 48, i32 1)
-  tail call void @llvm.aie2.release(i32 50, i32 1)
-  %11 = add nuw nsw i64 %9, 8
-  %12 = icmp ult i64 %10, 2046
-  br i1 %12, label %8, label %13
-
-13:                                               ; preds = %8
-  %14 = add nuw nsw i64 %1, 2
-  %15 = icmp ult i64 %7, 13
-  br i1 %15, label %.preheader, label %16
-
-16:                                               ; preds = %13
+9:                                                ; preds = %7
   ret void
 }
 

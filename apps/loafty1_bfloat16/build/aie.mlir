@@ -1,6 +1,7 @@
 module {
   aie.device(npu1_4col) {
     func.func private @passthrough(memref<768xbf16>, memref<768xbf16>, i32)
+    func.func private @mean(memref<192xbf16>, memref<192xbf16>, memref<32xbf16>, i32)
     func.func private @main_kernel(bf16, memref<96xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<768xbf16>, memref<32xbf16>, i32)
     %shim_noc_tile_0_0 = aie.tile(0, 0)
     %mem_tile_0_1 = aie.tile(0, 1)
@@ -63,9 +64,9 @@ module {
     aie.objectfifo @out(%tile_1_2, {%shim_noc_tile_1_0}, 2 : i32) : !aie.objectfifo<memref<32xbf16>> 
     %core_1_2 = aie.core(%tile_1_2) {
       %c0 = arith.constant 0 : index
-      %c14 = arith.constant 14 : index
+      %c9223372036854775807 = arith.constant 9223372036854775807 : index
       %c1 = arith.constant 1 : index
-      scf.for %arg0 = %c0 to %c14 step %c1 {
+      scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
         %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
@@ -76,13 +77,15 @@ module {
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<192xbf16>> -> memref<192xbf16>
           %4 = aie.objectfifo.acquire @out(Produce, 1) : !aie.objectfifosubview<memref<32xbf16>>
           %5 = aie.objectfifo.subview.access %4[0] : !aie.objectfifosubview<memref<32xbf16>> -> memref<32xbf16>
+          %c32_i32 = arith.constant 32 : i32
+          func.call @mean(%1, %3, %5, %c32_i32) : (memref<192xbf16>, memref<192xbf16>, memref<32xbf16>, i32) -> ()
           aie.objectfifo.release @out(Produce, 1)
           aie.objectfifo.release @out1(Consume, 1)
           aie.objectfifo.release @out2(Consume, 1)
         }
       }
       aie.end
-    } {link_with = "passthrough.o"}
+    } {link_with = "mean.o"}
     %core_0_3 = aie.core(%tile_0_3) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index
