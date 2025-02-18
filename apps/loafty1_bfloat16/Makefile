@@ -18,31 +18,11 @@ build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< > $@
 
-build/scale.o: ${srcdir}/kernels/vector_scale.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
 build/passthrough.o: ${srcdir}/kernels/passthrough.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/vector_add.o: ${srcdir}/kernels/vector_add.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/vector_sub.o: ${srcdir}/kernels/vector_sub.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/vector_mult.o: ${srcdir}/kernels/vector_mult.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/mean.o: ${srcdir}/kernels/mean.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/trig.o: ${srcdir}/kernels/trig_float.cc
+build/main_kernel.o: ${srcdir}/kernels/main_kernel.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -50,10 +30,10 @@ build/lut_ops.o: ${srcdir}/kernels/lut_ops.cpp
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/kernels.a: build/trig.o build/lut_ops.o
+build/kernels.a: build/main_kernel.o build/lut_ops.o
 	ar rvs $@ $+
 
-build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_sub.o build/vector_mult.o build/mean.o build/kernels.a
+build/final.xclbin: build/aie.mlir build/passthrough.o build/kernels.a
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
 				--no-xchesscc --no-xbridge \

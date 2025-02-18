@@ -14,14 +14,19 @@ from aie.dialects.aiex import *
 from aie.helpers.dialects.ext.scf import _for as range_
 from aie.extras.context import mlir_mod_ctx
 
-def declaring_kernel_func(tile_ty, dtype):
+def declaring_kernel_func(out_ty, factor_ty, tile_ty, dtype):
     # kernel for passthrough (scalar)
     name0 = "passthrough"
     kernel0 = external_func("passthrough",
         inputs=[tile_ty, tile_ty, dtype],
     )
+    name1 = "main"
+    kernel1 = external_func("main_kernel",
+        inputs=[bfloat16, factor_ty, tile_ty, tile_ty, tile_ty, tile_ty, tile_ty, out_ty, dtype],
+    )
     return {
         name0: kernel0,
+        name1: kernel1,
     }
 
 def declaring_tiles(n_cols, n_comp):
@@ -44,8 +49,11 @@ def loafty():
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MSIZE = 9216 # 96x96 # size of a full input
     BSIZE = 256*256 # 256X256 # size of lmn matrices
+    OUT_SIZE = 32
+    FACTOR_MOVE_SIZE = OUT_SIZE * 3 # 3 for l, m and n
+    FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*3
 
-    NPIXELS = 1
+    ITERS = BSIZE//OUT_SIZE
     
     NINPUTS = 5 # number of inputs in a single stream
     COLS = [0, 1]
@@ -57,6 +65,7 @@ def loafty():
     FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
     
     MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216*5/2)/6
+    JOIN_SIZE = OUT_SIZE * NCORES
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
@@ -65,15 +74,16 @@ def loafty():
     # Device setup
     @device(AIEDevice.npu1_4col)
     def device_body():
-        scalar_ty = np.ndarray[(2,), dtype]
-        scalar = np.ndarray[(1,), np.float32]
+        out_ty = np.ndarray[(OUT_SIZE,), dtype]
+        factor_ty = np.ndarray[(FACTOR_MOVE_SIZE,), dtype]
         input_ty = np.ndarray[(INPUT_SIZE,), dtype]
+        join_ty = np.ndarray[(JOIN_SIZE,), dtype]
         full_input_ty = np.ndarray[(FULL_INPUT_SIZE,), dtype]
         main_ct_ty = np.ndarray[(MAIN_SIZE,), dtype]
 
         # AIE Core Function declarations
 
-        kernels = declaring_kernel_func(main_ct_ty, dtype_k)
+        kernels = declaring_kernel_func(out_ty, factor_ty, main_ct_ty, dtype_k)
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
@@ -83,13 +93,14 @@ def loafty():
         for i in COLS:
             for j in ROWS:
                 main_compute_tilesA.append(ct[i][j])
-                # main_compute_tilesB.append(ct[i+NCOLS][j])
+                main_compute_tilesB.append(ct[i+NCOLS][j])
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[0], main_compute_tilesA + main_compute_tilesB, 2, scalar_ty)
-        of_in_mainA = object_fifo("in1", st[1], mt[1], 1, input_ty)       
-        of_in_mainB = object_fifo("in2", st[2], mt[2], 1, input_ty)
+        of_in_factorA = object_fifo("in0", st[1], main_compute_tilesA, 2, factor_ty)
+        of_in_factorB = object_fifo("in3", st[2], main_compute_tilesB, 2, factor_ty)
+        of_in_mainA = object_fifo("in1", st[0], mt[0], 2, input_ty)       
+        of_in_mainB = object_fifo("in2", st[3], mt[3], 2, input_ty)
 
         # Distribution of inputs mainA and mainB
         main_in_fifosA = []
@@ -98,8 +109,9 @@ def loafty():
         
         for i in COLS:
             for j in ROWS:
-                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[1], ct[i][j], 2, main_ct_ty))
-                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[2], ct[i+NCOLS][j], 2, main_ct_ty))
+                # Input distribution FIFOs
+                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[0], ct[i][j], 6, main_ct_ty))
+                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[3], ct[i+NCOLS][j], 6, main_ct_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
                 
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
@@ -112,15 +124,32 @@ def loafty():
         
         for i in COLS:
             for j in ROWS:
-                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[0], 2, main_ct_ty))
-                main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", ct[i+NCOLS][j], mt[3], 2, main_ct_ty))
-                main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
+                # Output join FIFOs
+                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[1], 2, out_ty))
+                main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", ct[i+NCOLS][j], mt[2], 2, out_ty))
+                main_dist_offsets.append((i*NROWS + j - 1) * OUT_SIZE)
 
-        of_out_mainA = object_fifo("out1", mt[0], st[0], 1, input_ty)
-        of_out_mainB = object_fifo("out2", mt[3], st[3], 1, input_ty)
+        of_out_mainA = object_fifo("out1", mt[1], ct[1][0], 2, join_ty)
+        of_out_mainB = object_fifo("out2", mt[2], ct[1][0], 2, join_ty)
         
         object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
         object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
+
+        of_out = object_fifo("out", ct[1][0], st[1], 2, out_ty)
+
+        # Declaring the cores
+
+        @core(ct[1][0], "passthrough.o")
+        def core_body():
+            for _ in range_(14): # this needs to be at least the number of iterations in the test file
+                for _ in range_(ITERS):
+                    inputA = of_out_mainA.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
+                    inputB = of_out_mainB.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
+                    output = of_out.acquire(ObjectFifoPort.Produce, 1) # OUT_SIZE
+
+                    of_out.release(ObjectFifoPort.Produce, 1)
+                    of_out_mainA.release(ObjectFifoPort.Consume, 1)
+                    of_out_mainB.release(ObjectFifoPort.Consume, 1)
 
         for i in COLS:
             for j in ROWS:
@@ -132,35 +161,42 @@ def loafty():
                 # FIFOs for B
                 obf_in_fifoB = main_in_fifosB[index]
                 obf_out_fifoB = main_out_fifosB[index]
-                
-                @core(ct[i][j], "passthrough.o")  # Main CTs A
-                def core_body():
-                    for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
-                        inputs = obf_in_fifoA.acquire(ObjectFifoPort.Consume, 1)
-                        outputs = obf_out_fifoA.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['passthrough'](inputs, outputs, MAIN_SIZE)
-                        obf_out_fifoA.release(ObjectFifoPort.Produce, 1)
-                        obf_in_fifoA.release(ObjectFifoPort.Consume, 1)
 
-                @core(ct[i+NCOLS][j], "passthrough.o")  # Main CTs B
-                def core_body():
-                    for _ in range_(ITER_KERNEL):
-                        inputs = obf_in_fifoB.acquire(ObjectFifoPort.Consume, 1)
-                        outputs = obf_out_fifoB.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['passthrough'](inputs, outputs, MAIN_SIZE)
-                        obf_out_fifoB.release(ObjectFifoPort.Produce, 1)
-                        obf_in_fifoB.release(ObjectFifoPort.Consume, 1)
+                # to only declare cores one
+                cores = [ct[i][j], ct[i+NCOLS][j]]
+                inFIFOs = [obf_in_fifoA, obf_in_fifoB]
+                outFIFOs = [obf_out_fifoA, obf_out_fifoB]
+                factorFIFOs = [of_in_factorA, of_in_factorB]
+                for c in range(2):
+                    @core(cores[c], "kernels.a")
+                    def core_body():
+                        for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
+                            freq = factorFIFOs[c].acquire(ObjectFifoPort.Consume, 1)
+                            ff = freq[0]
+                            factorFIFOs[c].release(ObjectFifoPort.Consume, 1)
+                            
+                            inputs = inFIFOs[c].acquire(ObjectFifoPort.Consume, 5)
+                            for _ in range_(ITERS):
+                                factors = factorFIFOs[c].acquire(ObjectFifoPort.Consume, 1)
+                                outputs = outFIFOs[c].acquire(ObjectFifoPort.Produce, 1)
+                            
+                                kernels['main'](ff, factors, inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], outputs, MAIN_SIZE)
+    
+                                outFIFOs[c].release(ObjectFifoPort.Produce, 1)
+                                factorFIFOs[c].release(ObjectFifoPort.Consume, 1)
+                            inFIFOs[c].release(ObjectFifoPort.Consume, 5)
 
                     
         # To/from AIE-array data movement
-        @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
-        def sequence(factor, mainA, mainB, output):
-            npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, 2])
+        @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty, full_input_ty)
+        def sequence(factor, factorB, mainA, mainB, output):
+            npu_dma_memcpy_nd(metadata=of_in_factorA, bd_id=1, mem=factor, sizes=[1, 1, 1, FACTOR_SIZE])
+            npu_dma_memcpy_nd(metadata=of_in_factorB, bd_id=4, mem=factorB, sizes=[1, 1, 1, FACTOR_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
             npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
-            npu_dma_memcpy_nd(metadata=of_out_mainA, bd_id=0, mem=output, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # output
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, OUT_SIZE*ITERS]) # output
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
-            dma_wait(of_out_mainA)
+            dma_wait(of_out)
 
 
 with mlir_mod_ctx() as ctx:

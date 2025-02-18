@@ -14,7 +14,7 @@ alignas(aie::vector_decl_align) extern bfloat16 sin_ilut_cd[512];
 alignas(aie::vector_decl_align) extern bfloat16 cos_ilut_ab[512];
 alignas(aie::vector_decl_align) extern bfloat16 cos_ilut_cd[512];
 
-aie::vector<uint16, VEC_SIZE> v16bfloat16_to_v16uint(aie::vector<bfloat16, VEC_SIZE> input) {
+aie::vector<uint16, VEC_SIZE> v32bfloat16_to_v32uint(aie::vector<bfloat16, VEC_SIZE> input) {
     const int mantissa_size = 7;
     const int exp_bias = 127;
     // Convert float32 to uint32
@@ -53,7 +53,7 @@ __attribute__((always_inline))  aie::vector<bfloat16, VEC_SIZE> getSinbFloat16(a
     aie::parallel_lookup<int16, lut_type, aie::lut_oor_policy::truncate> // index
     lookup_i(lut_i, step_i);
     
-    auto index = v16bfloat16_to_v16uint(x);
+    auto index = v32bfloat16_to_v32uint(x);
     // aie::vector<int16, 32> index0 = v32int16(bfloat16_to_int(x, 8));
     // aie::vector<int16, VEC_SIZE> index = aie::filter_even(index0);
     
@@ -70,7 +70,7 @@ __attribute__((always_inline))  aie::vector<bfloat16, VEC_SIZE> getCosbFloat16(a
     aie::parallel_lookup<int16, lut_type, aie::lut_oor_policy::truncate> // index
     lookup_i(lut_i, step_i);
     
-    auto index = v16bfloat16_to_v16uint(x);
+    auto index = v32bfloat16_to_v32uint(x);
     // aie::vector<int16, 32> index0 = v32int16(bfloat16_to_int(x, 8));
     // aie::vector<int16, VEC_SIZE> index = aie::filter_even(index0);
     

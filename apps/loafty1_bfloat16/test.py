@@ -30,15 +30,20 @@ def main(opts):
     MSIZE = 9216 # 96x96
     ISIZE = 1024
     BSIZE = 256*256 # 256X256
+
+    CV = 32 # number of consecutive values
+    
     INOUT0_VOLUME = int(MSIZE)  
-    INOUT1_VOLUME = int(2) 
-    INOUT2_VOLUME = int(BSIZE) 
+    INOUT1_VOLUME = int(CV*3) 
+    INOUT2_VOLUME = int(BSIZE)
+    INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * 3
+    
     NCORES = 6 # for each distribution
     NINPUTS = 5
     INPUT_VOL = int(MSIZE/2)
     CHUNK_VOL = int(INPUT_VOL/NCORES)
     FULL_INPUT_VOL = int(INPUT_VOL*NINPUTS)
-    FULL_CHUNK_VOL = int(FULL_INPUT_VOL/NCORES)
+    OUTPUT_VOL = BSIZE
 
     dtype = bfloat16
     INOUT0_DATATYPE = dtype
@@ -49,8 +54,9 @@ def main(opts):
     INOUT1_SIZE = INOUT1_VOLUME * 2
     INOUT2_SIZE = INOUT2_VOLUME * 2
     FULL_INPUT_SIZE = FULL_INPUT_VOL * 2
+    INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * 2
 
-    OUT_SIZE = FULL_INPUT_VOL*2
+    OUT_SIZE = OUTPUT_VOL*2
     OUT_DATATYPE = INOUT1_DATATYPE
 
     # ------------------------------------------------------
@@ -62,10 +68,10 @@ def main(opts):
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------
     bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
-    bo_inout0 = xrt.bo(device, INOUT1_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT)
-    bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # vis
-    bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # baselines (u, v, w)
-    bo_inout3 = xrt.bo(device, INOUT2_SIZE*3, xrt.bo.host_only, kernel.group_id(6)) # l, m, n
+    bo_inout0 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
+    bo_inout00 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(6)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
+    bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
+    bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
     bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
 
     # Initialize instruction buffer
@@ -75,7 +81,8 @@ def main(opts):
     f = 50_000_000 # 50MHz
     SL = 299_792_458 # m/s
     factor = -2 * f * math.pi / SL
-    inout0 = np.array([factor, 1], dtype=INOUT1_DATATYPE)               # factor (-2 pi f / SPEED_OF_LIGHT)
+    inout0 = np.array([factor], dtype=INOUT1_DATATYPE)               # factor (-2 pi f / SPEED_OF_LIGHT)
+    inout0 = np.repeat(inout0, INOUT1_VOLUME)
     print("Frequency/Factor Input: ")
     print(f"Frequency: {f/1_000_000}MHz")
     print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
@@ -122,43 +129,50 @@ def main(opts):
     
     
     inout3 = np.empty((INOUT2_VOLUME*3,), dtype=INOUT2_DATATYPE)     # l, m, n
-    inout3a = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # l
-    inout3b = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)         # m
-    inout3c = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # n
-    # l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
-    # n = np.sqrt(1 - l**2 - m**2) - 1
-    # inout3a = l.flatten().astype(dtype)
-    # inout3b = m.flatten().astype(dtype)
-    # inout3c = n.flatten().astype(dtype)
+    # inout3a = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # l
+    # inout3b = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)         # m
+    # inout3c = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # n
+    l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
+    n = np.sqrt(1 - l**2 - m**2) - 1
+    inout3a = l.flatten().astype(dtype)
+    inout3b = m.flatten().astype(dtype)
+    inout3c = n.flatten().astype(dtype)
+    
     # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
-    inout3[0::6] = inout3a[0::2]
-    inout3[1::6] = inout3a[1::2]
-    inout3[2::6] = inout3b[0::2]
-    inout3[3::6] = inout3b[1::2]
-    inout3[4::6] = inout3c[0::2]
-    inout3[5::6] = inout3c[1::2]
+    io3x = [inout3a, inout3b, inout3c] # each for l, m and n
+    for i in range(len(io3x)):
+        for j in range(CV):
+            inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
+    # inout3[0::6] = inout3a[0::2]
+    # inout3[1::6] = inout3a[1::2]
+    # inout3[2::6] = inout3b[0::2]
+    # inout3[3::6] = inout3b[1::2]
+    # inout3[4::6] = inout3c[0::2]
+    # inout3[5::6] = inout3c[1::2]
+    inout_factor = np.concatenate((inout0, inout3))
+    print(f"lmn: {inout3.flatten()[:24]}")
     
     inout4 = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
     
     # Initialize data buffers
     if dtype == bfloat16:
-        bo_inout0.write(inout0.view(np.uint16), 0)
+        bo_inout0.write(inout_factor.view(np.uint16), 0)
+        bo_inout00.write(inout_factor.view(np.uint16), 0)
         bo_inout1.write(inout1.view(np.uint16), 0)
         bo_inout2.write(inout2.view(np.uint16), 0)
-        bo_inout3.write(inout3.view(np.uint16), 0)
     else:
-        bo_inout0.write(inout0, 0)
+        bo_inout0.write(inout_factor, 0)
+        bo_inout00.write(inout_factor, 0)
         bo_inout1.write(inout1, 0)
         bo_inout2.write(inout2, 0)
-        bo_inout3.write(inout3, 0)
     bo_inout4.write(inout4, 0)
 
     # Sync buffers to update input buffer values
     bo_instr.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout0.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
+    bo_inout00.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout2.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
-    bo_inout3.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
 
     # ------------------------------------------------------
@@ -179,7 +193,7 @@ def main(opts):
             print("Running Kernel.")
         start = time.time_ns()
         opcode = 3
-        h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4) # only 4 inputs and 1 output
+        h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout00, bo_inout1, bo_inout2, bo_inout4) # only 4 inputs and 1 output
         h.wait()
         stop = time.time_ns()
         bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
@@ -200,7 +214,7 @@ def main(opts):
         if i == num_iter-1:
             print("\nOutput from distributed input 1/3:")
             print(output_buffer.shape)
-            for x in output_buffer.reshape(NINPUTS, INPUT_VOL):
+            for x in output_buffer.reshape(256, 256)[190:193]:
                 print(x)
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
@@ -213,6 +227,7 @@ def main(opts):
 
     # TODO - Mac count to guide gflops
 
+    print("\nTotal NPU time: {}us.".format(int(npu_time_total / 1000)))
     print("\nAvg NPU time: {}us.".format(int((npu_time_total / opts.iters) / 1000)))
     print("\nMin NPU time: {}us.".format(int((npu_time_min) / 1000)))
     print("\nMax NPU time: {}us.".format(int((npu_time_max) / 1000)))
