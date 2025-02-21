@@ -19,6 +19,7 @@ aie::vector<bfloat16, VEC_SIZE> sin_bfloat16(aie::vector<bfloat16, VEC_SIZE> inp
 aie::vector<bfloat16, VEC_SIZE> cos_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
     auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
     auto scaled_vec = aie::mul(inputs, FACTOR);
+    // aie::vector(int32, VEC_SIZE) bfloat16_to_int(scaled_vec, 0); // index to table int32, may want to cast to uint8?
     return getCosbFloat16(scaled_vec); // calling function for cos (calling the lut)
 }
 
