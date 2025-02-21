@@ -37,7 +37,7 @@ void mean(bfloat16 *a, bfloat16 *b,  bfloat16 *c, uint32_t N) { // Input Value S
     // Writing results to output
     aie::vector<float, VEC_SIZE> sum = aie::to_vector<float>(acc, 0);
     aie::vector<bfloat16, VEC_SIZE> resS = aie::zeros<bfloat16, VEC_SIZE>(); // need to change to filter (it didnt work before)
-    for(int i = 0; i < VEC_SIZE; i++) {
+    for(int i = 0; i < VEC_SIZE; i++) { // need to find a way to vectorize this
         resS[i] = sum[i];
     }
     aie::vector<bfloat16, VEC_SIZE> res = aie::div(resS, DIV);

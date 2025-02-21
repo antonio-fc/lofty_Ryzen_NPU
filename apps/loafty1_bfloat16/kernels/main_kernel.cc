@@ -32,9 +32,10 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
     for(int t = 0; t < CV; t++) // for each pixel/lmn
     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
         // Check if calculations can be skipped
-        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
-            return;
-        }
+        // if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
+        //     // Could also assign NaN to out[t], need to see if it is necessary
+        //     continue;
+        // }
         
         // Initialize the accum for the reduction
         auto sum_v = aie::zeros<bfloat16, VEC_SIZE>();
@@ -42,7 +43,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
         acc.from_vector(sum_v, 0);
 
         // Intermediate operations
-        for (int i = 0; i < N; i += VEC_SIZE) {
+        for (int i = 0; i < N; i += VEC_SIZE) { // 24 times
             // Getting baselines vectors
             auto vecU = aie::load_v<VEC_SIZE>(u + i);
             auto vecV = aie::load_v<VEC_SIZE>(v + i);

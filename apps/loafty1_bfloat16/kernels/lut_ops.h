@@ -3,6 +3,7 @@
     #define M_PI 3.14159265358979323846
 #endif
 #include "aie_api/aie.hpp"
+#include <cmath>
 
 using lut_type = aie::lut<4, bfloat16, bfloat16>;
 const int LUT_elems = 512;
@@ -19,28 +20,79 @@ aie::vector<uint16, VEC_SIZE> v32bfloat16_to_v32uint(aie::vector<bfloat16, VEC_S
     const int exp_bias = 127;
     // Convert float32 to uint32
     // 0. Make sure there isn't an already implemented conversion function like bfloat16_to_int
+    
     // 1. Extract mantissa bits using bit and with a broadcast  (put the 23 mantissa bits into a uint32 array starting at the LSB)
     aie::vector<uint16, VEC_SIZE> bitmap0 = aie::broadcast<uint16, VEC_SIZE>(0x007f);
     aie::vector<uint16, VEC_SIZE> mantissa = aie::bit_and(input.cast_to<uint16>(), bitmap0);
     mantissa = aie::add(mantissa, (uint16) 0x0080); // putting the implicit 1 in bit 24
+    
     // 2. Extract exponent bits (put the 8 mantissa bits into a int32 array starting at the LSB)
     aie::vector<uint16, VEC_SIZE> bitmap1 = aie::broadcast<uint16, VEC_SIZE>(0x7f80);
     aie::vector<uint16, VEC_SIZE> exponent_unshifted = aie::bit_and(input.cast_to<uint16>(), bitmap1);
     aie::vector<uint16, VEC_SIZE> exponent_biased = aie::downshift(exponent_unshifted, mantissa_size);
+    
     // 3. Substract the bias in the exponent (bias = 127) using a broadcast vector
     aie::vector<int16, VEC_SIZE> bias = aie::broadcast<int16, VEC_SIZE>(exp_bias);
     aie::vector<int16, VEC_SIZE> exponent_signed = aie::sub(exponent_biased.cast_to<int16>(), bias);
+    
     // 4. Save the absolute value of the exponent in an uint32 vector
-    aie::vector<int16, VEC_SIZE> exponent_abs = aie::abs(exponent_signed);
-    // 5. Save the number of left and right shift for each element 
-    aie::vector<uint16, VEC_SIZE> left = aie::downshift(aie::add(exponent_signed, exponent_abs), 1).cast_to<uint16>();
-    aie::vector<uint16, VEC_SIZE> right = aie::downshift(aie::add(aie::neg(exponent_signed), exponent_abs), 1).cast_to<uint16>();
-    // 6. Shift the mantissa vector according to the sign of the exponent (bitmap) and the exponent (vector)
+    // aie::vector<int16, VEC_SIZE> exponent_abs = aie::abs(exponent_signed);
+    
+    // // 5. Save the number of left and right shift for each element
+    // aie::vector<uint16, VEC_SIZE> left = aie::downshift(aie::add(exponent_signed, exponent_abs), 1).cast_to<uint16>();
+    // aie::vector<uint16, VEC_SIZE> right = aie::downshift(aie::add(aie::neg(exponent_signed), exponent_abs), 1).cast_to<uint16>();
+    
+    // // // aie::vector<int16, VEC_SIZE> zeros = aie::zeros<int16, VEC_SIZE>();
+    // // // aie::vector<int16, VEC_SIZE> min = aie::broadcast<int16, VEC_SIZE>(-127);
+    // // // aie::vector<int16, VEC_SIZE> max = aie::broadcast<int16, VEC_SIZE>(128);
+    // // // aie::vector<uint16, VEC_SIZE> left = aie::clamp(exponent_signed, zeros, max).cast_to<uint16>();
+    // // // aie::vector<uint16, VEC_SIZE> right = aie::abs(aie::clamp(exponent_signed, min, zeros)).cast_to<uint16>();
+
+    // auto multiplier = aie::broadcast<uint16, VEC_SIZE>(1);
+    // auto divider = aie::broadcast<uint16, VEC_SIZE>(1);
+
+    // // Getting the multiplier simmulating the left shift (range is 0 to 7) (no, for loop doesnt work)
+    // auto mask = aie::eq((unsigned short int) 1, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 1), mask); 
+
+    // mask = aie::eq((unsigned short int) 2, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 2), mask);
+    
+    // mask = aie::eq((unsigned short int) 3, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 3), mask);
+
+    // mask = aie::eq((unsigned short int) 4, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 4), mask);
+
+    // mask = aie::eq((unsigned short int) 5, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 5), mask);
+
+    // mask = aie::eq((unsigned short int) 6, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 6), mask);
+
+    // mask = aie::eq((unsigned short int) 7, left);
+    // multiplier = aie::select(multiplier, (unsigned short int) pow(2, 7), mask);
+
+    // // Getting the divider simmulating the right shift (range is 0 to 1)
+    // mask = aie::eq((unsigned short int) 0, right);
+    // divider = aie::select(divider, (unsigned short int) 2, mask);
+
+    // // 6. Shift the mantissa vector according to the sign of the exponent (bitmap) and the exponent (vector)
     aie::vector<uint16, VEC_SIZE> index = mantissa;
+
+    // index = aie::mul(index, multiplier).to_vector<uint16>(); // left shifting
+
+    // // right shifting [only left (up) shifting the zeros in 'right' and then right (down) shifting everthing]
+    // index = aie::mul(index, divider).to_vector<uint16>();
+    // index = aie::downshift(index, 1);
+    
+
     for (int i = 0; i < VEC_SIZE; i++) {
-        index[i] = (index[i] << left[i]) >> right[i];
+        index[i] = index[i] << exponent_signed[i];
     }
+    
     index = aie::downshift(index, mantissa_size);
+    
     // 7. The resulting vector should contain the correct indexes
     return index;
 }

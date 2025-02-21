@@ -32,15 +32,16 @@ def main(opts):
     BSIZE = 256*256 # 256X256
 
     CV = 32 # number of consecutive values
+    N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
     INOUT0_VOLUME = int(MSIZE)  
-    INOUT1_VOLUME = int(CV*3) 
+    INOUT1_VOLUME = int(CV*N_LMN) # padding the scalar of the frequency factor to be in the same stream as lmn values
     INOUT2_VOLUME = int(BSIZE)
-    INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * 3
+    INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
     
     NCORES = 6 # for each distribution
     NINPUTS = 5
-    INPUT_VOL = int(MSIZE/2)
+    INPUT_VOL = int(MSIZE/2) # split in 2 for each distribution data stream
     CHUNK_VOL = int(INPUT_VOL/NCORES)
     FULL_INPUT_VOL = int(INPUT_VOL*NINPUTS)
     OUTPUT_VOL = BSIZE
@@ -80,32 +81,32 @@ def main(opts):
     # Getting/generating input data
     f = 50_000_000 # 50MHz
     SL = 299_792_458 # m/s
-    factor = -2 * f * math.pi / SL
+    factor = 1.0 # -2 * f * math.pi / SL
     inout0 = np.array([factor], dtype=INOUT1_DATATYPE)               # factor (-2 pi f / SPEED_OF_LIGHT)
     inout0 = np.repeat(inout0, INOUT1_VOLUME)
     print("Frequency/Factor Input: ")
     print(f"Frequency: {f/1_000_000}MHz")
     print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
 
-    visR = np.zeros(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)         # vis real
+    visR = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)         # vis real
     visRa, visRb = np.split(visR, 2)
-    visRb = visRb + 0.5
+    # visRb = visRb + 0.5
     
     visC = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)          # vis complex
     visCa, visCb = np.split(visC, 2)
-    visCb = visCb + 0.5
+    # visCb = visCb + 0.5
     
-    u = np.full(INOUT0_VOLUME, 2, dtype=INOUT0_DATATYPE)          # baselines u
+    u = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines u
     ua, ub = np.split(u, 2)
-    ub = ub + 0.5
+    # ub = ub + 0.5
     
-    v = np.full(INOUT0_VOLUME, 3, dtype=INOUT0_DATATYPE)          # baselines v
+    v = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines v
     va, vb = np.split(v, 2)
-    vb = vb + 0.5
+    # vb = vb + 0.5
     
-    w = np.full(INOUT0_VOLUME, 4, dtype=INOUT0_DATATYPE)          # baselines w
+    w = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines w
     wa, wb = np.split(w, 2)
-    wb = wb + 0.5
+    # wb = wb + 0.5
     
     inout1 = np.empty((FULL_INPUT_VOL,), dtype=INOUT0_DATATYPE) # 9216 * 5 / 2
     inout1 = inout1.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
@@ -128,15 +129,15 @@ def main(opts):
     print(f"VisR: {inout2[0]}, VisC: {inout2[1]}, U: {inout2[2]}, V: {inout2[3]}, W: {inout2[4]}")
     
     
-    inout3 = np.empty((INOUT2_VOLUME*3,), dtype=INOUT2_DATATYPE)     # l, m, n
-    # inout3a = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # l
-    # inout3b = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)         # m
-    # inout3c = np.ones(INOUT2_VOLUME, dtype=INOUT2_DATATYPE)          # n
-    l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
-    n = np.sqrt(1 - l**2 - m**2) - 1
-    inout3a = l.flatten().astype(dtype)
-    inout3b = m.flatten().astype(dtype)
-    inout3c = n.flatten().astype(dtype)
+    inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=INOUT2_DATATYPE)     # l, m, n
+    inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=INOUT2_DATATYPE)          # l
+    inout3b = np.full(INOUT2_VOLUME, 0, dtype=INOUT2_DATATYPE)           # m
+    inout3c = np.full(INOUT2_VOLUME, 0, dtype=INOUT2_DATATYPE)            # n
+    # l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
+    # n = np.sqrt(1 - l**2 - m**2) - 1
+    # inout3a = l.flatten().astype(dtype)
+    # inout3b = m.flatten().astype(dtype)
+    # inout3c = n.flatten().astype(dtype)
     
     # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
     io3x = [inout3a, inout3b, inout3c] # each for l, m and n
