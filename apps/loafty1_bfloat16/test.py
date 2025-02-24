@@ -17,7 +17,6 @@ from ml_dtypes import bfloat16
 
 
 def main(opts):
-
     # Load instruction sequence
     with open(opts.instr, "r") as f:
         instr_text = f.read().split("\n")
@@ -27,11 +26,12 @@ def main(opts):
     # ------------------------------------------------------------
     # Configure this to match your design's buffer size and type
     # ------------------------------------------------------------
-    MSIZE = 9216 # 96x96
-    ISIZE = 1024
-    BSIZE = 256*256 # 256X256
+    MATRIX_DIM_SIZE0 = 96 # size of baselines and vis matrices side (square matrix) 
+    MATRIX_DIM_SIZE1 = 256 # size of lmn matrices side (square matrix), as well as size of image frame
+    MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
+    BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
-    CV = 32 # number of consecutive values
+    CV = 32 # number of consecutive values in output stream
     N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
     INOUT0_VOLUME = int(MSIZE)  
@@ -40,9 +40,8 @@ def main(opts):
     INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
     
     NCORES = 6 # for each distribution
-    NINPUTS = 5
+    NINPUTS = 5 # u, v, w, real vis and imag vis
     INPUT_VOL = int(MSIZE/2) # split in 2 for each distribution data stream
-    CHUNK_VOL = int(INPUT_VOL/NCORES)
     FULL_INPUT_VOL = int(INPUT_VOL*NINPUTS)
     OUTPUT_VOL = BSIZE
 

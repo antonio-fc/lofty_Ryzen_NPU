@@ -52,16 +52,19 @@ def declaring_tiles(n_cols, n_comp):
 def loafty():
     # Declaring constant sizes
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
-    MSIZE = 9216 # 96x96 # size of a full input
-    BSIZE = 256*256 # 256X256 # size of lmn matrices
+    MATRIX_DIM_SIZE0 = 96 # size of baselines and vis matrices side (square matrix) 
+    MATRIX_DIM_SIZE1 = 256 # size of lmn matrices side (square matrix), as well as size of image frame
+    MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
+    BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 
     OUT_SIZE = 32
-    FACTOR_MOVE_SIZE = OUT_SIZE * 3 # 3 for l, m and n
-    FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*3
+    N_LMN = 3 # 3 for l, m and n
+    FACTOR_MOVE_SIZE = OUT_SIZE * N_LMN
+    FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*N_LMN
 
     ITERS = BSIZE//OUT_SIZE
     
     NINPUTS = 5 # number of inputs in a single stream
-    COLS = [0, 1]
+    COLS = [0, 1] # for the second distribution, add 2 to each element to get the other columns
     ROWS = [1, 2, 3]
     NCOLS = len(COLS)
     NROWS = len(ROWS)
