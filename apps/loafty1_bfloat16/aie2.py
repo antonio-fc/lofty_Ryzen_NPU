@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 #
 # (c) Copyright 2024 Advanced Micro Devices, Inc. or its affiliates
+import argparse
 import numpy as np
 import sys
 from ml_dtypes import bfloat16
@@ -13,6 +14,7 @@ from aie.dialects.aie import *
 from aie.dialects.aiex import *
 from aie.helpers.dialects.ext.scf import _for as range_
 from aie.extras.context import mlir_mod_ctx
+import aie.utils.trace as trace_utils
 
 def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
     # kernel for passthrough (scalar)
@@ -49,7 +51,11 @@ def declaring_tiles(n_cols, n_comp):
         ct.append(c)
     return (st, mt, ct)
 
-def loafty():
+def loafty(opts):
+    # Trace constants
+    enableTrace = opts.trace_size > 0
+    trace_size = opts.trace_size
+    
     # Declaring constant sizes
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MATRIX_DIM_SIZE0 = 96 # size of baselines and vis matrices side (square matrix) 
@@ -74,6 +80,8 @@ def loafty():
     
     MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216*5/2)/6
     JOIN_SIZE = OUT_SIZE * NCORES
+
+    FULL_OUTPUT_SIZE = OUT_SIZE*ITERS # BSIZE
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
@@ -96,6 +104,8 @@ def loafty():
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
         
+        mean_tile = ct[1][0]
+        trace_shim_tile = st[1]
         main_compute_tilesA = []
         main_compute_tilesB = []
         for i in COLS:
@@ -105,8 +115,7 @@ def loafty():
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factorA = object_fifo("in0", st[1], main_compute_tilesA, 2, factor_ty)
-        of_in_factorB = object_fifo("in3", st[2], main_compute_tilesB, 2, factor_ty)
+        of_in_factor = object_fifo("in0", st[1], main_compute_tilesA + main_compute_tilesB, 2, factor_ty)
         of_in_mainA = object_fifo("in1", st[0], mt[0], 2, input_ty)       
         of_in_mainB = object_fifo("in2", st[3], mt[3], 2, input_ty)
 
@@ -137,17 +146,17 @@ def loafty():
                 main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", ct[i+NCOLS][j], mt[2], 2, out_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * OUT_SIZE)
 
-        of_out_mainA = object_fifo("out1", mt[1], ct[1][0], 2, join_ty)
-        of_out_mainB = object_fifo("out2", mt[2], ct[1][0], 2, join_ty)
+        of_out_mainA = object_fifo("out1", mt[1], mean_tile, 2, join_ty)
+        of_out_mainB = object_fifo("out2", mt[2], mean_tile, 2, join_ty)
         
         object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
         object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
 
-        of_out = object_fifo("out", ct[1][0], st[1], 2, out_ty)
+        of_out = object_fifo("out", mean_tile, st[1], 2, out_ty)
 
         # Declaring the cores
 
-        @core(ct[1][0], "mean.o")
+        @core(mean_tile, "mean.o")
         def core_body():
             for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
                 for _ in range_(ITERS):
@@ -170,47 +179,65 @@ def loafty():
                 obf_in_fifoB = main_in_fifosB[index]
                 obf_out_fifoB = main_out_fifosB[index]
 
-                # to only declare cores one
+                # to only declare cores once
                 cores = [ct[i][j], ct[i+NCOLS][j]]
                 inFIFOs = [obf_in_fifoA, obf_in_fifoB]
                 outFIFOs = [obf_out_fifoA, obf_out_fifoB]
-                factorFIFOs = [of_in_factorA, of_in_factorB]
                 for c in range(2):
                     @core(cores[c], "kernels.a")
                     def core_body():
                         for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
-                            freq = factorFIFOs[c].acquire(ObjectFifoPort.Consume, 1)
+                            freq = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
                             ff = freq[0]
-                            factorFIFOs[c].release(ObjectFifoPort.Consume, 1)
+                            of_in_factor.release(ObjectFifoPort.Consume, 1)
                             
                             inputs = inFIFOs[c].acquire(ObjectFifoPort.Consume, 5)
                             for _ in range_(ITERS):
-                                factors = factorFIFOs[c].acquire(ObjectFifoPort.Consume, 1)
+                                factors = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
                                 outputs = outFIFOs[c].acquire(ObjectFifoPort.Produce, 1)
                             
                                 kernels['main'](ff, factors, inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], outputs, MAIN_SIZE)
     
                                 outFIFOs[c].release(ObjectFifoPort.Produce, 1)
-                                factorFIFOs[c].release(ObjectFifoPort.Consume, 1)
+                                of_in_factor.release(ObjectFifoPort.Consume, 1)
                             inFIFOs[c].release(ObjectFifoPort.Consume, 5)
+
+        # Set up a packet-switched flow from core to shim for tracing information
+        tiles_to_trace = main_compute_tilesA + main_compute_tilesB
+        if enableTrace:
+            trace_utils.configure_packet_tracing_flow(tiles_to_trace, trace_shim_tile)
 
                     
         # To/from AIE-array data movement
-        @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty, full_input_ty)
-        def sequence(factor, factorB, mainA, mainB, output):
-            npu_dma_memcpy_nd(metadata=of_in_factorA, bd_id=1, mem=factor, sizes=[1, 1, 1, FACTOR_SIZE])
-            npu_dma_memcpy_nd(metadata=of_in_factorB, bd_id=4, mem=factorB, sizes=[1, 1, 1, FACTOR_SIZE])
+        @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
+        def sequence(factor, mainA, mainB, output):
+            if enableTrace:
+                trace_utils.configure_packet_tracing_aie2(tiles_to_trace, trace_shim_tile, opts.trace_size, FULL_OUTPUT_SIZE)
+            npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, FACTOR_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
             npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, OUT_SIZE*ITERS]) # output (size = BSIZE)
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, FULL_OUTPUT_SIZE]) # output (size = BSIZE)
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
+            # if enableTrace:
+            #     trace_utils.gen_trace_done_aie2(trace_shim_tile)
 
 
-with mlir_mod_ctx() as ctx:
-    loafty()
-    res = ctx.module.operation.verify()
-    if res == True:
-        print(ctx.module)
-    else:
-        print(res)
+if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument(
+        "-t",
+        "--trace_sz",
+        dest="trace_size",
+        default=0,
+        type=int,
+        help="trace size in bytes",
+    )
+    opts = p.parse_args(sys.argv[1:])
+    with mlir_mod_ctx() as ctx:
+        loafty(opts)
+        res = ctx.module.operation.verify()
+        if res == True:
+            print(ctx.module)
+        else:
+            print(res)

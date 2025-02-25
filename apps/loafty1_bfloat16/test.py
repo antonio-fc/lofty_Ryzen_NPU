@@ -13,6 +13,7 @@ import time
 import math
 
 import aie.utils.test as test_utils
+import aie.utils.trace as trace_utils
 from ml_dtypes import bfloat16
 
 
@@ -57,6 +58,7 @@ def main(opts):
     INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * 2
 
     OUT_SIZE = OUTPUT_VOL*2
+    TRACE_SIZE = int(opts.trace_size)
     OUT_DATATYPE = INOUT1_DATATYPE
 
     # ------------------------------------------------------
@@ -69,10 +71,9 @@ def main(opts):
     # ------------------------------------------------------
     bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
     bo_inout0 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
-    bo_inout00 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(6)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
     bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
     bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
-    bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
+    bo_inout4 = xrt.bo(device, OUT_SIZE + TRACE_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
 
     # Initialize instruction buffer
     bo_instr.write(instr_v, 0)
@@ -81,49 +82,41 @@ def main(opts):
     f = 50_000_000 # 50MHz
     SL = 299_792_458 # m/s
     factor = 1.0 # -2 * f * math.pi / SL
-    inout0 = np.array([factor], dtype=INOUT1_DATATYPE)               # factor (-2 pi f / SPEED_OF_LIGHT)
+    inout0 = np.array([factor], dtype=INOUT1_DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
     inout0 = np.repeat(inout0, INOUT1_VOLUME)
     print("Frequency/Factor Input: ")
     print(f"Frequency: {f/1_000_000}MHz")
     print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
 
-    visR = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)         # vis real
+    visR = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)          # vis real
     visRa, visRb = np.split(visR, 2)
-    # visRb = visRb + 0.5
     
     visC = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)          # vis complex
     visCa, visCb = np.split(visC, 2)
-    # visCb = visCb + 0.5
     
     u = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines u
     ua, ub = np.split(u, 2)
-    # ub = ub + 0.5
     
     v = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines v
     va, vb = np.split(v, 2)
-    # vb = vb + 0.5
     
     w = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines w
     wa, wb = np.split(w, 2)
-    # wb = wb + 0.5
+
+    inputsA = [visRa, visCa, ua, va, wa]
+    inputsB = [visRb, visCb, ub, vb, wb]
     
     inout1 = np.empty((FULL_INPUT_VOL,), dtype=INOUT0_DATATYPE) # 9216 * 5 / 2
     inout1 = inout1.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-    inout1[0, :] = visRa
-    inout1[1, :] = visCa
-    inout1[2, :] = ua
-    inout1[3, :] = va
-    inout1[4, :] = wa
+    for i in range(NINPUTS):
+        inout1[i, :] = inputsA[i]
     print("\nFull Input A: ")
     print(f"VisR: {inout1[0]}, VisC: {inout1[1]}, U: {inout1[2]}, V: {inout1[3]}, W: {inout1[4]}")
     
     inout2 = np.empty((FULL_INPUT_VOL,), dtype=INOUT0_DATATYPE) # 9216 * 5 / 2
     inout2 = inout2.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-    inout2[0, :] = visRb
-    inout2[1, :] = visCb
-    inout2[2, :] = ub
-    inout2[3, :] = vb
-    inout2[4, :] = wb
+    for i in range(NINPUTS):
+        inout2[i, :] = inputsB[i]
     print("\nFull Input B: ")
     print(f"VisR: {inout2[0]}, VisC: {inout2[1]}, U: {inout2[2]}, V: {inout2[3]}, W: {inout2[4]}")
     
@@ -143,26 +136,18 @@ def main(opts):
     for i in range(len(io3x)):
         for j in range(CV):
             inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
-    # inout3[0::6] = inout3a[0::2]
-    # inout3[1::6] = inout3a[1::2]
-    # inout3[2::6] = inout3b[0::2]
-    # inout3[3::6] = inout3b[1::2]
-    # inout3[4::6] = inout3c[0::2]
-    # inout3[5::6] = inout3c[1::2]
     inout_factor = np.concatenate((inout0, inout3))
     print(f"lmn: {inout3.flatten()[:24]}")
     
-    inout4 = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
+    inout4 = np.zeros(OUT_SIZE + TRACE_SIZE, dtype=np.uint8)                      # output
     
     # Initialize data buffers
     if dtype == bfloat16:
         bo_inout0.write(inout_factor.view(np.uint16), 0)
-        bo_inout00.write(inout_factor.view(np.uint16), 0)
         bo_inout1.write(inout1.view(np.uint16), 0)
         bo_inout2.write(inout2.view(np.uint16), 0)
     else:
         bo_inout0.write(inout_factor, 0)
-        bo_inout00.write(inout_factor, 0)
         bo_inout1.write(inout1, 0)
         bo_inout2.write(inout2, 0)
     bo_inout4.write(inout4, 0)
@@ -170,7 +155,6 @@ def main(opts):
     # Sync buffers to update input buffer values
     bo_instr.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout0.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
-    bo_inout00.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout2.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
@@ -193,7 +177,7 @@ def main(opts):
             print("Running Kernel.")
         start = time.time_ns()
         opcode = 3
-        h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout00, bo_inout1, bo_inout2, bo_inout4) # only 4 inputs and 1 output
+        h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4) # only 4 inputs and 1 output
         h.wait()
         stop = time.time_ns()
         bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
@@ -203,8 +187,15 @@ def main(opts):
             continue
 
         # Copy output results and verify they are correct
-        entire_buffer = bo_inout4.read(OUT_SIZE, 0).view(OUT_DATATYPE)
-        output_buffer = entire_buffer[:OUT_SIZE]
+        entire_buffer = bo_inout4.read(OUT_SIZE + TRACE_SIZE, 0)
+        output_buffer = entire_buffer[:OUT_SIZE].view(OUT_DATATYPE)
+        
+        if opts.trace_size > 0 and i==num_iter-1:
+            trace_buffer = entire_buffer[OUT_SIZE:]
+            for x in trace_buffer.reshape(16, 1024):
+                print(x)
+            trace_utils.write_out_trace(trace_buffer, str(opts.trace_file))
+        
         if opts.verify:
             if opts.verbosity >= 1:
                 print("Verifying results ...")
@@ -212,9 +203,9 @@ def main(opts):
         errors = 0
         
         if i == num_iter-1:
-            print("\nOutput from distributed input 1/3:")
+            print("\nOutput:")
             print(output_buffer.shape)
-            for x in output_buffer.reshape(256, 256)[190:193]:
+            for x in output_buffer.reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)[::32]:
                 print(x)
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
