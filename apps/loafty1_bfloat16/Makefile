@@ -6,14 +6,20 @@
 # 
 ##===----------------------------------------------------------------------===##
 
+##==------ IMPORTANT SETUP ------==##
+
 srcdir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 include ${srcdir}/../../programming_examples/makefile-common
 
 all: build/final.xclbin
 
-targetname = myFirstProgram
+targetname = loafty
 trace_size = 16384
+
+##==------------------------------==##
+
+##== COMPILING PYTHON AIE TO MLIR ==##
 
 build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
@@ -22,6 +28,10 @@ build/aie.mlir: ${srcdir}/aie2.py
 build/aie_trace.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
 	python3 $< -t ${trace_size} > $@
+
+##==-------------------------------==##
+
+##== COMPILING NPU KERNELS WITH PEANO ==##
 
 build/passthrough.o: ${srcdir}/kernels/passthrough.cc
 	mkdir -p ${@D}
@@ -42,6 +52,10 @@ build/lut_ops.o: ${srcdir}/kernels/lut_ops.cpp
 build/kernels.a: build/main_kernel.o build/lut_ops.o
 	ar rvs $@ $+
 
+##==------------------------------------==##
+
+##==------- GENERATING NPU CODE -------==##
+
 build/final.xclbin: build/aie.mlir build/passthrough.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
@@ -54,6 +68,10 @@ build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/
     			--no-xchesscc --no-xbridge \
 				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
 
+##==------------------------------------==##
+
+##==------- COMPILING C++ HOST CODE -------==##
+
 ${targetname}.exe: ${srcdir}/test.cpp
 	rm -rf _build
 	mkdir -p _build
@@ -65,13 +83,11 @@ else
 	cp _build/${targetname} $@ 
 endif
 
-run: ${targetname}.exe build/final.xclbin
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE
+##==--------------------------------------==##
 
-run-10: ${targetname}.exe build/final.xclbin build/insts.txt 
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 
+##==------- RUNNING CODE -------==##
 
-run-10-warmup: ${targetname}.exe build/final.xclbin build/insts.txt 
+run: ${targetname}.exe build/final.xclbin build/insts.txt 
 	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
 
 run_py: build/final.xclbin
@@ -81,5 +97,11 @@ trace_py: build/trace.xclbin
 	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 10 --warmup 4
 	${powershell} python3 ${srcdir}/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir > tracing/trace.json
 
+##==-----------------------------==##
+
+##==------- CLEAN -------==##
+
 clean:
 	rm -rf build _build ${targetname}.exe tracing/*
+
+##==---------------------==##

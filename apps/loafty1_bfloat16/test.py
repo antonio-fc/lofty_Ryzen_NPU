@@ -46,20 +46,17 @@ def main(opts):
     FULL_INPUT_VOL = int(INPUT_VOL*NINPUTS)
     OUTPUT_VOL = BSIZE
 
-    dtype = bfloat16
-    INOUT0_DATATYPE = dtype
-    INOUT1_DATATYPE = dtype
-    INOUT2_DATATYPE = dtype
+    DATATYPE = bfloat16
+    DTYPE_SIZE = 2 # bfloat16 size in bytes
 
-    INOUT0_SIZE = INOUT0_VOLUME * 2
-    INOUT1_SIZE = INOUT1_VOLUME * 2
-    INOUT2_SIZE = INOUT2_VOLUME * 2
-    FULL_INPUT_SIZE = FULL_INPUT_VOL * 2
-    INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * 2
+    INOUT0_SIZE = INOUT0_VOLUME * DTYPE_SIZE
+    INOUT1_SIZE = INOUT1_VOLUME * DTYPE_SIZE
+    INOUT2_SIZE = INOUT2_VOLUME * DTYPE_SIZE
+    FULL_INPUT_SIZE = FULL_INPUT_VOL * DTYPE_SIZE
+    INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * DTYPE_SIZE
 
-    OUT_SIZE = OUTPUT_VOL*2
+    OUT_SIZE = OUTPUT_VOL * DTYPE_SIZE
     TRACE_SIZE = int(opts.trace_size)
-    OUT_DATATYPE = INOUT1_DATATYPE
 
     # ------------------------------------------------------
     # Get device, load the xclbin & kernel and register them
@@ -73,7 +70,7 @@ def main(opts):
     bo_inout0 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
     bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
     bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
-    bo_inout4 = xrt.bo(device, OUT_SIZE + TRACE_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
+    bo_inout4 = xrt.bo(device, OUT_SIZE + TRACE_SIZE, xrt.bo.host_only, kernel.group_id(6))    # output
 
     # Initialize instruction buffer
     bo_instr.write(instr_v, 0)
@@ -82,38 +79,38 @@ def main(opts):
     f = 50_000_000 # 50MHz
     SL = 299_792_458 # m/s
     factor = 1.0 # -2 * f * math.pi / SL
-    inout0 = np.array([factor], dtype=INOUT1_DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
+    inout0 = np.array([factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
     inout0 = np.repeat(inout0, INOUT1_VOLUME)
     print("Frequency/Factor Input: ")
     print(f"Frequency: {f/1_000_000}MHz")
     print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
 
-    visR = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)          # vis real
+    visR = np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis real
     visRa, visRb = np.split(visR, 2)
     
-    visC = np.ones(INOUT0_VOLUME, dtype=INOUT0_DATATYPE)          # vis complex
+    visC = np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis complex
     visCa, visCb = np.split(visC, 2)
     
-    u = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines u
+    u = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines u
     ua, ub = np.split(u, 2)
     
-    v = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines v
+    v = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines v
     va, vb = np.split(v, 2)
     
-    w = np.full(INOUT0_VOLUME, 1, dtype=INOUT0_DATATYPE)          # baselines w
+    w = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines w
     wa, wb = np.split(w, 2)
 
     inputsA = [visRa, visCa, ua, va, wa]
     inputsB = [visRb, visCb, ub, vb, wb]
     
-    inout1 = np.empty((FULL_INPUT_VOL,), dtype=INOUT0_DATATYPE) # 9216 * 5 / 2
+    inout1 = np.empty((FULL_INPUT_VOL,), dtype=DATATYPE) # 9216 * 5 / 2
     inout1 = inout1.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
     for i in range(NINPUTS):
         inout1[i, :] = inputsA[i]
     print("\nFull Input A: ")
     print(f"VisR: {inout1[0]}, VisC: {inout1[1]}, U: {inout1[2]}, V: {inout1[3]}, W: {inout1[4]}")
     
-    inout2 = np.empty((FULL_INPUT_VOL,), dtype=INOUT0_DATATYPE) # 9216 * 5 / 2
+    inout2 = np.empty((FULL_INPUT_VOL,), dtype=DATATYPE) # 9216 * 5 / 2
     inout2 = inout2.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
     for i in range(NINPUTS):
         inout2[i, :] = inputsB[i]
@@ -121,10 +118,10 @@ def main(opts):
     print(f"VisR: {inout2[0]}, VisC: {inout2[1]}, U: {inout2[2]}, V: {inout2[3]}, W: {inout2[4]}")
     
     
-    inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=INOUT2_DATATYPE)     # l, m, n
-    inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=INOUT2_DATATYPE)          # l
-    inout3b = np.full(INOUT2_VOLUME, 0, dtype=INOUT2_DATATYPE)           # m
-    inout3c = np.full(INOUT2_VOLUME, 0, dtype=INOUT2_DATATYPE)            # n
+    inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=DATATYPE)     # l, m, n
+    inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=DATATYPE)          # l
+    inout3b = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)           # m
+    inout3c = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)            # n
     # l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
     # n = np.sqrt(1 - l**2 - m**2) - 1
     # inout3a = l.flatten().astype(dtype)
@@ -142,7 +139,7 @@ def main(opts):
     inout4 = np.zeros(OUT_SIZE + TRACE_SIZE, dtype=np.uint8)                      # output
     
     # Initialize data buffers
-    if dtype == bfloat16:
+    if DATATYPE == bfloat16:
         bo_inout0.write(inout_factor.view(np.uint16), 0)
         bo_inout1.write(inout1.view(np.uint16), 0)
         bo_inout2.write(inout2.view(np.uint16), 0)
@@ -188,7 +185,7 @@ def main(opts):
 
         # Copy output results and verify they are correct
         entire_buffer = bo_inout4.read(OUT_SIZE + TRACE_SIZE, 0)
-        output_buffer = entire_buffer[:OUT_SIZE].view(OUT_DATATYPE)
+        output_buffer = entire_buffer[:OUT_SIZE].view(DATATYPE)
         
         if opts.trace_size > 0 and i==num_iter-1:
             trace_buffer = entire_buffer[OUT_SIZE:]
