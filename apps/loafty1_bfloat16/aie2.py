@@ -54,7 +54,7 @@ def declaring_tiles(n_cols, n_comp):
 def loafty(opts):
     # Trace constants
     enableTrace = opts.trace_size > 0
-    trace_size = opts.trace_size
+    TRACE_SIZE = opts.trace_size
     
     # Declaring constant sizes
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
@@ -203,7 +203,7 @@ def loafty(opts):
                             inFIFOs[c].release(ObjectFifoPort.Consume, 5)
 
         # Set up a packet-switched flow from core to shim for tracing information
-        tiles_to_trace = main_compute_tilesA + main_compute_tilesB
+        tiles_to_trace = [mean_tile]
         if enableTrace:
             trace_utils.configure_packet_tracing_flow(tiles_to_trace, trace_shim_tile)
 
@@ -212,15 +212,15 @@ def loafty(opts):
         @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
         def sequence(factor, mainA, mainB, output):
             if enableTrace:
-                trace_utils.configure_packet_tracing_aie2(tiles_to_trace, trace_shim_tile, opts.trace_size, FULL_OUTPUT_SIZE)
+                trace_utils.configure_packet_tracing_aie2(tiles_to_trace=tiles_to_trace, shim=trace_shim_tile, ddr_id=4, trace_size=TRACE_SIZE, trace_offset=0)
             npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, FACTOR_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
             npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
             npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, FULL_OUTPUT_SIZE]) # output (size = BSIZE)
             # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
             dma_wait(of_out)
-            # if enableTrace:
-            #     trace_utils.gen_trace_done_aie2(trace_shim_tile)
+            if enableTrace:
+                trace_utils.gen_trace_done_aie2(trace_shim_tile)
 
 
 if __name__ == "__main__":

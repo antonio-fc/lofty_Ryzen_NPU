@@ -15,7 +15,7 @@ include ${srcdir}/../../programming_examples/makefile-common
 all: build/final.xclbin
 
 targetname = loafty
-trace_size = 16384
+trace_size = 256000
 
 ##==------------------------------==##
 
@@ -91,11 +91,11 @@ run: ${targetname}.exe build/final.xclbin build/insts.txt
 	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 1
 
 trace_py: build/trace.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 10 --warmup 4
-	${powershell} python3 ${srcdir}/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir > tracing/trace.json
+	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 10 --warmup 4 --verbosity 1
+	${powershell} python3 ${srcdir}/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
 
 ##==-----------------------------==##
 

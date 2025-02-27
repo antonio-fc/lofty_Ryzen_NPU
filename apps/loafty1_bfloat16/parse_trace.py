@@ -63,6 +63,7 @@ def core_trace_and_mem_trace_de_interleave(word_stream):
     toks_list = list()
     for t in range(NumTraceTypes):
         toks_list.append(dict())
+
     # core_streams = dict()   # pkt type 0
     # mem_stream = dict()     # pkt type 1
     # intfc_stream = dict()   # pkt type 2
@@ -125,20 +126,6 @@ def convert_to_byte_stream(toks_list):
                     byte = 3 - top
                     opcode = event >> (byte * 8) & 0xFF
                     byte_stream_dict[loc].append(opcode)
-        # for key, value in l.items():
-        #     # byte_stream = list()
-        #     byte_stream_dict[key] = list()
-        #     f = ['', 'a5a5a5a5']
-        #     toks = [t for t in value if not t in f]
-        #     events = [int(t,16) for t in toks]
-        #     for (i,event) in enumerate(events):
-        #         if ((i % 8) == 0): # assumed hdr every 8 words and ignores it
-        #             pass
-        #         else: # breaks line into list of bytes
-        #             for top in range(4):
-        #                 byte = 3-top
-        #                 opcode = (event >> (byte * 8) & 0xff)
-        #                 byte_stream_dict[key].append(opcode)
         byte_stream_list.append(byte_stream_dict)
     return byte_stream_list
 
@@ -303,48 +290,7 @@ def flatten_repeat_command(commands):
 
 # Using trace_event_0 = 0x4B222125, trace_event_1 = 0x2D2C1A4F
 def lookupEventNameInStr(event, pid, pid_events):
-    # TODO Expand to other pid for multiple cores? even/odd
-    # For now, we assume a single trace event and key based on that
-    # in the future, the pid will be used to match the right events
-    # print("pid_events[0]: ",pid_events[0])
-    # print("event: ",event)
-    # print("pid_events[0][event]: ",pid_events[0][int(event)])
     return lookup_event_name_by_code(pid_events[0][int(event)])
-
-    # if pid == 0 or pid == 2: # Core trace
-    #     if event == "0":
-    #         return "KernelExecutesVectorInstruction"
-    #     elif event == "1":
-    #         return "KernelStarts"
-    #     elif event == "2":
-    #         return "KernelDone"
-    #     elif event == "3":
-    #         return "PortRunning0"
-    #     elif event == "4":
-    #         return "PortRunning1"
-    #     elif event == "5":
-    #         return "LockStall"
-    #     elif event == "6":
-    #         return "LockAcquireInstr"
-    #     elif event == "7":lookupEventNameInstr
-    #         return "LockReleaseInstr"
-    # elif pid == 1 or pid == 3: # Memory trace
-    #     if event == "0":
-    #         return "S2mm0StartTask"
-    #     elif event == "1":
-    #         return "S2mm1StartTask"
-    #     elif event == "2":
-    #         return "Mm2s0StartTask"
-    #     elif event == "3":
-    #         return "Mm2s1StartTask"
-    #     elif event == "4":
-    #         return "S2mm0FinishedTask"
-    #     elif event == "5":
-    #         return "S2mm1FinishedTask"
-    #     elif event == "6":
-    #         return "Mm2s0FinishedTask"
-    #     elif event == "7":
-    #         return "Mm2s1FinishedTask"
 
 
 # multiples is a list of events that are being activated
@@ -379,16 +325,6 @@ def deactivate(
                 trace_events.append(trace_event)
             active_events[k] = 0
 
-
-# def update(t):
-#     for k in active_events.keys():
-#         if active_events[k]:
-#             active_events[k] = t
-
-
-# def convert_commands_to_json(trace_events, commands, pid, pid_events):
-# TODO iterate over commands which is ...
-#
 # commands:  list (idx = trace type, value = byte_stream_dict)
 # byte_stream_dict: dict (key = row,col, value = list of commands)
 def convert_commands_to_json(trace_events, commands, pid_events):
@@ -567,10 +503,6 @@ def thread_name_metadata(trace_events, trace_type, loc, pid, tid, pid_events):
     )
     trace_events.append(trace_event)
 
-
-# pid_events: list(idx=pkt_type, value=labels_dict)
-# label_dict: dict(key=row,col, value=labels list)
-# labels_list: list(idx=label idx, value=label code)
 def parse_mlir_trace_events(lines):
     # arg can be column, row, address or value
     # 1: arg: 2: val
@@ -583,10 +515,6 @@ def parse_mlir_trace_events(lines):
     # 7: arg, 8: 0x, 9: val
     # 10: arg, 11: 0x, 12: val
 
-    # TODO Need to check if this line is commented out, check for // ? (harder to check of /* */)
-    # TODO Need to support value in hex with 0x or decimal
-    # pattern = r"AIEX.npu.write32\s*\{\s*(\w+)\s*=\s*(\d+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(\d+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(\w+)\s*:\s*\w+\s*\}"
-    # pattern = r"AIEX.npu.write32\s*\{\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*\}"
     pattern = r"aiex.npu.write32\s*\{\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*,\s*(\w+)\s*=\s*(0x)?(\w+)\s*:\s*\w+\s*\}"
 
     pid_events = list()
@@ -619,20 +547,6 @@ def parse_mlir_trace_events(lines):
                     else:  # assume ''
                         value = int(result.group(3 * i2 + 3))
 
-                # var = result.group(2*i2+1)
-                # if(var == "address"):
-                #     address = int(result.group(2*i2+2))
-                # elif(var == "row"):
-                #     row = int(result.group(2*i2+2))
-                # elif(var == "column"):
-                #     col = int(result.group(2*i2+2)) + colshift
-                #     col = 1 if col == 0 else col
-                # elif(var == "value"):
-                #     value = int(result.group(2*i2+2))
-
-            # labels_dict = dict()
-            # labels_dict['row'] = row
-            # labels_dict['col'] = col
             key = str(row) + "," + str(col)
 
             # core event 0
@@ -742,11 +656,6 @@ def parse_mlir_trace_events(lines):
                 pid_events[3][key][7] = (value >> 24) & 0xFF
             # TODO intfc event 0, 1 needs to also be defined
 
-    # print("Found labels:\n")
-    # for j in pid_events:
-    #     print("row:",j['row'],", col: ",j['col'])
-    #     print("0: ", j[0], "1: ", j[1], "2: ", j[2], "3: ", j[3])
-    #     print("4: ", j[4], "5: ", j[5], "6: ", j[6], "7: ", j[7])
     return pid_events
 
 
@@ -768,92 +677,6 @@ def lookup_event_name_by_type(trace_type, code):
     else:
         event = "Unknown"
     return event
-
-
-# def lookup_event_name_by_code(code, traceType):
-#     event = ""
-#     # Core traces
-#     if traceType == 0:
-#         if code == 0x1:
-#             event = "True"
-#         elif code == 24: # 0x18:
-#             event = "StreamStall"
-#         elif code == 26: # 0x1A:
-#             event = "LockStall"
-#         elif code == 32: # 0x20, all events 33-45
-#             event = "CoreProgramFlow"
-#         elif code == 33: # 0x21:
-#             event = "Event0"
-#         elif code == 34: # 0x22:
-#             event = "Event1"
-#         elif code == 37: # 0x25:
-#             event = "VectorInstr"
-#         elif code == 38: # 0x26:
-#             event = "InstrLoad"
-#         elif code == 39: # 0x27:
-#             event = "InstrStore"
-#         elif code == 44: # 0x2C:
-#             event = "LockAcquireInstr"
-#         elif code == 45: # 0x2D:
-#             event = "LockReleaseInstr"
-#         elif code == 75: # 0x4B:
-#             event = "PortRunning0"
-#         elif code == 79: # 0x4F:
-#             event = "PortRunning1"
-#         else:
-#             event = "Unknown"
-#     # Mem traces
-#     elif traceType == 1:
-#         # TODO Need to define these
-#         event = "Unknown"
-#     else
-#         event = "Unknown"
-
-# match code:
-#     case 0x1:
-#         event = "True"
-#     case 0x18:
-#         event = "StreamStall"
-#     case 0x1A:
-#         event = "LockStall"
-#     case 0x22:
-#         event = "Event 1"
-#     case 0x21:
-#         event = "Event 0
-#     case 0x25:
-#         event = "VectorInstr"
-#     case 0x2C:
-#         event = "LockAcquireInstr"
-#     case 0x2D:
-#         event = "LockReleaseInstr"
-#     case 0x4F:
-#         event = "PortRunning1"
-#     case 0x4B:
-#         event = "PortRunning0"
-#     case _:
-#         event = "Unknown"
-# return event
-
-
-# lookupEventNameInStr(event, pid):
-# # TODO Expand to other pid for multiple cores? even/odd
-# if pid == 0 or pid == 2: # Core trace
-#     if event == "0":
-#         return "KernelExecutesVectorInstruction"
-#     elif event == "1":
-#         return "KernelStarts"
-#     elif event == "2":
-#         return "KernelDone"
-#     elif event == "3":
-#         return "PortRunning0"
-#     elif event == "4":
-#         return "PortRunning1"
-#     elif event == "5":
-#         return "LockStall"
-#     elif event == "6":
-#         return "LockAcquireInstr"
-#     elif event == "7":
-#         return "LockReleaseInstr"
 
 
 # This sets up the trace metadata and also assigned the unique pid that's referred
@@ -897,7 +720,6 @@ with open(opts.filename, "r") as f:
 
     # TODO Change this to list of toks instead of a fixed set?
     toks_list = core_trace_and_mem_trace_de_interleave(toks)
-    # print(len(toks_list))
 
     if DEBUG:
         print("\nDEBUG: stream")
@@ -905,41 +727,18 @@ with open(opts.filename, "r") as f:
         print("\n\n")
 
     bs_0 = convert_to_byte_stream(toks_list)
-    # core_bs_0    = convert_to_byte_stream(core_toks)
-    # mem_bs_0     = convert_to_byte_stream(mem_toks)
-    # intfc_bs_0   = convert_to_byte_stream(intfc_toks)
-    # memtile_bs_0 = convert_to_byte_stream(memtile_toks)
 
     if DEBUG:
         print("\nDEBUG: byte stream")
         print(bs_0)
         print("\n\n")
 
-    # core_bs_1 = convert_to_byte_stream(core_toks[1])
-    # mem_bs_0 = convert_to_byte_stream(mem_toks[0])
-    # mem_bs_1 = convert_to_byte_stream(mem_toks[1])
-
     commands_0 = convert_to_commands(bs_0, False)
-    # core_commands_0    = convert_to_commands(core_bs_0, False)
-    # mem_commands_0     = convert_to_commands(mem_bs_0, False)
-    # intfc_commands_0   = convert_to_commands(intfc_bs_0, False)
-    # memtile_commands_0 = convert_to_commands(memtile_bs_0, False)
-
-    # core_commands_1 = convert_to_commands(core_bs_1, False)
-    # mem_commands_0 = convert_to_commands(mem_bs_0, False)
-    # mem_commands_1 = convert_to_commands(mem_bs_1, False)
-
 if DEBUG:
     print("\nDEBUG: commands_0")
     print(commands_0)
     print("\n\n")
-
-# pid_events track the labels associated with pkt_type/ trace and row,col
-#
-# pid_events: list(idx=pkt_type, value=labels_dict)
-# label_dict: dict(key=row,col, value=labels list)
-# labels_list: list(idx=label idx, value=label code), idx=len is pid
-#
+    
 pid_events = list()
 
 if opts.mlir:
@@ -947,83 +746,16 @@ if opts.mlir:
         lines = mf.read().split("\n")
         pid_events = parse_mlir_trace_events(lines)
 
-# print(len(pid_events))
-# TODO need an else if mlir is not defined, some default or make it required?
-# else:
-
-
-# flat_commands = flatten_repeat_command(commands)
-
-# events_to_name= list()
-# core_events = dict()
-# events_to_name.append(core_events)
-
-# if opts.tracelabels:
-#     for i in range(8):
-#         events_to_name[0][i] = opts.tracelabels[i]
-# else:
-#     events_to_name[0][0] = "Instr_Vector"
-#     events_to_name[0][1] = "Tile Start"
-#     events_to_name[0][2] = "Tile End"
-#     events_to_name[0][3] = "Read A"
-#     events_to_name[0][4] = "Read B"
-#     events_to_name[0][5] = "Write C"
-#     events_to_name[0][6] = "Lock Stall"
-#     events_to_name[0][7] = "Lock Acquire"
-
-# print (json.dumps(commands))
-
 trace_events = list()
-# Let's name the threads
-# active_events = dict()
 
-# for i in range(8):
-# for i in range(16):
-#     active_events[i]  = 0
-# name_dict = dict()
-# # {"name": "thread_name", "ph":"M","pid":0, "tid":0,"args":{"name":"Phil"}}
-# name_dict["name"] = "thread_name"
-# name_dict["ph"]   = "M"           # Metadate
-# name_dict["pid"]  = 0             # We only have one process, but we may want one per core
-# name_dict["tid"]  = i             # I have baked in 8 here, we need this to be informed by how many events are supported
-# name_dict["args"] = {"name":events_to_name[i]}
-# trace_events.append(name_dict)
-
-# timer = 0
-
-# {'type': 'Start', 'timer_value': 0}
-# {'type': 'Single2', 'event': 0, 'cycles': 1161}
-# {'type': 'Single0', 'event': 0, 'cycles': 0}
-# {'type': 'Repeat1', 'repeats': 34}
-# {'type': 'Single0', 'event': 0, 'cycles': 2}
-# {'type': 'Single0', 'event': 0, 'cycles': 0}
-# {'type': 'Repeat1', 'repeats': 24}
-# {'type': 'Multiple0', 'cycles': 0, 'event0': 0, 'event2': 2}
-# {'type': 'Single0', 'event': 0, 'cycles': 0}
-# {'type': 'Repeat0', 'repeats': 4}
-# {'type': 'Single1', 'event': 3, 'cycles': 117}
-# {'type': 'Single1', 'event': 0, 'cycles': 21}
-# {'type': 'Single0', 'event': 0, 'cycles': 0}
-# {'type': 'Repeat1', 'repeats': 21}
-# {'type': 'Multiple0', 'cycles': 0, 'event0': 0, 'event1': 1}
-# {'type': 'Repeat0', 'repeats': 8}
-# {'type': 'Single0', 'event': 1, 'cycles': 0}
 
 # ------------------------------------------------------------------------------
 # Convert commands to json
 # ------------------------------------------------------------------------------
 
-# for pid in range(4):
-# for pid in range(1):
-#     process_name_metadata(trace_events, pid)
-#     for tid in range(8):
-#         thread_name_metadata(trace_events, pid, tid, pid_events)
-
 # pid will be a product of number of trace types and trace tiles
 
 setup_trace_metadata(trace_events, pid_events)
-
-# print(len(trace_events))
 
 if DEBUG:
     print("\nDEBUG: pid events\n")
@@ -1033,10 +765,4 @@ if DEBUG:
 # TODO Loop over cores/mem to call convert_commands_to_json
 convert_commands_to_json(trace_events, commands_0, pid_events)
 
-# convert_commands_to_json(trace_events, mem_commands_0, 1, pid_events)
-# convert_commands_to_json(trace_events, core_commands_1, 2, pid_events)
-# convert_commands_to_json(trace_events, mem_commands_1, 3, pid_events)
-
-# for t in trace_events:
-#     print(t)
 print(json.dumps(trace_events))
