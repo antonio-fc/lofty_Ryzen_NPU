@@ -57,7 +57,7 @@ def main(opts):
 
     OUT_SIZE = OUTPUT_VOL * DTYPE_SIZE
     TRACE_SIZE = int(opts.trace_size)
-    tracing = TRACE_SIZE > 0
+    do_tracing = TRACE_SIZE > 0
 
     # ------------------------------------------------------
     # Get device, load the xclbin & kernel and register them
@@ -72,7 +72,7 @@ def main(opts):
     bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
     bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
     bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(6))    # output
-    if tracing:
+    if do_tracing:
         bo_trace = xrt.bo(device, TRACE_SIZE, xrt.bo.host_only, kernel.group_id(7))    # trace
 
     # Initialize instruction buffer
@@ -152,7 +152,7 @@ def main(opts):
         bo_inout1.write(inout1, 0)
         bo_inout2.write(inout2, 0)
     bo_inout4.write(inout4, 0)
-    if tracing:
+    if do_tracing:
         bo_trace.write(trace_zero, 0)
 
     # Sync buffers to update input buffer values
@@ -161,7 +161,7 @@ def main(opts):
     bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout2.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
-    if tracing:
+    if do_tracing:
         bo_trace.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
 
     # ------------------------------------------------------
@@ -182,14 +182,14 @@ def main(opts):
             print(f"Running Kernel ({i}).")
         start = time.time_ns()
         opcode = 3
-        if tracing:
-            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ tracing)
+        if do_tracing:
+            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ do_tracing)
         else:
             h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4)  # only 4 inputs and 1 output
         h.wait()
         stop = time.time_ns()
         bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
-        if tracing:
+        if do_tracing:
             bo_trace.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)
 
         # Warmup iterations do not count towards average runtime.
@@ -200,13 +200,9 @@ def main(opts):
         entire_buffer = bo_inout4.read(OUT_SIZE, 0)
         output_buffer = entire_buffer[:OUT_SIZE].view(DATATYPE)
         
-        if tracing and i==num_iter-1:
+        if do_tracing and i==num_iter-1:
             print("Dumping out trace.")
             trace_buffer = bo_trace.read(TRACE_SIZE, 0).view(np.uint32)
-
-            if opts.verbosity >= 1:
-                for x in trace_buffer.reshape(125, 512):
-                    print(x)
 
             trace_utils.write_out_trace(trace_buffer, str(opts.trace_file))
         

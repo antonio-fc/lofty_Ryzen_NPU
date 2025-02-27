@@ -66,6 +66,7 @@ int main(int argc, const char *argv[]) {
     int n_iterations = vm["iters"].as<int>();
     int n_warmup_iterations = vm["warmup"].as<int>();
     int trace_size = vm["trace_sz"].as<int>();
+    int do_trace = trace_size > 0;
 
     // ------------------------------------------------------
     // BUFFER SIZES
@@ -160,7 +161,12 @@ int main(int argc, const char *argv[]) {
     auto bo_inout0 = xrt::bo(device, INOUT_FACTOR_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(3));
     auto bo_inout1 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(4));
     auto bo_inout2 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(5));
-    auto bo_inout4 = xrt::bo(device, OUT_SIZE + TRACE_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(6));
+    auto bo_inout4 = xrt::bo(device, OUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(6));
+    xrt::bo bo_trace;
+    if(do_trace)
+        bo_trace = xrt::bo(device, TRACE_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
+    else
+        bo_trace = xrt::bo(device, 1, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
     
     if (verbosity >= 1)
         std::cout << "Writing data into buffer objects.\n";
@@ -204,23 +210,31 @@ int main(int argc, const char *argv[]) {
             std::cout << "Running Kernel.\n";
         auto start = std::chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
-        auto run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+        xrt::run run;
+        if(do_trace)
+            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
+        else
+            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
         run.wait();
         auto stop = std::chrono::high_resolution_clock::now();
         bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+        if(do_trace)
+            bo_trace.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
         
         if (iter < n_warmup_iterations) {
             /* Warmup iterations do not count towards average runtime. */
             continue;
         }
-        std::bfloat16_t *bufOut = bo_inout4.map<std::bfloat16_t *>();
+        // Copy trace and output to file
+        std::uint32_t *bufTrace = bo_trace.map<std::uint32_t *>();
+        std::vector<std::uint32_t> trace_vec(TRACE_SIZE/4);
+        memcpy(trace_vec.data(), bufTrace, (trace_vec.size() * sizeof(uint32_t)));
     
         // Copy output results and verify they are correct
+        std::bfloat16_t *bufOut = bo_inout4.map<std::bfloat16_t *>();
         std::vector<DATATYPE> out_vec(OUTPUT_VOL);
         memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
-
         
-    
         if (do_verify) {
             if (verbosity >= 1) {
                 std::cout << "Verifying results ..." << std::endl;
