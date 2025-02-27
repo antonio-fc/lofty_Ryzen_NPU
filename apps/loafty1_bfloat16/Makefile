@@ -88,7 +88,10 @@ endif
 ##==------- RUNNING CODE -------==##
 
 run: ${targetname}.exe build/final.xclbin build/insts.txt 
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
+	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 0
+
+trace: ${targetname}.exe build/trace.xclbin build/insts.txt 
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --iters 10 --warmup 4 --verbosity 1
 
 run_py: build/final.xclbin
 	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 1

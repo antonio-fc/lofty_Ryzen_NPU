@@ -207,7 +207,7 @@ int main(int argc, const char *argv[]) {
     for (unsigned iter = 0; iter < num_iter; iter++) {        
         // Run kernel
         if (verbosity >= 1)
-            std::cout << "Running Kernel.\n";
+            std::cout << "Running Kernel " << iter << ".\n";
         auto start = std::chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
         xrt::run run;
