@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <bits/stdc++.h>
 
 #include <boost/program_options.hpp>
@@ -8,6 +10,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <sqlite3.h>
+#include "npy.hpp"
 
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
@@ -22,30 +26,49 @@
 
 namespace po = boost::program_options;
 
-// ----------------------------------------------------------------------------
-// Verify results (specific to our design example)
-// ----------------------------------------------------------------------------
+// Function to read data from SQLite and dynamically store it in vectors
+bool loadDataFromSQLite(const std::string& db_name, const std::string& table_name, 
+                        std::vector<std::vector<double>>& data) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    std::string sql = "SELECT * FROM " + table_name + ";";  // Fetch all columns
 
-template <typename T>
-int verify(int CSize, std::vector<T> A, std::vector<T> C, int verbosity) {
-  int errors = 0;
-  for (uint32_t i = 0; i < CSize; i++) {
-    std::bfloat16_t ref = exp(A[i]);
-    // Let's check if they are inf or nan, and if so just pass because
-    // comparisions will then fail, even for matches
-    if (std::isinf(ref) || std::isinf(C[i]))
-      break;
-    if (std::isnan(ref) || std::isnan(C[i]))
-      break;
-    if (!test_utils::nearly_equal(ref, C[i], 0.0078125)) {
-      std::cout << "Error in output " << C[i] << " != " << ref << std::endl;
-      errors++;
-    } else {
-      if (verbosity > 1)
-        std::cout << "Correct output " << C[i] << " == " << ref << std::endl;
+    // Open SQLite database
+    if (sqlite3_open(db_name.c_str(), &db) != SQLITE_OK) {
+        std::cerr << "Error opening database: " << sqlite3_errmsg(db) << std::endl;
+        return false;
     }
-  }
-  return errors;
+
+    // Prepare the SQL statement
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_close(db);
+        return false;
+    }
+
+    int column_count = sqlite3_column_count(stmt);  // Get number of columns
+    if (column_count == 0) {
+        std::cerr << "No columns found in table.\n";
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return false;
+    }
+
+    // Resize outer vector to match column count
+    data.resize(column_count);
+
+    // Fetch rows and store in vectors
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        for (int col = 0; col < column_count; col++) {
+            data[col].push_back(sqlite3_column_double(stmt, col));  // Store in corresponding vector
+        }
+    }
+
+    // Clean up
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    
+    return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -72,33 +95,33 @@ int main(int argc, const char *argv[]) {
     // BUFFER SIZES
     // ------------------------------------------------------
 
-    int MATRIX_DIM_SIZE0 = 96; // size of baselines and vis matrices side (square matrix) 
-    int MATRIX_DIM_SIZE1 = 256; // size of lmn matrices side (square matrix), as well as size of image frame
-    int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
-    int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
+    const int MATRIX_DIM_SIZE0 = 96; // size of baselines and vis matrices side (square matrix) 
+    const int MATRIX_DIM_SIZE1 = 256; // size of lmn matrices side (square matrix), as well as size of image frame
+    const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
+    const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    int CV = 32; // number of consecutive values in output stream
-    int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
+    const int CV = 32; // number of consecutive values in output stream
+    const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
-    int INOUT0_VOLUME = MSIZE;
-    int INOUT1_VOLUME = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
-    int INOUT2_VOLUME = BSIZE;
-    int INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN; // size of the stream for the lmn values and the frequency factor
+    const int INOUT0_VOLUME = MSIZE;
+    const int INOUT1_VOLUME = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
+    const int INOUT2_VOLUME = BSIZE;
+    const int INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN; // size of the stream for the lmn values and the frequency factor
 
-    int NCORES = 6;
-    int NINPUTS = 5;
+    const int NCORES = 6;
+    const int NINPUTS = 5;
     
-    int INPUT_VOL = MSIZE/2;
-    int FULL_INPUT_VOL = INPUT_VOL * NINPUTS;
-    int OUTPUT_VOL = BSIZE;
+    const int INPUT_VOL = MSIZE/2;
+    const int FULL_INPUT_VOL = INPUT_VOL * NINPUTS;
+    const int OUTPUT_VOL = BSIZE;
     
-    size_t INOUT0_SIZE = INOUT0_VOLUME * sizeof(DATATYPE);
-    size_t INOUT1_SIZE = INOUT1_VOLUME * sizeof(DATATYPE);
-    size_t INOUT2_SIZE = INOUT2_VOLUME * sizeof(DATATYPE);
-    size_t FULL_INPUT_SIZE = FULL_INPUT_VOL * sizeof(DATATYPE);
-    size_t INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * sizeof(DATATYPE);
-    size_t OUT_SIZE = OUTPUT_VOL * sizeof(DATATYPE);
-    size_t TRACE_SIZE = trace_size;
+    const size_t INOUT0_SIZE = INOUT0_VOLUME * sizeof(DATATYPE);
+    const size_t INOUT1_SIZE = INOUT1_VOLUME * sizeof(DATATYPE);
+    const size_t INOUT2_SIZE = INOUT2_VOLUME * sizeof(DATATYPE);
+    const size_t FULL_INPUT_SIZE = FULL_INPUT_VOL * sizeof(DATATYPE);
+    const size_t INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * sizeof(DATATYPE);
+    const size_t OUT_SIZE = OUTPUT_VOL * sizeof(DATATYPE);
+    const size_t TRACE_SIZE = trace_size;
     
     srand(time(NULL)); // What is this for?
     
@@ -175,15 +198,81 @@ int main(int argc, const char *argv[]) {
     void *bufInstr = bo_instr.map<void *>();
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
-    // // Initialize Inout buffer 0
-    // INOUT0_DATATYPE *bufInOut0 = bo_inout0.map<INOUT0_DATATYPE *>();
-    // std::vector<INOUT0_DATATYPE> AVec(INOUT0_VOLUME);
-    // for (int i = 0; i < INOUT0_VOLUME; i++) {
-    //     std::uint16_t u16 = (std::uint16_t)i;
-    //     std::bfloat16_t bf16 = *(std::bfloat16_t *)&u16;
-    //     AVec[i] = bf16;
+    // Obtaining the input data
+
+    
+
+    // Separating per input
+    DATATYPE frequency = 50000000; // 50MHz
+    DATATYPE SpeedOfLight = 299792458; // m/s
+    DATATYPE factor = -2 * M_PI / SpeedOfLight;
+    DATATYPE ff = frequency * factor; // frequency factor
+    // DATATYPE ff = 1.5;
+    
+    std::vector<DATATYPE> visR(INOUT0_VOLUME, 1); // real component of visibilities
+    std::vector<DATATYPE> visC(INOUT0_VOLUME, 1); // imaginary component of visibilities
+    
+    std::vector<DATATYPE> u(INOUT0_VOLUME, 1); // baselines, u
+    std::vector<DATATYPE> v(INOUT0_VOLUME, 1); // baselines, v
+    std::vector<DATATYPE> w(INOUT0_VOLUME, 1); // baselines, w
+
+    std::vector<DATATYPE> l(INOUT2_VOLUME, 1); // l
+    std::vector<DATATYPE> m(INOUT2_VOLUME, 0); // m
+    std::vector<DATATYPE> n(INOUT2_VOLUME, 0); // n
+    
+
+    // Format input 0 (frequency factor + lmn)
+    DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
+    std::vector<DATATYPE> factor_vec(INOUT_FACTOR_VOLUME);
+
+    std::vector<DATATYPE> freq_vector(INOUT1_VOLUME, 0); // Frequency factor with padding to add to the lmn data stream
+    freq_vector[0] = ff;
+
+    std::vector<std::vector<DATATYPE>> lmnInputs = {l, m, n};
+    std::vector<DATATYPE> lmn_vector(INOUT2_VOLUME * N_LMN, 0);
+    for(int i=0; i<INOUT2_VOLUME/CV; i++) {
+        for(int j=0; j<CV; j++) {
+            for(int lmn=0; lmn<N_LMN; lmn++) {
+                auto lmnI = i*N_LMN+lmn;
+                lmn_vector[lmnI*CV + j] = lmnInputs[lmn][i*CV + j];
+            }
+        }
+    }
+    // for(int i=0; i<2; i++)
+    //     for(int lmn=0; lmn<N_LMN; lmn++) 
+    //         for(int j=0; j<5; j++) {
+    //             auto lmnI = i*N_LMN+lmn;
+    //             std::cout << lmn_vector[lmnI*CV + j] << ", ";
+    //         }
+    // std::cout << std::endl;
+    std::copy(std::begin(freq_vector), std::end(freq_vector), std::begin(factor_vec));
+    std::copy(std::begin(lmn_vector), std::end(lmn_vector), std::begin(factor_vec) + freq_vector.size());
+    
+
+    // Format inputs 1 and 2 (Main inputs A and B)
+    DATATYPE *bufInOut1 = bo_inout1.map<DATATYPE *>();
+    DATATYPE *bufInOut2 = bo_inout2.map<DATATYPE *>();
+    std::vector<DATATYPE> main_inputA(FULL_INPUT_VOL);
+    std::vector<DATATYPE> main_inputB(FULL_INPUT_VOL);
+    std::vector<std::vector<DATATYPE>> mainInputs = {visR, visC, u, v, w};
+    
+    for(int v=0; v<NINPUTS; v++) {
+        for(int i=0; i<INPUT_VOL; i++) {    
+            main_inputA[i + v*INPUT_VOL] = mainInputs[v][i];
+            main_inputB[i + v*INPUT_VOL] = mainInputs[v][i + INPUT_VOL];
+        }
+    }
+    // for(int i=0; i<NINPUTS; i++) {
+    //     for(int j=0; j<5; j++) {
+    //         std::cout << main_inputB[i*INPUT_VOL + j] << ", ";
+    //     }
+    //     std::cout << std::endl;
     // }
-    // memcpy(bufInOut0, AVec.data(), (AVec.size() * sizeof(INOUT0_DATATYPE)));
+
+    // Initialize data buffers
+    memcpy(bufInOut0, factor_vec.data(), INOUT_FACTOR_SIZE);
+    memcpy(bufInOut1, main_inputA.data(), FULL_INPUT_SIZE);
+    memcpy(bufInOut2, main_inputB.data(), FULL_INPUT_SIZE);
     
     // Sync buffers to update input buffer values
     bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
@@ -234,7 +323,18 @@ int main(int argc, const char *argv[]) {
         std::bfloat16_t *bufOut = bo_inout4.map<std::bfloat16_t *>();
         std::vector<DATATYPE> out_vec(OUTPUT_VOL);
         memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
-        
+
+        // Printing part of the output
+        if(iter == num_iter-1) {
+            for(int i=0; i<MATRIX_DIM_SIZE1; i+=32) {
+                for(int j=0; j<8; j++) {
+                    std::cout << out_vec[i*8 + j] << ", ";
+                }
+                std::cout << std::endl;
+            }   
+        }
+
+        // Verification
         if (do_verify) {
             if (verbosity >= 1) {
                 std::cout << "Verifying results ..." << std::endl;

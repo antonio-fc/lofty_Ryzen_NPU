@@ -4,6 +4,7 @@
 const bfloat16 LUT_TRUE_SIZE = 256.0; // This is for a 512 lut, where half of the values are repeated for parallel access
 const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2pi]
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
+const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
 const int CV = 32; // consecutive lmn values
 
@@ -32,10 +33,9 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
     for(int t = 0; t < CV; t++) // for each pixel/lmn
     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
         // Check if calculations can be skipped
-        // if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
-        //     // Could also assign NaN to out[t], need to see if it is necessary
-        //     continue;
-        // }
+        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
+            out[t] = NANCONST; // hex for NaN
+        }
         
         // Initialize the accum for the reduction
         auto sum_v = aie::zeros<bfloat16, VEC_SIZE>();

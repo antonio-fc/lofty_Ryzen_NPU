@@ -11,10 +11,38 @@ import pyxrt as xrt
 import sys
 import time
 import math
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 import aie.utils.test as test_utils
 import aie.utils.trace as trace_utils
 from ml_dtypes import bfloat16
+
+def image_reference(visibilities, baselines, freq, npix_l, npix_m):
+    SPEED_OF_LIGHT = 299792458.0
+    img = np.zeros((npix_l, npix_m), dtype=np.complex128)
+    l, m = np.meshgrid(np.linspace(-1, 1, npix_l), np.linspace(1, -1, npix_m))
+    n = np.sqrt(1 - l**2 - m**2) - 1
+
+    for l_ix in range(npix_l):
+        for m_ix in range(npix_m):
+            # image is saved from bottom to top so need to reverse at the end for the NPU implementations
+            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = np.mean(
+                visibilities
+                * np.exp(
+                    -2j
+                    * np.pi
+                    * freq
+                    * (
+                        baselines[:, :, 0] * l[l_ix, m_ix]
+                        + baselines[:, :, 1] * m[l_ix, m_ix]
+                        + baselines[:, :, 2] * n[l_ix, m_ix]
+                    )
+                    / SPEED_OF_LIGHT
+                )
+            )
+    return np.real(img)
+
 
 
 def main(opts):
@@ -78,29 +106,56 @@ def main(opts):
     # Initialize instruction buffer
     bo_instr.write(instr_v, 0)
 
+    # Getting the data sim/files
+    npy_path = "data/basic"
+    baselines = np.load(f"{npy_path}/baselines.npy")
+    visibilities = np.load(f"{npy_path}/vis.npy")[0]
+    frequency = np.load(f"{npy_path}/freq.npy")
+
+    sns.heatmap(np.real(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/visR.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(np.imag(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/visC.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 0], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/l.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 1], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/m.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 2], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/n.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+    
+
     # Getting/generating input data
-    f = 50_000_000 # 50MHz
+    f = frequency[0] # 50MHz
     SL = 299_792_458 # m/s
-    factor = 1.0 # -2 * f * math.pi / SL
+    factor = -2 * f * math.pi / SL
     inout0 = np.array([factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
     inout0 = np.repeat(inout0, INOUT1_VOLUME)
     print("Frequency/Factor Input: ")
     print(f"Frequency: {f/1_000_000}MHz")
     print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
 
-    visR = np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis real
+    visR = np.real(visibilities).astype(dtype=DATATYPE).flatten() # np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis real
     visRa, visRb = np.split(visR, 2)
     
-    visC = np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis complex
+    visC = np.imag(visibilities).astype(dtype=DATATYPE).flatten() # np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis complex
     visCa, visCb = np.split(visC, 2)
     
-    u = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines u
+    u = baselines[:, :, 0].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines u
     ua, ub = np.split(u, 2)
     
-    v = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines v
+    v = baselines[:, :, 1].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines v
     va, vb = np.split(v, 2)
     
-    w = np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines w
+    w = baselines[:, :, 2].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines w
     wa, wb = np.split(w, 2)
 
     inputsA = [visRa, visCa, ua, va, wa]
@@ -122,14 +177,14 @@ def main(opts):
     
     
     inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=DATATYPE)     # l, m, n
-    inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=DATATYPE)          # l
-    inout3b = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)           # m
-    inout3c = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)            # n
-    # l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
-    # n = np.sqrt(1 - l**2 - m**2) - 1
-    # inout3a = l.flatten().astype(dtype)
-    # inout3b = m.flatten().astype(dtype)
-    # inout3c = n.flatten().astype(dtype)
+    # inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=DATATYPE)          # l
+    # inout3b = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)           # m
+    # inout3c = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)            # n
+    l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
+    n = np.sqrt(1 - l**2 - m**2) - 1
+    inout3a = l.flatten().astype(DATATYPE)
+    inout3b = m.flatten().astype(DATATYPE)
+    inout3c = n.flatten().astype(DATATYPE)
     
     # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
     io3x = [inout3a, inout3b, inout3c] # each for l, m and n
@@ -217,6 +272,21 @@ def main(opts):
             print(output_buffer.shape)
             for x in output_buffer.reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)[::32]:
                 print(x)
+        
+        # outputting image
+        if i == num_iter-1:
+            output = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
+            sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            plt.savefig("plots/output.png")  # Save as image
+            plt.close()  # Close the plot to free memory
+
+            # img_ref = image_reference(visibilities, baselines, frequency, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)
+            # sns.heatmap(img_ref, cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            # plt.savefig("plots/ref.png")  # Save as image
+            # plt.close()  # Close the plot to free memory
+
+
+        
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
         npu_time_min = min(npu_time_min, npu_time)
