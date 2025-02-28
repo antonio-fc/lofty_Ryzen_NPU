@@ -78,7 +78,7 @@ def loafty(opts):
     INPUT_SIZE = int(MSIZE/2) # 9216/2 # size of an input per stream
     FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
     
-    MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216*5/2)/6
+    MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216/2)/6
     JOIN_SIZE = OUT_SIZE * NCORES
 
     FULL_OUTPUT_SIZE = OUT_SIZE*ITERS # BSIZE
@@ -191,7 +191,7 @@ def loafty(opts):
                             ff = freq[0]
                             of_in_factor.release(ObjectFifoPort.Consume, 1)
                             
-                            inputs = inFIFOs[c].acquire(ObjectFifoPort.Consume, 5)
+                            inputs = inFIFOs[c].acquire(ObjectFifoPort.Consume, NINPUTS)
                             for _ in range_(ITERS):
                                 factors = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
                                 outputs = outFIFOs[c].acquire(ObjectFifoPort.Produce, 1)
@@ -200,7 +200,7 @@ def loafty(opts):
     
                                 outFIFOs[c].release(ObjectFifoPort.Produce, 1)
                                 of_in_factor.release(ObjectFifoPort.Consume, 1)
-                            inFIFOs[c].release(ObjectFifoPort.Consume, 5)
+                            inFIFOs[c].release(ObjectFifoPort.Consume, NINPUTS)
 
         # Set up a packet-switched flow from core to shim for tracing information
         tiles_to_trace = [mean_tile]
