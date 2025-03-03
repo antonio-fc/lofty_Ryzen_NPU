@@ -75,7 +75,8 @@ def loafty(opts):
     NCOLS = len(COLS)
     NROWS = len(ROWS)
     NCORES = NCOLS * NROWS
-    INPUT_SIZE = int(MSIZE/2) # 9216/2 # size of an input per stream
+    NDISTGROUP = 2
+    INPUT_SIZE = int(MSIZE/NDISTGROUP) # 9216/2 # size of an input per stream
     FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
     
     MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216/2)/6
@@ -127,8 +128,8 @@ def loafty(opts):
         for i in COLS:
             for j in ROWS:
                 # Input distribution FIFOs
-                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[0], ct[i][j], 6, main_ct_ty))
-                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[3], ct[i+NCOLS][j], 6, main_ct_ty))
+                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[0], ct[i][j], 2, main_ct_ty))
+                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[3], ct[i+NCOLS][j], 2, main_ct_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
                 
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
@@ -183,7 +184,7 @@ def loafty(opts):
                 cores = [ct[i][j], ct[i+NCOLS][j]]
                 inFIFOs = [obf_in_fifoA, obf_in_fifoB]
                 outFIFOs = [obf_out_fifoA, obf_out_fifoB]
-                for c in range(2):
+                for c in range(NDISTGROUP): # Twice for each distribution group, So GroupA (6) + GroupB (6) = 12
                     @core(cores[c], "kernels.a")
                     def core_body():
                         for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file

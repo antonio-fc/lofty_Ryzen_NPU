@@ -30,18 +30,18 @@ module {
     aie.objectfifo @in0(%shim_noc_tile_1_0, {%tile_0_3, %tile_0_4, %tile_0_5, %tile_1_3, %tile_1_4, %tile_1_5, %tile_2_3, %tile_2_4, %tile_2_5, %tile_3_3, %tile_3_4, %tile_3_5}, 2 : i32) : !aie.objectfifo<memref<96xbf16>> 
     aie.objectfifo @in1(%shim_noc_tile_0_0, {%mem_tile_0_1}, 2 : i32) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @in2(%shim_noc_tile_3_0, {%mem_tile_3_1}, 2 : i32) : !aie.objectfifo<memref<4608xbf16>> 
-    aie.objectfifo @of_in_mainA01(%mem_tile_0_1, {%tile_0_3}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB21(%mem_tile_3_1, {%tile_2_3}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainA02(%mem_tile_0_1, {%tile_0_4}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB22(%mem_tile_3_1, {%tile_2_4}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainA03(%mem_tile_0_1, {%tile_0_5}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB23(%mem_tile_3_1, {%tile_2_5}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainA11(%mem_tile_0_1, {%tile_1_3}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB31(%mem_tile_3_1, {%tile_3_3}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainA12(%mem_tile_0_1, {%tile_1_4}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB32(%mem_tile_3_1, {%tile_3_4}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainA13(%mem_tile_0_1, {%tile_1_5}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
-    aie.objectfifo @of_in_mainB33(%mem_tile_3_1, {%tile_3_5}, 6 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA01(%mem_tile_0_1, {%tile_0_3}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB21(%mem_tile_3_1, {%tile_2_3}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA02(%mem_tile_0_1, {%tile_0_4}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB22(%mem_tile_3_1, {%tile_2_4}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA03(%mem_tile_0_1, {%tile_0_5}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB23(%mem_tile_3_1, {%tile_2_5}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA11(%mem_tile_0_1, {%tile_1_3}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB31(%mem_tile_3_1, {%tile_3_3}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA12(%mem_tile_0_1, {%tile_1_4}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB32(%mem_tile_3_1, {%tile_3_4}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainA13(%mem_tile_0_1, {%tile_1_5}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
+    aie.objectfifo @of_in_mainB33(%mem_tile_3_1, {%tile_3_5}, 2 : i32) : !aie.objectfifo<memref<768xbf16>> 
     aie.objectfifo.link [@in1] -> [@of_in_mainA01, @of_in_mainA02, @of_in_mainA03, @of_in_mainA11, @of_in_mainA12, @of_in_mainA13]([] [0, 768, 1536, 2304, 3072, 3840])
     aie.objectfifo.link [@in2] -> [@of_in_mainB21, @of_in_mainB22, @of_in_mainB23, @of_in_mainB31, @of_in_mainB32, @of_in_mainB33]([] [0, 768, 1536, 2304, 3072, 3840])
     aie.objectfifo @of_out_mainA01(%tile_0_3, {%mem_tile_1_1}, 2 : i32) : !aie.objectfifo<memref<32xbf16>> 

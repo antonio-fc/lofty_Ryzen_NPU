@@ -275,8 +275,10 @@ def main(opts):
         
         # outputting image
         if i == num_iter-1:
+            nan_mask = np.isnan(n)
             print(output_buffer[0])
-            output = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
+            output_raw = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
+            output = np.select([~np.isnan(n)], [output_raw], np.nan)
             print(output[0][0])
             # print(output.flatten()[256*100:256*100+10])
             sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
