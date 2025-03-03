@@ -91,14 +91,14 @@ run: ${targetname}.exe build/final.xclbin build/insts.txt
 	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 0
 
 trace: ${targetname}.exe build/trace.xclbin build/insts.txt 
-	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --iters 1 --warmup 4 --verbosity 1
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 1 --warmup 4 --verbosity 1
 
 run_py: build/final.xclbin
 	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 0
 
 trace_py: build/trace.xclbin
 	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 10 --warmup 4 --verbosity 1
-	${powershell} python3 ${srcdir}/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
+	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
 
 ##==-----------------------------==##
 

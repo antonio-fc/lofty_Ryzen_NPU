@@ -275,13 +275,16 @@ def main(opts):
         
         # outputting image
         if i == num_iter-1:
+            print(output_buffer[0])
             output = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
+            print(output[0][0])
             # print(output.flatten()[256*100:256*100+10])
             sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
             plt.savefig("plots/output.png")  # Save as image
             plt.close()  # Close the plot to free memory
 
             img_ref = image_reference(visibilities, baselines, frequency, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)
+            print(img_ref[0][0])
             # print(img_ref.flatten()[256*100:256*100+10])
             sns.heatmap(img_ref, cmap="viridis", annot=False, cbar=True)  # Create heatmap
             plt.savefig("plots/ref.png")  # Save as image

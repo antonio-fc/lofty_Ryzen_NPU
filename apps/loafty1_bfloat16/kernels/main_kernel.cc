@@ -34,7 +34,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
         // Check if calculations can be skipped
         if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
-            out[t] = NANCONST; // hex for NaN
+            out[t] = (bfloat16) 0xff81; // hex for NaN
         }
         
         // Initialize the accum for the reduction
