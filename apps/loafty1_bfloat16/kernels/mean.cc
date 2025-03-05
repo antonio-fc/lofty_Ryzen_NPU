@@ -17,7 +17,7 @@
 
 const int VEC_SIZE = 32; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
 const int REDUC_SIZE = 6; // matching the number of cores per group (A and B)
-const bfloat16 DIV = 9216.0;
+const float DIV = 9216.0;
 
 extern "C" {
 void mean(bfloat16 *a, bfloat16 *b,  bfloat16 *c, uint32_t N) { // Input Value Sizes: OUT_SIZE * 6, Output Size
@@ -36,11 +36,7 @@ void mean(bfloat16 *a, bfloat16 *b,  bfloat16 *c, uint32_t N) { // Input Value S
 
     // Writing results to output
     auto sum = aie::to_vector<float>(acc, 0);
-    auto resS = aie::zeros<bfloat16, VEC_SIZE>(); // need to change to filter (it didnt work before)
-    for(int i = 0; i < VEC_SIZE; i++) { // need to find a way to vectorize this
-        resS[i] = sum[i];
-    }
-    auto res = aie::div(resS, DIV);
+    auto res = aie::div(sum, DIV);
     aie::store_v(c, res.to_vector<bfloat16>());
     
 
