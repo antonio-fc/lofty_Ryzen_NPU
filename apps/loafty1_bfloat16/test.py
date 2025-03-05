@@ -18,30 +18,42 @@ import aie.utils.test as test_utils
 import aie.utils.trace as trace_utils
 from ml_dtypes import bfloat16
 
-def image_reference(visibilities, baselines, freq, npix_l, npix_m):
-    SPEED_OF_LIGHT = 299792458.0
-    img = np.zeros((npix_l, npix_m), dtype=np.complex128)
+def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
+    img = np.zeros((npix_l, npix_m), dtype=rtype)
     l, m = np.meshgrid(np.linspace(-1, 1, npix_l), np.linspace(1, -1, npix_m))
     n = np.sqrt(1 - l**2 - m**2) - 1
-
+    l, m, n = l.astype(rtype), m.astype(rtype), n.astype(rtype)
     for l_ix in range(npix_l):
         for m_ix in range(npix_m):
-            # image is saved from bottom to top so need to reverse at the end for the NPU implementations
-            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = np.mean(
-                visibilities
-                * np.exp(
-                    -2j
-                    * np.pi
-                    * freq
-                    * (
-                        baselines[:, :, 0] * l[l_ix, m_ix]
-                        + baselines[:, :, 1] * m[l_ix, m_ix]
-                        + baselines[:, :, 2] * n[l_ix, m_ix]
-                    )
-                    / SPEED_OF_LIGHT
-                )
-            )
-    return np.real(img)
+            # Scale baselines with l, m and n
+            scaleU = u * l[l_ix, m_ix]
+            scaleV = v * m[l_ix, m_ix]
+            scaleW = w * n[l_ix, m_ix]
+            # Add scaled baselines
+            blAdd = scaleU + scaleV + scaleW
+            # Multiply by frequency factor
+            scaleFactor = freq * blAdd
+            # Appy sin/cos
+            cos = np.cos(scaleFactor)
+            sin = np.sin(scaleFactor)
+            # Multiply with visibilities
+            real = visR * cos
+            imag = visC * sin
+            # Subtract
+            vis_mult = real - imag
+            # Get the average
+            n_split = 12
+            if rtype==bfloat16:
+                splits = np.split(vis_mult, n_split)
+                results = np.empty(n_split, dtype=rtype)
+                for i in range(n_split):
+                    results[i] = np.mean(splits[i].astype(np.float32)).astype(bfloat16)
+                result = np.mean(results.astype(np.float32)).astype(bfloat16)
+            else:
+                result = np.mean(vis_mult)
+            # Save result
+            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = result # image is saved from bottom to top so need to reverse at the end for the NPU implementations
+    return img
 
 
 
@@ -113,23 +125,23 @@ def main(opts):
     frequency = np.load(f"{npy_path}/freq.npy")
 
     sns.heatmap(np.real(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/visR.png")  # Save as image
+    plt.savefig("plots/inputs/visR.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(np.imag(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/visC.png")  # Save as image
+    plt.savefig("plots/inputs/visC.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 0], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/l.png")  # Save as image
+    plt.savefig("plots/inputs/l.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 1], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/m.png")  # Save as image
+    plt.savefig("plots/inputs/m.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 2], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/n.png")  # Save as image
+    plt.savefig("plots/inputs/n.png")  # Save as image
     plt.close()  # Close the plot to free memory
     
 
@@ -180,7 +192,7 @@ def main(opts):
     # inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=DATATYPE)          # l
     # inout3b = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)           # m
     # inout3c = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)            # n
-    l, m = np.meshgrid(np.linspace(-1, 1, 256), np.linspace(1, -1, 256))
+    l, m = np.meshgrid(np.linspace(-1, 1, MATRIX_DIM_SIZE1), np.linspace(1, -1, MATRIX_DIM_SIZE1))
     n = np.sqrt(1 - l**2 - m**2) - 1
     inout3a = l.flatten().astype(DATATYPE)
     inout3b = m.flatten().astype(DATATYPE)
@@ -224,7 +236,7 @@ def main(opts):
     # ------------------------------------------------------
     num_iter = opts.iters + opts.warmup_iters
     npu_time_total = 0
-    npu_time_min = 9999999
+    npu_time_min = 9999999999999999
     npu_time_max = 0
     errors = 0
 
@@ -276,21 +288,67 @@ def main(opts):
         # outputting image
         if i == num_iter-1:
             nan_mask = np.isnan(n)
-            print(output_buffer[0])
+            cmap_coolwarm = sns.color_palette("coolwarm", as_cmap=True)
             output_raw = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
             output = np.select([~np.isnan(n)], [output_raw], np.nan)
-            print(output[0][0])
             # print(output.flatten()[256*100:256*100+10])
             sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
-            plt.savefig("plots/output.png")  # Save as image
+            plt.savefig("plots/images/output_py.png")  # Save as image
             plt.close()  # Close the plot to free memory
-
-            img_ref = image_reference(visibilities, baselines, frequency, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)
-            print(img_ref[0][0])
+            rtype = bfloat16
+            img_ref = image_reference(np.real(visibilities).astype(dtype=rtype),
+                                      np.imag(visibilities).astype(dtype=rtype),
+                                      baselines[:, :, 0].astype(dtype=rtype),
+                                      baselines[:, :, 1].astype(dtype=rtype),
+                                      baselines[:, :, 2].astype(dtype=rtype),
+                                      factor.astype(dtype=rtype),
+                                      MATRIX_DIM_SIZE1,
+                                      MATRIX_DIM_SIZE1,
+                                      rtype).astype(np.float64)
             # print(img_ref.flatten()[256*100:256*100+10])
             sns.heatmap(img_ref, cmap="viridis", annot=False, cbar=True)  # Create heatmap
-            plt.savefig("plots/ref.png")  # Save as image
+            plt.savefig("plots/images/ref.png")  # Save as image
             plt.close()  # Close the plot to free memory
+
+            sns.heatmap(np.abs(img_ref - output), cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            plt.savefig("plots/images/diff.png")  # Save as image
+            plt.close() 
+
+            n_bins = 32768
+
+            print()
+            # value historgrams
+            aa = output.flatten()[~np.isnan(output.flatten())]
+            aa_nan = np.count_nonzero(np.isnan(output))
+            aa_max = np.max(aa)
+            aa_min = np.min(aa)
+            aa_range = aa_max - aa_min
+            print(f"[NPU Output] Max: {aa_max}, Min: {aa_min}, Nr.NaN: {aa_nan}, RangeSz: {aa_range}")
+            plt.hist(aa, n_bins)
+            plt.axvline(x=aa_max, color='red', linestyle='--', linewidth=2, label="Max")
+            plt.axvline(x=aa_min, color='red', linestyle='--', linewidth=2, label="Min")
+            # plt.ylim(0, 2_048_000/n_bins)
+            plt.savefig(f"plots/histograms/output_hist{n_bins}.png")  # Save as image
+            plt.close()  # Close the plot to free memory
+
+            bb = img_ref.flatten()[~np.isnan(img_ref.flatten())]
+            bb_nan = np.count_nonzero(np.isnan(img_ref))
+            bb_max = np.max(bb)
+            bb_min = np.min(bb)
+            bb_range = bb_max - bb_min
+            print(f"[Numpy Reference] Max: {bb_max}, Min: {bb_min}, Nr.NaN: {bb_nan}, RangeSz: {bb_range}")
+            plt.hist(bb, n_bins)
+            plt.axvline(x=bb_max, color='red', linestyle='--', linewidth=2, label="Max")
+            plt.axvline(x=bb_min, color='red', linestyle='--', linewidth=2, label="Min")
+            # plt.ylim(0, 2500)
+            plt.savefig(f"plots/histograms/ref_hist{n_bins}.png")  # Save as image
+            plt.close()  # Close the plot to free memory
+
+            diff = aa - bb
+            diff_mean = np.mean(np.abs(diff))
+            diff_max = np.max(np.abs(diff))
+            diff_min = np.min(np.abs(diff))
+            print(f"[Error] Avg Diff: {diff_mean}, Max Diff: {diff_max}, Min Diff: {diff_min}, Avg Diff(npu%): {diff_mean/aa_range*100}%, Avg Diff(numpy%): {diff_mean/bb_range*100}%")
 
 
         

@@ -1,7 +1,7 @@
 #include "lut_ops.h"
 #include <cmath>
 
-const bfloat16 LUT_TRUE_SIZE = 256.0; // This is for a 512 lut, where half of the values are repeated for parallel access
+const bfloat16 LUT_TRUE_SIZE = LUT_SIZE/2.0; // This is for a 512 lut, where half of the values are repeated for parallel access
 const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2pi]
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
@@ -45,27 +45,27 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
         // Intermediate operations
         for (int i = 0; i < N; i += VEC_SIZE) { // 24 times
             // Getting baselines vectors
-            aie::vector<bfloat16, VEC_SIZE> vecU = aie::load_v<VEC_SIZE>(u + i);
-            aie::vector<bfloat16, VEC_SIZE> vecV = aie::load_v<VEC_SIZE>(v + i);
-            aie::vector<bfloat16, VEC_SIZE> vecW = aie::load_v<VEC_SIZE>(w + i);
+            auto vecU = aie::load_v<VEC_SIZE>(u + i);
+            auto vecV = aie::load_v<VEC_SIZE>(v + i);
+            auto vecW = aie::load_v<VEC_SIZE>(w + i);
 
             // Scale, Add and Scale
-            aie::vector<bfloat16, VEC_SIZE> scaleU = aie::mul(vecU, l[t]);
-            aie::vector<bfloat16, VEC_SIZE> scaleV = aie::mul(vecV, m[t]);
-            aie::vector<bfloat16, VEC_SIZE> scaleW = aie::mul(vecW, n[t]);
-            aie::vector<bfloat16, VEC_SIZE> baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
-            aie::vector<bfloat16, VEC_SIZE> A = aie::mul(baseAdd, freq);
+            auto scaleU = aie::mul(vecU, l[t]);
+            auto scaleV = aie::mul(vecV, m[t]);
+            auto scaleW = aie::mul(vecW, n[t]);
+            auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
+            auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
             // Trig
-            aie::vector<bfloat16, VEC_SIZE> cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
-            aie::vector<bfloat16, VEC_SIZE> sin = sin_bfloat16(A);
+            auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
+            auto sin = sin_bfloat16(A);
 
             // Mult with visibilities and subtract
-            aie::vector<bfloat16, VEC_SIZE> vecR = aie::load_v<VEC_SIZE>(visR + i);
-            aie::vector<bfloat16, VEC_SIZE> vecC = aie::load_v<VEC_SIZE>(visC + i);
-            aie::vector<bfloat16, VEC_SIZE> R = aie::mul(cos, vecR);
-            aie::vector<bfloat16, VEC_SIZE> C = aie::mul(sin, vecC);
-            aie::vector<bfloat16, VEC_SIZE> result = aie::sub(R, C);
+            auto vecR = aie::load_v<VEC_SIZE>(visR + i);
+            auto vecC = aie::load_v<VEC_SIZE>(visC + i);
+            auto R = aie::mul(cos, vecR);
+            auto C = aie::mul(sin, vecC);
+            auto result = aie::sub(R, C);
 
             // Adding to acc
             acc = aie::add(acc, result);
@@ -74,7 +74,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
         // Final reduction
         aie::vector<float, VEC_SIZE> sum = acc.to_vector<float>(0);
         bfloat16 res = aie::reduce_add(sum);
-        out[t] = res; //-9.84556/100000000000000000.0;
+        out[t] = res;
     }
 }
 // void sin_float_1024(bfloat16 *a_in, bfloat16 *c_out) {
