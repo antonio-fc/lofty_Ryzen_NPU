@@ -310,10 +310,6 @@ def main(opts):
             plt.savefig("plots/images/ref.png")  # Save as image
             plt.close()  # Close the plot to free memory
 
-            sns.heatmap(np.abs(img_ref - output), cmap="viridis", annot=False, cbar=True)  # Create heatmap
-            plt.savefig("plots/images/diff.png")  # Save as image
-            plt.close() 
-
             n_bins = 32768
 
             print()
@@ -343,6 +339,10 @@ def main(opts):
             # plt.ylim(0, 2500)
             plt.savefig(f"plots/histograms/ref_hist{n_bins}.png")  # Save as image
             plt.close()  # Close the plot to free memory
+
+            sns.heatmap(np.abs(img_ref - output)/bb_range*100, cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            plt.savefig("plots/images/diff.png")  # Save as image
+            plt.close() 
 
             diff = aa - bb
             diff_mean = np.mean(np.abs(diff))
