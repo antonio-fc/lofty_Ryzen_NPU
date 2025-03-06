@@ -10,12 +10,15 @@
 
 srcdir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-include ${srcdir}/../../programming_examples/makefile-common
+include ${srcdir}/utils/makefile-common
 
 all: build/final.xclbin
 
 targetname = loafty
 trace_size = 256000
+n_antenna = 96 # make sure to run 'make clean' after changing this
+image_size = 128 # make sure to run 'make clean' after changing this
+trace_file = tracing/trace.txt
 
 ##==------------------------------==##
 
@@ -23,11 +26,11 @@ trace_size = 256000
 
 build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
-	python3 $< > $@
+	python3 $< --anten ${n_antenna} --imgsz ${image_size} > $@
 
 build/aie_trace.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
-	python3 $< -t ${trace_size} > $@
+	python3 $< -t ${trace_size} --anten ${n_antenna} --imgsz ${image_size} > $@
 
 ##==-------------------------------==##
 
@@ -85,20 +88,28 @@ endif
 
 ##==--------------------------------------==##
 
+##==------- PARSING TRACE -------==##
+
+parse_trace:
+	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename ${trace_file} --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
+
+##==-----------------------------==##
+
 ##==------- RUNNING CODE -------==##
 
 run: ${targetname}.exe build/final.xclbin build/insts.txt 
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 0
+	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 
 trace: ${targetname}.exe build/trace.xclbin build/insts.txt 
-	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 1 --warmup 4 --verbosity 1
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${parse_trace}
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4 --verbosity 0
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 
 trace_py: build/trace.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file tracing/trace.txt --iters 10 --warmup 4 --verbosity 1
-	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename tracing/trace.txt --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
+	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${parse_trace}
 
 ##==-----------------------------==##
 

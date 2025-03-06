@@ -14,7 +14,8 @@ import math
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import aie.utils.test as test_utils
+# import aie.utils.test as test_utils
+import utils.test_utils as test_utils
 import aie.utils.trace as trace_utils
 from ml_dtypes import bfloat16
 
@@ -56,7 +57,6 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
     return img
 
 
-
 def main(opts):
     # Load instruction sequence
     with open(opts.instr, "r") as f:
@@ -67,23 +67,25 @@ def main(opts):
     # ------------------------------------------------------------
     # Configure this to match your design's buffer size and type
     # ------------------------------------------------------------
-    MATRIX_DIM_SIZE0 = 96 # size of baselines and vis matrices side (square matrix) 
-    MATRIX_DIM_SIZE1 = 256 # size of lmn matrices side (square matrix), as well as size of image frame
+    MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
+    MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
     CV = 32 # number of consecutive values in output stream
     N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
-    INOUT0_VOLUME = int(MSIZE)  
-    INOUT1_VOLUME = int(CV*N_LMN) # padding the scalar of the frequency factor to be in the same stream as lmn values
-    INOUT2_VOLUME = int(BSIZE)
+    INOUT0_VOLUME = MSIZE
+    INOUT1_VOLUME = CV*N_LMN # padding the scalar of the frequency factor to be in the same stream as lmn values
+    INOUT2_VOLUME = BSIZE
     INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
     
     NCORES = 6 # for each distribution
     NINPUTS = 5 # u, v, w, real vis and imag vis
-    INPUT_VOL = int(MSIZE/2) # split in 2 for each distribution data stream
-    FULL_INPUT_VOL = int(INPUT_VOL*NINPUTS)
+    NDISTGROUP = 2 # number of ct groups for distribution
+    
+    INPUT_VOL = MSIZE//NDISTGROUP # split in 2 for each distribution data stream
+    FULL_INPUT_VOL = INPUT_VOL*NINPUTS
     OUTPUT_VOL = BSIZE
 
     DATATYPE = bfloat16
@@ -172,26 +174,21 @@ def main(opts):
 
     inputsA = [visRa, visCa, ua, va, wa]
     inputsB = [visRb, visCb, ub, vb, wb]
-    
-    inout1 = np.empty((FULL_INPUT_VOL,), dtype=DATATYPE) # 9216 * 5 / 2
-    inout1 = inout1.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-    for i in range(NINPUTS):
-        inout1[i, :] = inputsA[i]
+    inputs = [inputsA, inputsB]
+    main_inputs = [np.empty((FULL_INPUT_VOL,), dtype=DATATYPE), np.empty((FULL_INPUT_VOL,), dtype=DATATYPE)] # 9216 * 5 / 2 each
+
+    # Formatting the main input
+    for m in range(2):
+        main_inputs[m] = main_inputs[m].reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
+        for i in range(NINPUTS):
+            main_inputs[m][i, :] = inputs[m][i]
     print("\nFull Input A: ")
-    print(f"VisR: {inout1[0]}, VisC: {inout1[1]}, U: {inout1[2]}, V: {inout1[3]}, W: {inout1[4]}")
-    
-    inout2 = np.empty((FULL_INPUT_VOL,), dtype=DATATYPE) # 9216 * 5 / 2
-    inout2 = inout2.reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-    for i in range(NINPUTS):
-        inout2[i, :] = inputsB[i]
+    print(f"VisR: {main_inputs[0][0]}, VisC: {main_inputs[0][1]}, U: {main_inputs[0][2]}, V: {main_inputs[0][3]}, W: {main_inputs[0][4]}")
     print("\nFull Input B: ")
-    print(f"VisR: {inout2[0]}, VisC: {inout2[1]}, U: {inout2[2]}, V: {inout2[3]}, W: {inout2[4]}")
+    print(f"VisR: {main_inputs[1][0]}, VisC: {main_inputs[1][1]}, U: {main_inputs[1][2]}, V: {main_inputs[1][3]}, W: {main_inputs[1][4]}")
     
     
     inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=DATATYPE)     # l, m, n
-    # inout3a = np.full(INOUT2_VOLUME, 1.5, dtype=DATATYPE)          # l
-    # inout3b = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)           # m
-    # inout3c = np.full(INOUT2_VOLUME, 0, dtype=DATATYPE)            # n
     l, m = np.meshgrid(np.linspace(-1, 1, MATRIX_DIM_SIZE1), np.linspace(1, -1, MATRIX_DIM_SIZE1))
     n = np.sqrt(1 - l**2 - m**2) - 1
     inout3a = l.flatten().astype(DATATYPE)
@@ -206,19 +203,19 @@ def main(opts):
     inout_factor = np.concatenate((inout0, inout3))
     print(f"lmn: {inout3.flatten()[:24]}")
     
-    inout4 = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
+    out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
     trace_zero = np.zeros(TRACE_SIZE, dtype=np.uint8)                # trace
     
     # Initialize data buffers
     if DATATYPE == bfloat16:
         bo_inout0.write(inout_factor.view(np.uint16), 0)
-        bo_inout1.write(inout1.view(np.uint16), 0)
-        bo_inout2.write(inout2.view(np.uint16), 0)
+        bo_inout1.write(main_inputs[0].view(np.uint16), 0)
+        bo_inout2.write(main_inputs[1].view(np.uint16), 0)
     else:
         bo_inout0.write(inout_factor, 0)
-        bo_inout1.write(inout1, 0)
-        bo_inout2.write(inout2, 0)
-    bo_inout4.write(inout4, 0)
+        bo_inout1.write(main_inputs[0], 0)
+        bo_inout2.write(main_inputs[1], 0)
+    bo_inout4.write(out_zero, 0)
     if do_tracing:
         bo_trace.write(trace_zero, 0)
 
@@ -348,7 +345,7 @@ def main(opts):
             diff_mean = np.mean(np.abs(diff))
             diff_max = np.max(np.abs(diff))
             diff_min = np.min(np.abs(diff))
-            print(f"[Error] Avg Diff: {diff_mean}, Max Diff: {diff_max}, Min Diff: {diff_min}, Avg Diff(npu%): {diff_mean/aa_range*100}%, Avg Diff(numpy%): {diff_mean/bb_range*100}%")
+            print(f"[Error] Avg Diff: {diff_mean}, Max Diff: {diff_max}, Min Diff: {diff_min}, Max Diff(numpy%): {diff_max/bb_range*100}%, Avg Diff(numpy%): {diff_mean/bb_range*100}%")
 
 
         

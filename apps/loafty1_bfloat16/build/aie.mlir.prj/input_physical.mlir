@@ -572,12 +572,12 @@ module {
       cf.cond_br %1, ^bb2, ^bb6
     ^bb2:  // pred: ^bb1
       %c0_0 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_1 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_0 : index)
     ^bb3(%2: index):  // 2 preds: ^bb2, ^bb4
-      %3 = arith.cmpi slt, %2, %c2048 : index
+      %3 = arith.cmpi slt, %2, %c512 : index
       cf.cond_br %3, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%out1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -621,12 +621,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -651,12 +651,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -681,12 +681,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -711,12 +711,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -741,12 +741,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -771,12 +771,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -804,12 +804,12 @@ module {
       aie.use_lock(%in0_0_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA01_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_0_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -847,12 +847,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -877,12 +877,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -907,12 +907,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -937,12 +937,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -967,12 +967,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -997,12 +997,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1030,12 +1030,12 @@ module {
       aie.use_lock(%in0_6_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB21_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_6_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1073,12 +1073,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1103,12 +1103,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1133,12 +1133,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1163,12 +1163,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1193,12 +1193,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1223,12 +1223,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1256,12 +1256,12 @@ module {
       aie.use_lock(%in0_1_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA02_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_1_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1299,12 +1299,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1329,12 +1329,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1359,12 +1359,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1389,12 +1389,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1419,12 +1419,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1449,12 +1449,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1482,12 +1482,12 @@ module {
       aie.use_lock(%in0_7_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB22_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_7_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1525,12 +1525,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1555,12 +1555,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1585,12 +1585,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1615,12 +1615,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1645,12 +1645,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1675,12 +1675,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1708,12 +1708,12 @@ module {
       aie.use_lock(%in0_2_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA03_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_2_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1751,12 +1751,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1781,12 +1781,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1811,12 +1811,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1841,12 +1841,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1871,12 +1871,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1901,12 +1901,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1934,12 +1934,12 @@ module {
       aie.use_lock(%in0_8_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB23_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_8_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -1977,12 +1977,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2007,12 +2007,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2037,12 +2037,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2067,12 +2067,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2097,12 +2097,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2127,12 +2127,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2160,12 +2160,12 @@ module {
       aie.use_lock(%in0_3_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA11_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_3_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2203,12 +2203,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2233,12 +2233,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2263,12 +2263,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2293,12 +2293,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2323,12 +2323,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2353,12 +2353,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2386,12 +2386,12 @@ module {
       aie.use_lock(%in0_9_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB31_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_9_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2429,12 +2429,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2459,12 +2459,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2489,12 +2489,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2519,12 +2519,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2549,12 +2549,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2579,12 +2579,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2612,12 +2612,12 @@ module {
       aie.use_lock(%in0_4_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA12_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_4_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2655,12 +2655,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2685,12 +2685,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2715,12 +2715,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2745,12 +2745,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2775,12 +2775,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2805,12 +2805,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2838,12 +2838,12 @@ module {
       aie.use_lock(%in0_10_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB32_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_10_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2881,12 +2881,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2911,12 +2911,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2941,12 +2941,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -2971,12 +2971,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3001,12 +3001,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3031,12 +3031,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3064,12 +3064,12 @@ module {
       aie.use_lock(%in0_5_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainA13_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_5_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3107,12 +3107,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_1 = arith.constant 0 : index
-      %c2048 = arith.constant 2048 : index
+      %c512 = arith.constant 512 : index
       %c1_2 = arith.constant 1 : index
       %c2 = arith.constant 2 : index
       cf.br ^bb3(%c0_1 : index)
     ^bb3(%3: index):  // 2 preds: ^bb2, ^bb4
-      %4 = arith.cmpi slt, %3, %c2048 : index
+      %4 = arith.cmpi slt, %3, %c512 : index
       cf.cond_br %4, ^bb4, ^bb5
     ^bb4:  // pred: ^bb3
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3137,12 +3137,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_5 = arith.constant 0 : index
-      %c2048_6 = arith.constant 2048 : index
+      %c512_6 = arith.constant 512 : index
       %c1_7 = arith.constant 1 : index
       %c2_8 = arith.constant 2 : index
       cf.br ^bb6(%c0_5 : index)
     ^bb6(%7: index):  // 2 preds: ^bb5, ^bb7
-      %8 = arith.cmpi slt, %7, %c2048_6 : index
+      %8 = arith.cmpi slt, %7, %c512_6 : index
       cf.cond_br %8, ^bb7, ^bb8
     ^bb7:  // pred: ^bb6
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3167,12 +3167,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_12 = arith.constant 0 : index
-      %c2048_13 = arith.constant 2048 : index
+      %c512_13 = arith.constant 512 : index
       %c1_14 = arith.constant 1 : index
       %c2_15 = arith.constant 2 : index
       cf.br ^bb9(%c0_12 : index)
     ^bb9(%11: index):  // 2 preds: ^bb8, ^bb10
-      %12 = arith.cmpi slt, %11, %c2048_13 : index
+      %12 = arith.cmpi slt, %11, %c512_13 : index
       cf.cond_br %12, ^bb10, ^bb11
     ^bb10:  // pred: ^bb9
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3197,12 +3197,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_19 = arith.constant 0 : index
-      %c2048_20 = arith.constant 2048 : index
+      %c512_20 = arith.constant 512 : index
       %c1_21 = arith.constant 1 : index
       %c2_22 = arith.constant 2 : index
       cf.br ^bb12(%c0_19 : index)
     ^bb12(%15: index):  // 2 preds: ^bb11, ^bb13
-      %16 = arith.cmpi slt, %15, %c2048_20 : index
+      %16 = arith.cmpi slt, %15, %c512_20 : index
       cf.cond_br %16, ^bb13, ^bb14
     ^bb13:  // pred: ^bb12
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3227,12 +3227,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_26 = arith.constant 0 : index
-      %c2048_27 = arith.constant 2048 : index
+      %c512_27 = arith.constant 512 : index
       %c1_28 = arith.constant 1 : index
       %c2_29 = arith.constant 2 : index
       cf.br ^bb15(%c0_26 : index)
     ^bb15(%19: index):  // 2 preds: ^bb14, ^bb16
-      %20 = arith.cmpi slt, %19, %c2048_27 : index
+      %20 = arith.cmpi slt, %19, %c512_27 : index
       cf.cond_br %20, ^bb16, ^bb17
     ^bb16:  // pred: ^bb15
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3257,12 +3257,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_33 = arith.constant 0 : index
-      %c2048_34 = arith.constant 2048 : index
+      %c512_34 = arith.constant 512 : index
       %c1_35 = arith.constant 1 : index
       %c2_36 = arith.constant 2 : index
       cf.br ^bb18(%c0_33 : index)
     ^bb18(%23: index):  // 2 preds: ^bb17, ^bb19
-      %24 = arith.cmpi slt, %23, %c2048_34 : index
+      %24 = arith.cmpi slt, %23, %c512_34 : index
       cf.cond_br %24, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3290,12 +3290,12 @@ module {
       aie.use_lock(%in0_11_cons_prod_lock, Release, 1)
       aie.use_lock(%of_in_mainB33_cons_cons_lock, AcquireGreaterEqual, 5)
       %c0_40 = arith.constant 0 : index
-      %c2048_41 = arith.constant 2048 : index
+      %c512_41 = arith.constant 512 : index
       %c1_42 = arith.constant 1 : index
       %c2_43 = arith.constant 2 : index
       cf.br ^bb22(%c0_40 : index)
     ^bb22(%28: index):  // 2 preds: ^bb21, ^bb23
-      %29 = arith.cmpi slt, %28, %c2048_41 : index
+      %29 = arith.cmpi slt, %28, %c512_41 : index
       cf.cond_br %29, ^bb23, ^bb24
     ^bb23:  // pred: ^bb22
       aie.use_lock(%in0_11_cons_cons_lock, AcquireGreaterEqual, 1)
@@ -3317,10 +3317,10 @@ module {
       aie.end
     } {link_with = "kernels.a"}
     aiex.runtime_sequence @sequence(%arg0: memref<23040xbf16>, %arg1: memref<23040xbf16>, %arg2: memref<23040xbf16>, %arg3: memref<23040xbf16>) {
-      aiex.npu.dma_memcpy_nd(0, 0, %arg0[0, 0, 0, 0][1, 1, 1, 196704][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(0, 0, %arg0[0, 0, 0, 0][1, 1, 1, 49248][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23040xbf16>
       aiex.npu.dma_memcpy_nd(0, 0, %arg1[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<23040xbf16>
       aiex.npu.dma_memcpy_nd(0, 0, %arg2[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<23040xbf16>
-      aiex.npu.dma_memcpy_nd(0, 0, %arg3[0, 0, 0, 0][1, 1, 1, 65536][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(0, 0, %arg3[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23040xbf16>
       aiex.npu.dma_wait {symbol = @out}
     }
     aie.shim_dma_allocation @in0(MM2S, 0, 1)

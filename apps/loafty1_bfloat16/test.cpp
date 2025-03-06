@@ -10,14 +10,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <sqlite3.h>
 #include "npy.hpp"
 
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
 #include "xrt/xrt_kernel.h"
 
-#include "test_utils.h"
+#include "utils/test_utils.h"
 
 #ifndef DATATYPES_USING_DEFINED
 #define DATATYPES_USING_DEFINED
@@ -25,51 +24,6 @@
 #endif
 
 namespace po = boost::program_options;
-
-// Function to read data from SQLite and dynamically store it in vectors
-bool loadDataFromSQLite(const std::string& db_name, const std::string& table_name, 
-                        std::vector<std::vector<double>>& data) {
-    sqlite3* db;
-    sqlite3_stmt* stmt;
-    std::string sql = "SELECT * FROM " + table_name + ";";  // Fetch all columns
-
-    // Open SQLite database
-    if (sqlite3_open(db_name.c_str(), &db) != SQLITE_OK) {
-        std::cerr << "Error opening database: " << sqlite3_errmsg(db) << std::endl;
-        return false;
-    }
-
-    // Prepare the SQL statement
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
-        sqlite3_close(db);
-        return false;
-    }
-
-    int column_count = sqlite3_column_count(stmt);  // Get number of columns
-    if (column_count == 0) {
-        std::cerr << "No columns found in table.\n";
-        sqlite3_finalize(stmt);
-        sqlite3_close(db);
-        return false;
-    }
-
-    // Resize outer vector to match column count
-    data.resize(column_count);
-
-    // Fetch rows and store in vectors
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        for (int col = 0; col < column_count; col++) {
-            data[col].push_back(sqlite3_column_double(stmt, col));  // Store in corresponding vector
-        }
-    }
-
-    // Clean up
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-    
-    return true;
-}
 
 // ----------------------------------------------------------------------------
 // Main
@@ -90,13 +44,15 @@ int main(int argc, const char *argv[]) {
     int n_warmup_iterations = vm["warmup"].as<int>();
     int trace_size = vm["trace_sz"].as<int>();
     int do_trace = trace_size > 0;
+    int antennas = vm["anten"].as<int>();
+    int image_size = vm["imgsz"].as<int>();
 
     // ------------------------------------------------------
     // BUFFER SIZES
     // ------------------------------------------------------
 
-    const int MATRIX_DIM_SIZE0 = 96; // size of baselines and vis matrices side (square matrix) 
-    const int MATRIX_DIM_SIZE1 = 256; // size of lmn matrices side (square matrix), as well as size of image frame
+    const int MATRIX_DIM_SIZE0 = antennas; // size of baselines and vis matrices side (square matrix) 
+    const int MATRIX_DIM_SIZE1 = image_size; // size of lmn matrices side (square matrix), as well as size of image frame
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
@@ -110,14 +66,12 @@ int main(int argc, const char *argv[]) {
 
     const int NCORES = 6;
     const int NINPUTS = 5;
+    const int NDISTGROUP = 2; // number of ct groups for distribution
     
-    const int INPUT_VOL = MSIZE/2;
+    const int INPUT_VOL = MSIZE/NDISTGROUP;
     const int FULL_INPUT_VOL = INPUT_VOL * NINPUTS;
     const int OUTPUT_VOL = BSIZE;
     
-    const size_t INOUT0_SIZE = INOUT0_VOLUME * sizeof(DATATYPE);
-    const size_t INOUT1_SIZE = INOUT1_VOLUME * sizeof(DATATYPE);
-    const size_t INOUT2_SIZE = INOUT2_VOLUME * sizeof(DATATYPE);
     const size_t FULL_INPUT_SIZE = FULL_INPUT_VOL * sizeof(DATATYPE);
     const size_t INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * sizeof(DATATYPE);
     const size_t OUT_SIZE = OUTPUT_VOL * sizeof(DATATYPE);

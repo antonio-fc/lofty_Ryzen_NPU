@@ -44,6 +44,8 @@ void test_utils::add_default_options(po::options_description &desc) {
       "whether to verify the AIE computed output")(
       "iters", po::value<int>()->default_value(1))(
       "warmup", po::value<int>()->default_value(0))(
+      "anten", po::value<int>()->default_value(96))(
+      "imgsz", po::value<int>()->default_value(128))(
       "trace_sz,t", po::value<int>()->default_value(0))(
       "trace_file", po::value<std::string>()->default_value("trace.txt"),
       "where to store trace output");

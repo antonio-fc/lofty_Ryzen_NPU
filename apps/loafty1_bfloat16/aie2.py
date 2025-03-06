@@ -16,6 +16,30 @@ from aie.helpers.dialects.ext.scf import _for as range_
 from aie.extras.context import mlir_mod_ctx
 import aie.utils.trace as trace_utils
 
+def create_argparser():
+    p = argparse.ArgumentParser()
+    p.add_argument(
+        "-t",
+        "--trace_sz",
+        dest="trace_size",
+        default=0,
+        type=int,
+        help="trace size in bytes",
+    )
+    p.add_argument(
+        "--anten",
+        default=96,
+        type=int,
+        help="the number of antennas used for obtaining the visibilities",
+    )
+    p.add_argument(
+        "--imgsz",
+        default=128,
+        type=int,
+        help="the size S of an SxS image to be genrated by the imager",
+    )
+    return p
+
 def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
     # kernel for passthrough (scalar)
     name0 = "passthrough"
@@ -58,8 +82,8 @@ def loafty(opts):
     
     # Declaring constant sizes
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
-    MATRIX_DIM_SIZE0 = 96 # size of baselines and vis matrices side (square matrix) 
-    MATRIX_DIM_SIZE1 = 256 # size of lmn matrices side (square matrix), as well as size of image frame
+    MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
+    MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 
     OUT_SIZE = 32
@@ -76,12 +100,11 @@ def loafty(opts):
     NROWS = len(ROWS)
     NCORES = NCOLS * NROWS
     NDISTGROUP = 2
-    INPUT_SIZE = int(MSIZE/NDISTGROUP) # 9216/2 # size of an input per stream
-    FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
     
+    INPUT_SIZE = MSIZE//NDISTGROUP # 9216/2 # size of an input per stream
+    FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
     MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216/2)/6
     JOIN_SIZE = OUT_SIZE * NCORES
-
     FULL_OUTPUT_SIZE = OUT_SIZE*ITERS # BSIZE
     
     # Declaring basic types
@@ -225,16 +248,8 @@ def loafty(opts):
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser()
-    p.add_argument(
-        "-t",
-        "--trace_sz",
-        dest="trace_size",
-        default=0,
-        type=int,
-        help="trace size in bytes",
-    )
-    opts = p.parse_args(sys.argv[1:])
+    p = create_argparser()
+    opts = p.parse_args()
     with mlir_mod_ctx() as ctx:
         loafty(opts)
         res = ctx.module.operation.verify()
