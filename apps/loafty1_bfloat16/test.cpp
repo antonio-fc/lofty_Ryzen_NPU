@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "npy.hpp"
+#include <h5cpp/hdf5.hpp>
 
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
@@ -24,6 +24,9 @@
 #endif
 
 namespace po = boost::program_options;
+using namespace hdf5;
+
+
 
 // ----------------------------------------------------------------------------
 // Main
@@ -153,14 +156,14 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Obtaining the input data
-
+    
     
 
     // Separating per input
-    DATATYPE frequency = 50000000; // 50MHz
+    DATATYPE freq = 50000000; // 50MHz
     DATATYPE SpeedOfLight = 299792458; // m/s
     DATATYPE factor = -2 * M_PI / SpeedOfLight;
-    DATATYPE ff = frequency * factor; // frequency factor
+    DATATYPE ff = freq * factor; // frequency factor
     // DATATYPE ff = 1.5;
     
     std::vector<DATATYPE> visR(INOUT0_VOLUME, 1); // real component of visibilities
@@ -239,10 +242,8 @@ int main(int argc, const char *argv[]) {
     // ------------------------------------------------------
     unsigned num_iter = n_iterations + n_warmup_iterations;
     float npu_time_total = 0;
-    float npu_time_min = 9999999;
+    float npu_time_min = 999999999999;
     float npu_time_max = 0;
-    
-    int errors = 0;
 
     // ------------------------------------------------------
     // Main run loop
@@ -346,13 +347,4 @@ int main(int argc, const char *argv[]) {
     if (macs > 0)
         std::cout << "Min NPU gflops: " << macs / (1000 * npu_time_max)
         << std::endl;
-    
-    if (!errors) {
-        std::cout << "\nPASS!\n\n";
-        return 0;
-    } else {
-        std::cout << "\nError count: " << errors << "\n\n";
-        std::cout << "\nFailed.\n\n";
-        return 1;
-    }
 }

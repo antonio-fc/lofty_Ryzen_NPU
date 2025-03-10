@@ -6,35 +6,37 @@
 # 
 ##===----------------------------------------------------------------------===##
 
+##==------ IMPORTANT SETUP ------==##
+
 srcdir := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-include ${srcdir}/../../programming_examples/makefile-common
+include ${srcdir}/utils/makefile-common
 
 all: build/final.xclbin
 
-targetname = myFirstProgram
+targetname = loafty
+trace_size = 256000
+n_antenna = 96 # make sure to run 'make clean' after changing this
+image_size = 128 # make sure to run 'make clean' after changing this
+trace_file = tracing/trace.txt
+
+##==------------------------------==##
+
+##== COMPILING PYTHON AIE TO MLIR ==##
 
 build/aie.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
-	python3 $< > $@
+	python3 $< --anten ${n_antenna} --imgsz ${image_size} > $@
 
-build/scale.o: ${srcdir}/kernels/vector_scale.cc
+build/aie_trace.mlir: ${srcdir}/aie2.py
 	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+	python3 $< -t ${trace_size} --anten ${n_antenna} --imgsz ${image_size} > $@
+
+##==-------------------------------==##
+
+##== COMPILING NPU KERNELS WITH PEANO ==##
 
 build/passthrough.o: ${srcdir}/kernels/passthrough.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/vector_add.o: ${srcdir}/kernels/vector_add.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/vector_sub.o: ${srcdir}/kernels/vector_sub.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/vector_mult.o: ${srcdir}/kernels/vector_mult.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -42,7 +44,7 @@ build/mean.o: ${srcdir}/kernels/mean.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/trig.o: ${srcdir}/kernels/trig_float.cc
+build/main_kernel.o: ${srcdir}/kernels/main_kernel.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -50,14 +52,28 @@ build/lut_ops.o: ${srcdir}/kernels/lut_ops.cpp
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/kernels.a: build/trig.o build/lut_ops.o
+build/kernels.a: build/main_kernel.o build/lut_ops.o
 	ar rvs $@ $+
 
-build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_sub.o build/vector_mult.o build/mean.o build/kernels.a
+##==------------------------------------==##
+
+##==------- GENERATING NPU CODE -------==##
+
+build/final.xclbin: build/aie.mlir build/passthrough.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
 				--no-xchesscc --no-xbridge \
 				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+
+build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/kernels.a
+	mkdir -p ${@D}
+	cd ${@D} && aiecc.py -v --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
+    			--no-xchesscc --no-xbridge \
+				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+
+##==------------------------------------==##
+
+##==------- COMPILING C++ HOST CODE -------==##
 
 ${targetname}.exe: ${srcdir}/test.cpp
 	rm -rf _build
@@ -70,17 +86,36 @@ else
 	cp _build/${targetname} $@ 
 endif
 
-run: ${targetname}.exe build/final.xclbin
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE
+##==--------------------------------------==##
 
-run-10: ${targetname}.exe build/final.xclbin build/insts.txt 
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 
+##==------- PARSING TRACE -------==##
 
-run-10-warmup: ${targetname}.exe build/final.xclbin build/insts.txt 
-	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
+parse_trace:
+	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename ${trace_file} --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
+
+##==-----------------------------==##
+
+##==------- RUNNING CODE -------==##
+
+run: ${targetname}.exe build/final.xclbin build/insts.txt 
+	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
+
+trace: ${targetname}.exe build/trace.xclbin build/insts.txt 
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${parse_trace}
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
+
+trace_py: build/trace.xclbin
+	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${parse_trace}
+
+##==-----------------------------==##
+
+##==------- CLEAN -------==##
 
 clean:
-	rm -rf build _build ${targetname}.exe
+	rm -rf build _build ${targetname}.exe tracing/*
+
+##==---------------------==##

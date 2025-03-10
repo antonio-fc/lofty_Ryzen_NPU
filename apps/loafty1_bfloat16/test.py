@@ -20,6 +20,8 @@ import aie.utils.trace as trace_utils
 from ml_dtypes import bfloat16
 
 def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
+    SL = 299_792_458 # m/s
+    factor = -2 * freq * math.pi / SL
     img = np.zeros((npix_l, npix_m), dtype=rtype)
     l, m = np.meshgrid(np.linspace(-1, 1, npix_l), np.linspace(1, -1, npix_m))
     n = np.sqrt(1 - l**2 - m**2) - 1
@@ -33,7 +35,7 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
             # Add scaled baselines
             blAdd = scaleU + scaleV + scaleW
             # Multiply by frequency factor
-            scaleFactor = freq * blAdd
+            scaleFactor = factor * blAdd
             # Appy sin/cos
             cos = np.cos(scaleFactor)
             sin = np.sin(scaleFactor)
@@ -56,6 +58,154 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
             img[npix_l - l_ix - 1, npix_m - m_ix - 1] = result # image is saved from bottom to top so need to reverse at the end for the NPU implementations
     return img
 
+def image_reference2(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
+    SL = 299_792_458 # m/s
+    factor = -2 * freq * math.pi / SL
+    img = np.zeros((npix_l, npix_m), dtype=rtype)
+    l, m = np.meshgrid(np.linspace(-1, 1, npix_l), np.linspace(1, -1, npix_m))
+    n = np.sqrt(1 - l**2 - m**2) - 1
+    l, m, n = l.astype(rtype), m.astype(rtype), n.astype(rtype)
+    for l_ix in range(npix_l):
+        for m_ix in range(npix_m):
+            # Scale baselines with l, m and n
+            scaleU = u * l[l_ix, m_ix]
+            scaleV = v * m[l_ix, m_ix]
+            scaleW = w * n[l_ix, m_ix]
+            # Add scaled baselines
+            blAdd = scaleU + scaleV + scaleW
+            # Multiply by frequency factor
+            scaleFactor = factor * blAdd
+            # Appy sin/cos
+            cos = np.cos(scaleFactor)
+            sin = np.sin(scaleFactor)
+            # Multiply with visibilities
+            real = visR * cos
+            imag = visC * sin
+            # Subtract
+            # vis_mult = real - imag
+            # Get the average
+            if rtype==bfloat16:
+                result = np.mean(real.astype(np.float32)) - np.mean(imag.astype(np.float32)) # np.mean(vis_mult.astype(np.float32)).astype(bfloat16)
+            else:
+                result = np.mean(vis_mult)
+            # Save result
+            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = result # image is saved from bottom to top so need to reverse at the end for the NPU implementations
+    return img
+
+def plot_input_data(visibilities, baselines):
+    sns.heatmap(np.real(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/inputs/visR.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(np.imag(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/inputs/visC.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 0], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/inputs/l.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 1], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/inputs/m.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+    sns.heatmap(baselines[:, :, 2], cmap="viridis", annot=False, cbar=True)  # Create heatmap
+    plt.savefig("plots/inputs/n.png")  # Save as image
+    plt.close()  # Close the plot to free memory
+
+def read_npy_data(path, plot):
+    baselines = np.load(f"{path}/baselines.npy")
+    visibilities = np.load(f"{path}/vis.npy")[0]
+    frequency = np.load(f"{path}/freq.npy")
+    if plot:
+        plot_input_data(visibilities, baselines)
+    return (frequency, visibilities, baselines)
+
+def read_npz_data(path, index, plot):
+    files = np.load(path)
+    print(files.files)
+    times = files['times'] # time stamps
+    duration = files['duration']
+    subband = files['subband']
+    band = files['band']
+    antenna_status = files['antenna_status']
+    data = files['data'] # visibilities
+    station_name = files['station_name']
+    antenna_set = files['antenna_set']
+    print(data.shape)
+    print(data.dtype)
+
+    file = duration
+    print(file.shape)
+    print(file.dtype)
+    print(file)
+    return data
+
+def format_input1(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, INPUT_VOL, FULL_INPUT_VOL, OUT_SIZE, TRACE_SIZE, DATATYPE, verbose):
+    f = freq[0] # 50MHz
+    SL = 299_792_458 # m/s
+    factor = -2 * f * math.pi / SL
+    inout0 = np.array([factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
+    inout0 = np.repeat(inout0, IN1_VOL)
+
+    visR = np.real(vis).astype(dtype=DATATYPE).flatten()         # vis real
+    visRa, visRb = np.split(visR, 2)
+    
+    visC = np.imag(vis).astype(dtype=DATATYPE).flatten()         # vis complex
+    visCa, visCb = np.split(visC, 2)
+    
+    u = blines[:, :, 0].astype(dtype=DATATYPE).flatten()         # baselines u
+    ua, ub = np.split(u, 2)
+    
+    v = blines[:, :, 1].astype(dtype=DATATYPE).flatten()         # baselines v
+    va, vb = np.split(v, 2)
+    
+    w = blines[:, :, 2].astype(dtype=DATATYPE).flatten()         # baselines w
+    wa, wb = np.split(w, 2)
+
+    inputsA = [visRa, visCa, ua, va, wa]
+    inputsB = [visRb, visCb, ub, vb, wb]
+    inputs = [inputsA, inputsB]
+    main_inputs = [np.empty((FULL_INPUT_VOL,), dtype=DATATYPE), np.empty((FULL_INPUT_VOL,), dtype=DATATYPE)] # 9216 * 5 / 2 each
+
+    # Formatting the main input
+    for m in range(2):
+        main_inputs[m] = main_inputs[m].reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
+        for i in range(NINPUTS):
+            main_inputs[m][i, :] = inputs[m][i]
+    
+    
+    inout3 = np.empty((IN2_VOL*N_LMN,), dtype=DATATYPE)     # l, m, n
+    l, m = np.meshgrid(np.linspace(-1, 1, IMG_DIM_SIZE), np.linspace(1, -1, IMG_DIM_SIZE))
+    n = np.sqrt(1 - l**2 - m**2) - 1
+    nan_mask = np.isnan(n)
+    inout3a = l.flatten().astype(DATATYPE)
+    inout3b = m.flatten().astype(DATATYPE)
+    inout3c = n.flatten().astype(DATATYPE)
+    
+    # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
+    io3x = [inout3a, inout3b, inout3c] # each for l, m and n
+    for i in range(len(io3x)):
+        for j in range(CV):
+            inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
+    inout_factor = np.concatenate((inout0, inout3))
+    
+    out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
+    trace_zero = np.zeros(TRACE_SIZE, dtype=np.uint8)                # trace
+
+    if verbose:
+        print("Frequency/Factor Input: ")
+        print(f"Frequency: {f/1_000_000}MHz")
+        print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
+        
+        print("\nFull Input A: ")
+        print(f"VisR: {main_inputs[0][0]}, VisC: {main_inputs[0][1]}, U: {main_inputs[0][2]}, V: {main_inputs[0][3]}, W: {main_inputs[0][4]}")
+        print("\nFull Input B: ")
+        print(f"VisR: {main_inputs[1][0]}, VisC: {main_inputs[1][1]}, U: {main_inputs[1][2]}, V: {main_inputs[1][3]}, W: {main_inputs[1][4]}")
+
+        print(f"lmn: {inout3.flatten()[:24]}")
+    
+    return (inout_factor, main_inputs[0], main_inputs[1], out_zero, trace_zero, nan_mask)
 
 def main(opts):
     # Load instruction sequence
@@ -121,100 +271,30 @@ def main(opts):
     bo_instr.write(instr_v, 0)
 
     # Getting the data sim/files
-    npy_path = "data/basic"
-    baselines = np.load(f"{npy_path}/baselines.npy")
-    visibilities = np.load(f"{npy_path}/vis.npy")[0]
-    frequency = np.load(f"{npy_path}/freq.npy")
+    npy_path = "data/npy/set0"
+    frequency, visibilities, baselines = read_npy_data(path=npy_path, plot=False)
 
-    sns.heatmap(np.real(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/visR.png")  # Save as image
-    plt.close()  # Close the plot to free memory
+    # npz_path = "data/npz/input1.npz"
+    # input_set = 0
+    # inputs = read_npz_data(npz_path, input_set, False)
 
-    sns.heatmap(np.imag(visibilities), cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/visC.png")  # Save as image
-    plt.close()  # Close the plot to free memory
-
-    sns.heatmap(baselines[:, :, 0], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/l.png")  # Save as image
-    plt.close()  # Close the plot to free memory
-
-    sns.heatmap(baselines[:, :, 1], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/m.png")  # Save as image
-    plt.close()  # Close the plot to free memory
-
-    sns.heatmap(baselines[:, :, 2], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/n.png")  # Save as image
-    plt.close()  # Close the plot to free memory
-    
-
-    # Getting/generating input data
-    f = frequency[0] # 50MHz
-    SL = 299_792_458 # m/s
-    factor = -2 * f * math.pi / SL
-    inout0 = np.array([factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
-    inout0 = np.repeat(inout0, INOUT1_VOLUME)
-    print("Frequency/Factor Input: ")
-    print(f"Frequency: {f/1_000_000}MHz")
-    print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
-
-    visR = np.real(visibilities).astype(dtype=DATATYPE).flatten() # np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis real
-    visRa, visRb = np.split(visR, 2)
-    
-    visC = np.imag(visibilities).astype(dtype=DATATYPE).flatten() # np.ones(INOUT0_VOLUME, dtype=DATATYPE)          # vis complex
-    visCa, visCb = np.split(visC, 2)
-    
-    u = baselines[:, :, 0].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines u
-    ua, ub = np.split(u, 2)
-    
-    v = baselines[:, :, 1].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines v
-    va, vb = np.split(v, 2)
-    
-    w = baselines[:, :, 2].astype(dtype=DATATYPE).flatten() # np.full(INOUT0_VOLUME, 1, dtype=DATATYPE)          # baselines w
-    wa, wb = np.split(w, 2)
-
-    inputsA = [visRa, visCa, ua, va, wa]
-    inputsB = [visRb, visCb, ub, vb, wb]
-    inputs = [inputsA, inputsB]
-    main_inputs = [np.empty((FULL_INPUT_VOL,), dtype=DATATYPE), np.empty((FULL_INPUT_VOL,), dtype=DATATYPE)] # 9216 * 5 / 2 each
-
-    # Formatting the main input
-    for m in range(2):
-        main_inputs[m] = main_inputs[m].reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-        for i in range(NINPUTS):
-            main_inputs[m][i, :] = inputs[m][i]
-    print("\nFull Input A: ")
-    print(f"VisR: {main_inputs[0][0]}, VisC: {main_inputs[0][1]}, U: {main_inputs[0][2]}, V: {main_inputs[0][3]}, W: {main_inputs[0][4]}")
-    print("\nFull Input B: ")
-    print(f"VisR: {main_inputs[1][0]}, VisC: {main_inputs[1][1]}, U: {main_inputs[1][2]}, V: {main_inputs[1][3]}, W: {main_inputs[1][4]}")
-    
-    
-    inout3 = np.empty((INOUT2_VOLUME*N_LMN,), dtype=DATATYPE)     # l, m, n
-    l, m = np.meshgrid(np.linspace(-1, 1, MATRIX_DIM_SIZE1), np.linspace(1, -1, MATRIX_DIM_SIZE1))
-    n = np.sqrt(1 - l**2 - m**2) - 1
-    inout3a = l.flatten().astype(DATATYPE)
-    inout3b = m.flatten().astype(DATATYPE)
-    inout3c = n.flatten().astype(DATATYPE)
-    
-    # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
-    io3x = [inout3a, inout3b, inout3c] # each for l, m and n
-    for i in range(len(io3x)):
-        for j in range(CV):
-            inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
-    inout_factor = np.concatenate((inout0, inout3))
-    print(f"lmn: {inout3.flatten()[:24]}")
-    
-    out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
-    trace_zero = np.zeros(TRACE_SIZE, dtype=np.uint8)                # trace
+    # Formatting input data
+    inout_factor, main_inputsA, main_inputsB, out_zero, trace_zero, nan_mask = format_input1(frequency, visibilities, baselines,
+                                                                                   INOUT0_VOLUME, INOUT1_VOLUME, INOUT2_VOLUME,
+                                                                                   N_LMN, NINPUTS, CV, MATRIX_DIM_SIZE1,
+                                                                                   INPUT_VOL, FULL_INPUT_VOL,
+                                                                                   OUT_SIZE, TRACE_SIZE,
+                                                                                   DATATYPE, False)
     
     # Initialize data buffers
     if DATATYPE == bfloat16:
         bo_inout0.write(inout_factor.view(np.uint16), 0)
-        bo_inout1.write(main_inputs[0].view(np.uint16), 0)
-        bo_inout2.write(main_inputs[1].view(np.uint16), 0)
+        bo_inout1.write(main_inputsA.view(np.uint16), 0)
+        bo_inout2.write(main_inputsB.view(np.uint16), 0)
     else:
         bo_inout0.write(inout_factor, 0)
-        bo_inout1.write(main_inputs[0], 0)
-        bo_inout2.write(main_inputs[1], 0)
+        bo_inout1.write(main_inputsA, 0)
+        bo_inout2.write(main_inputsB, 0)
     bo_inout4.write(out_zero, 0)
     if do_tracing:
         bo_trace.write(trace_zero, 0)
@@ -247,7 +327,7 @@ def main(opts):
         start = time.time_ns()
         opcode = 3
         if do_tracing:
-            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ do_tracing)
+            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ tracing)
         else:
             h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4)  # only 4 inputs and 1 output
         h.wait()
@@ -260,7 +340,7 @@ def main(opts):
         if i < opts.warmup_iters:
             continue
 
-        # Copy output results and verify they are correct
+        # Copy output results
         entire_buffer = bo_inout4.read(OUT_SIZE, 0)
         output_buffer = entire_buffer[:OUT_SIZE].view(DATATYPE)
         
@@ -269,13 +349,8 @@ def main(opts):
             trace_buffer = bo_trace.read(TRACE_SIZE, 0).view(np.uint32)
 
             trace_utils.write_out_trace(trace_buffer, str(opts.trace_file))
-        
-        # if opts.verify:
-        #     if opts.verbosity >= 1:
-        #         print("Verifying results ...")
-                
-        errors = 0
-        
+
+        # Writing out unformatted output
         if i == num_iter-1 and opts.verbosity >= 1:
             print("\nOutput:")
             print(output_buffer.shape)
@@ -284,24 +359,29 @@ def main(opts):
         
         # outputting image
         if i == num_iter-1:
-            nan_mask = np.isnan(n)
-            cmap_coolwarm = sns.color_palette("coolwarm", as_cmap=True)
+            # Formatting output for plotting
             output_raw = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
-            output = np.select([~np.isnan(n)], [output_raw], np.nan)
-            # print(output.flatten()[256*100:256*100+10])
-            sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
-            plt.savefig("plots/images/output_py.png")  # Save as image
-            plt.close()  # Close the plot to free memory
+            output = np.select([~nan_mask], [output_raw], np.nan)
+
+            # Generating reference values
             rtype = bfloat16
-            img_ref = image_reference(np.real(visibilities).astype(dtype=rtype),
+            img_ref = image_reference2(np.real(visibilities).astype(dtype=rtype),
                                       np.imag(visibilities).astype(dtype=rtype),
                                       baselines[:, :, 0].astype(dtype=rtype),
                                       baselines[:, :, 1].astype(dtype=rtype),
                                       baselines[:, :, 2].astype(dtype=rtype),
-                                      factor.astype(dtype=rtype),
+                                      frequency.astype(dtype=rtype),
                                       MATRIX_DIM_SIZE1,
                                       MATRIX_DIM_SIZE1,
                                       rtype).astype(np.float64)
+
+            # Plotting and Analysis
+            cmap_coolwarm = sns.color_palette("coolwarm", as_cmap=True)
+            # print(output.flatten()[256*100:256*100+10])
+            sns.heatmap(output, cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            plt.savefig("plots/images/output_py.png")  # Save as image
+            plt.close()  # Close the plot to free memory
+            
             # print(img_ref.flatten()[256*100:256*100+10])
             sns.heatmap(img_ref, cmap="viridis", annot=False, cbar=True)  # Create heatmap
             plt.savefig("plots/images/ref.png")  # Save as image
@@ -337,7 +417,7 @@ def main(opts):
             plt.savefig(f"plots/histograms/ref_hist{n_bins}.png")  # Save as image
             plt.close()  # Close the plot to free memory
 
-            sns.heatmap(np.abs(img_ref - output)/bb_range*100, cmap="viridis", annot=False, cbar=True)  # Create heatmap
+            sns.heatmap(np.abs(img_ref - output), cmap="viridis", annot=False, cbar=True)  # Create heatmap
             plt.savefig("plots/images/diff.png")  # Save as image
             plt.close() 
 
@@ -346,8 +426,6 @@ def main(opts):
             diff_max = np.max(np.abs(diff))
             diff_min = np.min(np.abs(diff))
             print(f"[Error] Avg Diff: {diff_mean}, Max Diff: {diff_max}, Min Diff: {diff_min}, Max Diff(numpy%): {diff_max/bb_range*100}%, Avg Diff(numpy%): {diff_mean/bb_range*100}%")
-
-
         
         npu_time = stop - start
         npu_time_total = npu_time_total + npu_time
@@ -364,14 +442,6 @@ def main(opts):
     print("\nAvg NPU time: {}us.".format(int((npu_time_total / opts.iters) / 1000)))
     print("\nMin NPU time: {}us.".format(int((npu_time_min) / 1000)))
     print("\nMax NPU time: {}us.".format(int((npu_time_max) / 1000)))
-
-    if not errors:
-        print("\nPASS!\n")
-        exit(0)
-    else:
-        print("\nError count: ", errors)
-        print("\nFailed.\n")
-        exit(-1)
 
 
 if __name__ == "__main__":
