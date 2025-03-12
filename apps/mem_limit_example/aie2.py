@@ -87,7 +87,7 @@ def loafty():
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MSIZE = 9216 # 96x96
     BSIZE = 256*256 # 256X256
-    ITER_M = 9 # this can be any number that can divide MSIZE whose quotient is an even integer, except 1 (doesnt work atm cause of size limitations)
+    ITER_M = 1 # this can be any number that can divide MSIZE whose quotient is an even integer, except 1 (doesnt work atm cause of size limitations)
     TSIZE = MSIZE//ITER_M
     ITER_B = 9
     

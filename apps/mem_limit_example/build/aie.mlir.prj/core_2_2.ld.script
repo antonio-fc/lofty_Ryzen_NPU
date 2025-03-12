@@ -43,30 +43,30 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the south. */
 . = 0x40000;
 . += 0x10000;
-. = 0x50400;
+. = 0x58000;
 m_cons_buff_0 = .;
 . += 0x4;
-. = 0x54000;
+. = 0x5C000;
 m_cons_buff_1 = .;
 . += 0x4;
-. = 0x58000;
+. = 0x50400;
 v_cons_buff_0 = .;
-. += 0x4;
-. = 0x5C000;
+. += 0x800;
+. = 0x54000;
 v_cons_buff_1 = .;
-. += 0x4;
-. = 0x70400;
+. += 0x800;
+. = 0x78000;
 n_cons_buff_0 = .;
 . += 0x4;
-. = 0x74000;
+. = 0x7C000;
 n_cons_buff_1 = .;
 . += 0x4;
-. = 0x78000;
+. = 0x70400;
 w_cons_buff_0 = .;
-. += 0x4;
-. = 0x7C000;
+. += 0x800;
+. = 0x74000;
 w_cons_buff_1 = .;
-. += 0x4;
+. += 0x800;
   .bss : { *(.bss*) } > data
 }
 INPUT(scale.o)

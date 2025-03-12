@@ -52,18 +52,18 @@ in0_cons_buff_0 = .;
 . = 0x64000;
 in0_cons_buff_1 = .;
 . += 0x4;
-. = 0x70400;
+. = 0x78000;
 l_cons_buff_0 = .;
 . += 0x4;
-. = 0x74000;
+. = 0x7C000;
 l_cons_buff_1 = .;
 . += 0x4;
-. = 0x78000;
+. = 0x70400;
 u_cons_buff_0 = .;
-. += 0x4;
-. = 0x7C000;
+. += 0x800;
+. = 0x74000;
 u_cons_buff_1 = .;
-. += 0x4;
+. += 0x800;
   .bss : { *(.bss*) } > data
 }
 INPUT(scale.o)

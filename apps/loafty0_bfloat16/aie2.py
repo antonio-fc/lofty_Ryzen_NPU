@@ -40,7 +40,7 @@ def create_argparser():
     )
     return p
 
-def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
+def declaring_kernel_func(out_ty, sing_input_ty, tile_ty, dtype):
     # kernel for passthrough (scalar)
     name0 = "passthrough"
     kernel0 = external_func("passthrough",
@@ -48,16 +48,11 @@ def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
     )
     name1 = "mean"
     kernel1 = external_func("mean",
-        inputs=[join_ty, join_ty, out_ty, dtype],
-    )
-    name2 = "main"
-    kernel2 = external_func("main_kernel",
-        inputs=[bfloat16, factor_ty, tile_ty, tile_ty, tile_ty, tile_ty, tile_ty, out_ty, dtype],
+        inputs=[sing_input_ty, out_ty, dtype, dtype],
     )
     return {
         name0: kernel0,
         name1: kernel1,
-        name2: kernel2,
     }
 
 def declaring_tiles(n_cols, n_comp):
@@ -84,28 +79,21 @@ def loafty(opts):
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
-    MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
-    BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 
-    OUT_SIZE = 32
+    MSIZE = MATRIX_DIM_SIZE0**2 # 96x96 only for now
+    BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 or 128*128 typically
+    CV = 8 # how many pixels (lmn) are moved at once
     N_LMN = 3 # 3 for l, m and n
-    FACTOR_MOVE_SIZE = OUT_SIZE * N_LMN
-    FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*N_LMN
-
-    ITERS = BSIZE//OUT_SIZE
+    ITERS = BSIZE//CV
     
     NINPUTS = 5 # number of inputs in a single stream
-    COLS = [0, 1] # for the second distribution, add 2 to each element to get the other columns
-    ROWS = [1, 2, 3]
-    NCOLS = len(COLS)
-    NROWS = len(ROWS)
-    NCORES = NCOLS * NROWS
-    NDISTGROUP = 2
-    
-    INPUT_SIZE = MSIZE//NDISTGROUP # 9216/2 # size of an input per stream
-    FULL_INPUT_SIZE = INPUT_SIZE*NINPUTS # 9216*5/2 #
-    MAIN_SIZE = int(INPUT_SIZE/NCORES) # (9216/2)/6
-    JOIN_SIZE = OUT_SIZE * NCORES
-    FULL_OUTPUT_SIZE = OUT_SIZE*ITERS # BSIZE
+    FREQ_SIZE = 2 # the size of the frequency data points comming in the main input streams
+    NCHANNELS = 2 # number of pipeline channels
+
+    SINGLE_INPUT_SIZE = MSIZE//NCHANNELS # 4608
+    COMP_INPUT_SIZE = SINGLE_INPUT_SIZE + FREQ_SIZE # 9216/2 + 2 = 4610 size of an input per stream
+    FULL_INPUT_SIZE = COMP_INPUT_SIZE*NINPUTS # COMP_INPUT_SIZE * 5 for each main input
+    LMN_MOVE_SIZE = CV * N_LMN
+    FULL_LMN_SIZE = BSIZE * N_LMN # IMG_SIZE**2 * 3
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
@@ -114,134 +102,99 @@ def loafty(opts):
     # Device setup
     @device(AIEDevice.npu1_4col)
     def device_body():
-        out_ty = np.ndarray[(OUT_SIZE,), dtype]
-        factor_ty = np.ndarray[(FACTOR_MOVE_SIZE,), dtype]
-        input_ty = np.ndarray[(INPUT_SIZE,), dtype]
-        join_ty = np.ndarray[(JOIN_SIZE,), dtype]
+        dist_input_ty = np.ndarray[(COMP_INPUT_SIZE,), dtype]
         full_input_ty = np.ndarray[(FULL_INPUT_SIZE,), dtype]
-        main_ct_ty = np.ndarray[(MAIN_SIZE,), dtype]
+        out_ty = np.ndarray[(CV,), dtype]
+        lmn_broad_ty = np.ndarray[(LMN_MOVE_SIZE,), dtype]
+        single_input_ty = np.ndarray[(SINGLE_INPUT_SIZE,), dtype]
+
 
         # AIE Core Function declarations
-
-        kernels = declaring_kernel_func(out_ty, factor_ty, main_ct_ty, join_ty, dtype_k)
+        kernels = declaring_kernel_func(out_ty, single_input_ty, dist_input_ty, dtype_k)
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
-        
-        mean_tile = ct[1][0]
-        trace_shim_tile = st[1]
-        main_compute_tilesA = []
-        main_compute_tilesB = []
-        for i in COLS:
-            for j in ROWS:
-                main_compute_tilesA.append(ct[i][j])
-                main_compute_tilesB.append(ct[i+NCOLS][j])
+
+        main_tiles = [[ct[1][1], ct[0][0]], [ct[2][1], ct[3][0]]] # [[mainRA, mainCA], [mainRB, mainCB]]
+        scale_tiles = [[ct[0][3], ct[0][2], ct[0][1]], [ct[3][3], ct[3][2], ct[3][1]]] # [[uA, vA, wA], [uB, vB, wB]]
+        add_tiles = [[ct[1][3], ct[1][2]], [ct[2][3], ct[2][2]]] # [[add1A, add2A], [add1B, add2B]]
+        sub_tile = ct[1][0]
+        mean_tile = ct[2][0]
+
+        memDistA = mt[0]
+        memDistB = mt[3]
+        memJoinR = mt[2]
+        memJoinC = mt[1]
+
+        dist_tiles = [[], []] # [ComputeTilesA, ComputTilesB] (order: visR, visC, u, v, w)
+        for c in range(NCHANNELS):
+            dist_tiles[c] = main_tiles[c] + scale_tiles[c]
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[1], main_compute_tilesA + main_compute_tilesB, 2, factor_ty)
-        of_in_mainA = object_fifo("in1", st[0], mt[0], 2, input_ty)       
-        of_in_mainB = object_fifo("in2", st[3], mt[3], 2, input_ty)
+        of_in_lmn = object_fifo("in0", st[1], scale_tiles[0] + scale_tiles[1], 2, lmn_broad_ty)
+        of_in_mainA = object_fifo("in1", st[0], memDistA, 2, full_input_ty)       
+        of_in_mainB = object_fifo("in2", st[3], memDistB, 2, full_input_ty)
 
-        # Distribution of inputs mainA and mainB
+        # Distribution of main inputs
         main_in_fifosA = []
         main_in_fifosB = []
         main_dist_offsets = []
-        
-        for i in COLS:
-            for j in ROWS:
-                # Input distribution FIFOs
-                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[0], ct[i][j], 2, main_ct_ty))
-                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[3], ct[i+NCOLS][j], 2, main_ct_ty))
-                main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
-                
+        for t in range(NINPUTS):
+            # Input distribution FIFOs
+            main_in_fifosA.append(object_fifo(f"of_in_mainA{t}", memDistA, dist_tiles[0][t], 2, dist_input_ty))
+            main_in_fifosB.append(object_fifo(f"of_in_mainB{t}", memDistB, dist_tiles[1][t], 2, dist_input_ty))
+            main_dist_offsets.append(t * COMP_INPUT_SIZE)
+
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
         object_fifo_link(of_in_mainB, main_in_fifosB, [], main_dist_offsets)
 
-        # Join of processed inputs mainA and mainB
-        main_out_fifosA = []
-        main_out_fifosB = []
-        main_dist_offsets = []
+        # Moving sub result to mean tile
+        of_sub2mean = object_fifo("sub2mean", sub_tile, mean_tile, 2, single_input_ty)
+
+        # Output movement
+        of_out = object_fifo("out", mean_tile, st[2], 2, out_ty)
+
+        # DECLARING THE CORES
+        @core(sub_tile)
+        def core_body():
+            for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
+                for _ in range_(BSIZE):
+                    # inputs = of_sub2mean.acquire
+                    output = of_sub2mean.acquire(ObjectFifoPort.Produce, 1) # 4608
+                    
+                    of_sub2mean.release(ObjectFifoPort.Produce, 1)
+
         
-        for i in COLS:
-            for j in ROWS:
-                # Output join FIFOs
-                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[1], 2, out_ty))
-                main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", ct[i+NCOLS][j], mt[2], 2, out_ty))
-                main_dist_offsets.append((i*NROWS + j - 1) * OUT_SIZE)
-
-        of_out_mainA = object_fifo("out1", mt[1], mean_tile, 2, join_ty)
-        of_out_mainB = object_fifo("out2", mt[2], mean_tile, 2, join_ty)
-        
-        object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
-        object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
-
-        of_out = object_fifo("out", mean_tile, st[1], 2, out_ty)
-
-        # Declaring the cores
-
         @core(mean_tile, "mean.o")
         def core_body():
             for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
                 for _ in range_(ITERS):
-                    inputA = of_out_mainA.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
-                    inputB = of_out_mainB.acquire(ObjectFifoPort.Consume, 1) # OUT_SIZE * NCORES
-                    output = of_out.acquire(ObjectFifoPort.Produce, 1) # OUT_SIZE
-                    kernels['mean'](inputA, inputB, output, OUT_SIZE)
+                    output = of_out.acquire(ObjectFifoPort.Produce, 1) # CV
+                    
+                    for i in range(CV):
+                        inputs = of_sub2mean.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        kernels['mean'](inputs, output, i, SINGLE_INPUT_SIZE)
+                        of_sub2mean.release(ObjectFifoPort.Consume, 1)
+                    
                     of_out.release(ObjectFifoPort.Produce, 1)
-                    of_out_mainA.release(ObjectFifoPort.Consume, 1)
-                    of_out_mainB.release(ObjectFifoPort.Consume, 1)
-
-        for i in COLS:
-            for j in ROWS:
-                index = i*NROWS + j - 1
-                # FIFOs for A
-                obf_in_fifoA = main_in_fifosA[index]
-                obf_out_fifoA = main_out_fifosA[index]
-
-                # FIFOs for B
-                obf_in_fifoB = main_in_fifosB[index]
-                obf_out_fifoB = main_out_fifosB[index]
-
-                # to only declare cores once
-                cores = [ct[i][j], ct[i+NCOLS][j]]
-                inFIFOs = [obf_in_fifoA, obf_in_fifoB]
-                outFIFOs = [obf_out_fifoA, obf_out_fifoB]
-                for c in range(NDISTGROUP): # Twice for each distribution group, So GroupA (6) + GroupB (6) = 12
-                    @core(cores[c], "kernels.a")
-                    def core_body():
-                        for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
-                            freq = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
-                            ff = freq[0]
-                            of_in_factor.release(ObjectFifoPort.Consume, 1)
-                            
-                            inputs = inFIFOs[c].acquire(ObjectFifoPort.Consume, NINPUTS)
-                            for _ in range_(ITERS):
-                                factors = of_in_factor.acquire(ObjectFifoPort.Consume, 1)
-                                outputs = outFIFOs[c].acquire(ObjectFifoPort.Produce, 1)
-                            
-                                kernels['main'](ff, factors, inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], outputs, MAIN_SIZE)
-    
-                                outFIFOs[c].release(ObjectFifoPort.Produce, 1)
-                                of_in_factor.release(ObjectFifoPort.Consume, 1)
-                            inFIFOs[c].release(ObjectFifoPort.Consume, NINPUTS)
-
+        
         # Set up a packet-switched flow from core to shim for tracing information
-        tiles_to_trace = [mean_tile]
+        tiles_to_trace = []
         if enableTrace:
             trace_utils.configure_packet_tracing_flow(tiles_to_trace, trace_shim_tile)
 
                     
         # To/from AIE-array data movement
         @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
-        def sequence(factor, mainA, mainB, output):
+        def sequence(lmn, mainA, mainB, output):
             if enableTrace:
                 trace_utils.configure_packet_tracing_aie2(tiles_to_trace=tiles_to_trace, shim=trace_shim_tile, ddr_id=4, trace_size=TRACE_SIZE, trace_offset=0)
-            npu_dma_memcpy_nd(metadata=of_in_factor, bd_id=1, mem=factor, sizes=[1, 1, 1, FACTOR_SIZE])
+            npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=1, mem=lmn, sizes=[1, 1, 1, FULL_LMN_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
             npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, FULL_OUTPUT_SIZE]) # output (size = BSIZE)
-            # We know of_out will complete after of_in and of_in_factor, so it is sufficient to just wait for of_out
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, BSIZE]) # output (size = BSIZE)
+            # We know of_out will complete after of_in_mainA, of_in_mainB and of_in_lmn, so it is sufficient to just wait for of_out
             dma_wait(of_out)
             if enableTrace:
                 trace_utils.gen_trace_done_aie2(trace_shim_tile)

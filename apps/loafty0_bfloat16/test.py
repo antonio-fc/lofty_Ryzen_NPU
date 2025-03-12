@@ -98,22 +98,24 @@ def read_npz_data(path, index, plot):
     data = files['data'] # visibilities
     station_name = files['station_name']
     antenna_set = files['antenna_set']
-    print(data.shape)
-    print(data.dtype)
+    # print(data.shape)
+    # print(data.dtype)
 
     file = duration
-    print(file.shape)
-    print(file.dtype)
-    print(file)
+    # print(file.shape)
+    # print(file.dtype)
+    # print(file)
     return data
 
-def format_input1(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, INPUT_VOL, FULL_INPUT_VOL, OUT_SIZE, TRACE_SIZE, DATATYPE, verbose):
+def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, OUT_SIZE, TRACE_SIZE, DATATYPE, verbose):
+    # Formatting the frequency to rads
     f = freq[0] # 50MHz
     SL = 299_792_458 # m/s
     factor = -2 * f * math.pi / SL
-    inout0 = np.array([factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
-    inout0 = np.repeat(inout0, IN1_VOL)
+    inout0 = np.array([factor, factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
+    # inout0 = np.repeat(inout0, IN1_VOL)
 
+    # Formatting main inputs (baselines and visibilities)
     visR = np.real(vis).astype(dtype=DATATYPE).flatten()         # vis real
     visRa, visRb = np.split(visR, 2)
     
@@ -132,16 +134,13 @@ def format_input1(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     inputsA = [visRa, visCa, ua, va, wa]
     inputsB = [visRb, visCb, ub, vb, wb]
     inputs = [inputsA, inputsB]
-    main_inputs = [np.empty((FULL_INPUT_VOL,), dtype=DATATYPE), np.empty((FULL_INPUT_VOL,), dtype=DATATYPE)] # 9216 * 5 / 2 each
-
-    # Formatting the main input
     for m in range(2):
-        main_inputs[m] = main_inputs[m].reshape(NINPUTS, INPUT_VOL) # 5, 9216 / 2
-        for i in range(NINPUTS):
-            main_inputs[m][i, :] = inputs[m][i]
-    
-    
-    inout3 = np.empty((IN2_VOL*N_LMN,), dtype=DATATYPE)     # l, m, n
+        for v in range(NINPUTS):
+            inputs[m][v] = np.concatenate([inout0, inputs[m][v]])
+    main_inputs = [np.concatenate(inputsA), np.concatenate(inputsB)] # (9216/2 + 2) * 5  (4610 * 5 = 23050) each to then be distributed
+
+    # Formatting lmn and combining with the frequency
+    inout3 = np.empty((IN2_VOL*N_LMN), dtype=DATATYPE)     # l, m, n
     l, m = np.meshgrid(np.linspace(-1, 1, IMG_DIM_SIZE), np.linspace(1, -1, IMG_DIM_SIZE))
     n = np.sqrt(1 - l**2 - m**2) - 1
     nan_mask = np.isnan(n)
@@ -149,14 +148,15 @@ def format_input1(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     inout3b = m.flatten().astype(DATATYPE)
     inout3c = n.flatten().astype(DATATYPE)
     
-    # Values are stored in pairs since the data needs to be sent in chunks of at least 32 bits
+    # Values are stored in chunks of CV, alternating for l, m and n
     io3x = [inout3a, inout3b, inout3c] # each for l, m and n
     for i in range(len(io3x)):
         for j in range(CV):
             inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
-    inout_factor = np.concatenate((inout0, inout3))
-    
-    out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                      # output
+    inout3 = inout3.reshape(IN2_VOL//CV, N_LMN, CV)
+
+    # Output buffers
+    out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                    # output
     trace_zero = np.zeros(TRACE_SIZE, dtype=np.uint8)                # trace
 
     if verbose:
@@ -169,9 +169,12 @@ def format_input1(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
         print("\nFull Input B: ")
         print(f"VisR: {main_inputs[1][0]}, VisC: {main_inputs[1][1]}, U: {main_inputs[1][2]}, V: {main_inputs[1][3]}, W: {main_inputs[1][4]}")
 
-        print(f"lmn: {inout3.flatten()[:24]}")
+        print("\nLMN Input: ")
+        print(f"l0: {inout3[10][0]}")
+        print(f"m0: {inout3[10][1]}")
+        print(f"n0: {inout3[10][2]}")
     
-    return (inout_factor, main_inputs[0], main_inputs[1], out_zero, trace_zero, nan_mask)
+    return (main_inputs[0], main_inputs[1], inout3, out_zero, trace_zero, nan_mask)
 
 def main(opts):
     # Load instruction sequence
@@ -188,20 +191,22 @@ def main(opts):
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
-    CV = 32 # number of consecutive values in output stream
+    CV = 8 # number of consecutive values in output stream
     N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
     INOUT0_VOLUME = MSIZE
     INOUT1_VOLUME = CV*N_LMN # padding the scalar of the frequency factor to be in the same stream as lmn values
     INOUT2_VOLUME = BSIZE
-    INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
+    INOUT_LMN_VOLUME = INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
     
     NCORES = 6 # for each distribution
     NINPUTS = 5 # u, v, w, real vis and imag vis
     NDISTGROUP = 2 # number of ct groups for distribution
     
+    FREQ_VOL = 2
     INPUT_VOL = MSIZE//NDISTGROUP # split in 2 for each distribution data stream
-    FULL_INPUT_VOL = INPUT_VOL*NINPUTS
+    FULL_INPUT_VOL = (INPUT_VOL + FREQ_VOL)*NINPUTS
+    print(FULL_INPUT_VOL)
     OUTPUT_VOL = BSIZE
 
     DATATYPE = bfloat16
@@ -211,7 +216,7 @@ def main(opts):
     INOUT1_SIZE = INOUT1_VOLUME * DTYPE_SIZE
     INOUT2_SIZE = INOUT2_VOLUME * DTYPE_SIZE
     FULL_INPUT_SIZE = FULL_INPUT_VOL * DTYPE_SIZE
-    INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * DTYPE_SIZE
+    INOUT_LMN_SIZE = INOUT_LMN_VOLUME * DTYPE_SIZE
 
     OUT_SIZE = OUTPUT_VOL * DTYPE_SIZE
     TRACE_SIZE = int(opts.trace_size)
@@ -226,7 +231,7 @@ def main(opts):
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------
     bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
-    bo_inout0 = xrt.bo(device, INOUT_FACTOR_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
+    bo_inout0 = xrt.bo(device, INOUT_LMN_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
     bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
     bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
     bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(6))    # output
@@ -243,23 +248,22 @@ def main(opts):
     npz_path = "data/npz/input1.npz"
     input_set = 0
     inputs = read_npz_data(npz_path, input_set, False)
-    exit()
 
     # Formatting input data
-    inout_factor, main_inputsA, main_inputsB, out_zero, trace_zero, nan_mask = format_input1(frequency, visibilities, baselines,
+    main_inputsA, main_inputsB, lmn_input, out_zero, trace_zero, nan_mask = format_input0(frequency, visibilities, baselines,
                                                                                    INOUT0_VOLUME, INOUT1_VOLUME, INOUT2_VOLUME,
                                                                                    N_LMN, NINPUTS, CV, MATRIX_DIM_SIZE1,
-                                                                                   INPUT_VOL, FULL_INPUT_VOL,
+                                                                                   # INPUT_VOL, FULL_INPUT_VOL,
                                                                                    OUT_SIZE, TRACE_SIZE,
-                                                                                   DATATYPE, False)
+                                                                                   DATATYPE, True)
     
     # Initialize data buffers
     if DATATYPE == bfloat16:
-        bo_inout0.write(inout_factor.view(np.uint16), 0)
+        bo_inout0.write(lmn_input.view(np.uint16), 0)
         bo_inout1.write(main_inputsA.view(np.uint16), 0)
         bo_inout2.write(main_inputsB.view(np.uint16), 0)
     else:
-        bo_inout0.write(inout_factor, 0)
+        bo_inout0.write(lmn_input, 0)
         bo_inout1.write(main_inputsA, 0)
         bo_inout2.write(main_inputsB, 0)
     bo_inout4.write(out_zero, 0)
@@ -283,7 +287,6 @@ def main(opts):
     npu_time_min = 9999999999999999
     npu_time_max = 0
     errors = 0
-
     # ------------------------------------------------------
     # Main run loop
     # ------------------------------------------------------
@@ -318,14 +321,15 @@ def main(opts):
             trace_utils.write_out_trace(trace_buffer, str(opts.trace_file))
 
         # Writing out unformatted output
-        if i == num_iter-1 and opts.verbosity >= 1:
+        # if i == num_iter-1 and opts.verbosity >= 1:
+        if i == num_iter-1:
             print("\nOutput:")
             print(output_buffer.shape)
             for x in output_buffer.reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)[::32]:
                 print(x)
         
         # outputting image
-        if i == num_iter-1:
+        if False:# i == num_iter-1:
             # Formatting output for plotting
             output_raw = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
             output = np.select([~nan_mask], [output_raw], np.nan)
