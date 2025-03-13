@@ -2,18 +2,18 @@
 source_filename = "LLVMDialectModule"
 target triple = "aie2"
 
-@in0_5_cons_buff_1 = external global [24 x bfloat]
-@in0_5_cons_buff_0 = external global [24 x bfloat]
-@in0_4_cons_buff_1 = external global [24 x bfloat]
-@in0_4_cons_buff_0 = external global [24 x bfloat]
-@in0_3_cons_buff_1 = external global [24 x bfloat]
-@in0_3_cons_buff_0 = external global [24 x bfloat]
-@in0_2_cons_buff_1 = external global [24 x bfloat]
-@in0_2_cons_buff_0 = external global [24 x bfloat]
-@in0_1_cons_buff_1 = external global [24 x bfloat]
-@in0_1_cons_buff_0 = external global [24 x bfloat]
-@in0_0_cons_buff_1 = external global [24 x bfloat]
-@in0_0_cons_buff_0 = external global [24 x bfloat]
+@in0_5_cons_buff_1 = external global [6 x bfloat]
+@in0_5_cons_buff_0 = external global [6 x bfloat]
+@in0_4_cons_buff_1 = external global [6 x bfloat]
+@in0_4_cons_buff_0 = external global [6 x bfloat]
+@in0_3_cons_buff_1 = external global [6 x bfloat]
+@in0_3_cons_buff_0 = external global [6 x bfloat]
+@in0_2_cons_buff_1 = external global [6 x bfloat]
+@in0_2_cons_buff_0 = external global [6 x bfloat]
+@in0_1_cons_buff_1 = external global [6 x bfloat]
+@in0_1_cons_buff_0 = external global [6 x bfloat]
+@in0_0_cons_buff_1 = external global [6 x bfloat]
+@in0_0_cons_buff_0 = external global [6 x bfloat]
 @in1_cons_buff_1 = external global [23050 x bfloat]
 @in1_cons_buff_0 = external global [23050 x bfloat]
 @in2_cons_buff_1 = external global [23050 x bfloat]
@@ -38,13 +38,54 @@ target triple = "aie2"
 @of_in_mainA4_cons_buff_0 = external global [4610 x bfloat]
 @of_in_mainB4_cons_buff_1 = external global [4610 x bfloat]
 @of_in_mainB4_cons_buff_0 = external global [4610 x bfloat]
-@sub2mean_buff_1 = external global [4608 x bfloat]
-@sub2mean_buff_0 = external global [4608 x bfloat]
-@out_buff_1 = external global [8 x bfloat]
-@out_buff_0 = external global [8 x bfloat]
-@out_cons = external global [8 x bfloat]
-@out = external global [8 x bfloat]
-@sub2mean = external global [4608 x bfloat]
+@of_add_u0_buff_0 = external global [4608 x bfloat]
+@of_add_v0_buff_0 = external global [4608 x bfloat]
+@of_add_v0_cons_buff_0 = external global [4608 x bfloat]
+@of_add_w0_buff_0 = external global [4608 x bfloat]
+@of_add_w0_cons_buff_0 = external global [4608 x bfloat]
+@of_add_uv0_buff_1 = external global [4608 x bfloat]
+@of_add_uv0_buff_0 = external global [4608 x bfloat]
+@of_add_u1_buff_0 = external global [4608 x bfloat]
+@of_add_v1_buff_0 = external global [4608 x bfloat]
+@of_add_v1_cons_buff_0 = external global [4608 x bfloat]
+@of_add_w1_buff_0 = external global [4608 x bfloat]
+@of_add_w1_cons_buff_0 = external global [4608 x bfloat]
+@of_add_uv1_buff_1 = external global [4608 x bfloat]
+@of_add_uv1_buff_0 = external global [4608 x bfloat]
+@of_add2real0_buff_1 = external global [4608 x bfloat]
+@of_add2real0_buff_0 = external global [4608 x bfloat]
+@of_add2real0_1_cons_buff_1 = external global [4608 x bfloat]
+@of_add2real0_1_cons_buff_0 = external global [4608 x bfloat]
+@of_add2real0_0_cons_buff_1 = external global [4608 x bfloat]
+@of_add2real0_0_cons_buff_0 = external global [4608 x bfloat]
+@of_add2real1_buff_1 = external global [4608 x bfloat]
+@of_add2real1_buff_0 = external global [4608 x bfloat]
+@of_add2real1_1_cons_buff_1 = external global [4608 x bfloat]
+@of_add2real1_1_cons_buff_0 = external global [4608 x bfloat]
+@of_add2real1_0_cons_buff_1 = external global [4608 x bfloat]
+@of_add2real1_0_cons_buff_0 = external global [4608 x bfloat]
+@out_buff_1 = external global [2 x bfloat]
+@out_buff_0 = external global [2 x bfloat]
+@out_cons = external global [2 x bfloat]
+@out = external global [2 x bfloat]
+@of_add2real1_0_cons = external global [4608 x bfloat]
+@of_add2real1_1_cons = external global [4608 x bfloat]
+@of_add2real1 = external global [4608 x bfloat]
+@of_add2real0_0_cons = external global [4608 x bfloat]
+@of_add2real0_1_cons = external global [4608 x bfloat]
+@of_add2real0 = external global [4608 x bfloat]
+@of_add_uv1 = external global [4608 x bfloat]
+@of_add_w1_cons = external global [4608 x bfloat]
+@of_add_w1 = external global [4608 x bfloat]
+@of_add_v1_cons = external global [4608 x bfloat]
+@of_add_v1 = external global [4608 x bfloat]
+@of_add_u1 = external global [4608 x bfloat]
+@of_add_uv0 = external global [4608 x bfloat]
+@of_add_w0_cons = external global [4608 x bfloat]
+@of_add_w0 = external global [4608 x bfloat]
+@of_add_v0_cons = external global [4608 x bfloat]
+@of_add_v0 = external global [4608 x bfloat]
+@of_add_u0 = external global [4608 x bfloat]
 @of_in_mainB4_cons = external global [4610 x bfloat]
 @of_in_mainB4 = external global [4610 x bfloat]
 @of_in_mainA4_cons = external global [4610 x bfloat]
@@ -69,13 +110,13 @@ target triple = "aie2"
 @in2 = external global [23050 x bfloat]
 @in1_cons = external global [23050 x bfloat]
 @in1 = external global [23050 x bfloat]
-@in0_0_cons = external global [24 x bfloat]
-@in0_1_cons = external global [24 x bfloat]
-@in0_2_cons = external global [24 x bfloat]
-@in0_3_cons = external global [24 x bfloat]
-@in0_4_cons = external global [24 x bfloat]
-@in0_5_cons = external global [24 x bfloat]
-@in0 = external global [24 x bfloat]
+@in0_0_cons = external global [6 x bfloat]
+@in0_1_cons = external global [6 x bfloat]
+@in0_2_cons = external global [6 x bfloat]
+@in0_3_cons = external global [6 x bfloat]
+@in0_4_cons = external global [6 x bfloat]
+@in0_5_cons = external global [6 x bfloat]
+@in0 = external global [6 x bfloat]
 
 declare void @debug_i32(i32)
 
@@ -100,98 +141,18 @@ define void @core_2_2() {
 
 1:                                                ; preds = %9, %0
   %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
-  %3 = icmp slt i64 %2, 9223372036854775807
+  %3 = icmp slt i64 %2, 14
   br i1 %3, label %4, label %11
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 2048
+  %6 = icmp slt i64 %5, 8192
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
   call void @llvm.aie2.acquire(i32 48, i32 -1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_0, i32 0, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_0, i32 1, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_0, i32 2, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_0, i32 3, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_0, i32 4, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_0, i32 5, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_0, i32 6, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_0, i32 7, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 49, i32 1)
   call void @llvm.aie2.acquire(i32 48, i32 -1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_1, i32 0, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_1, i32 1, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_1, i32 2, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_1, i32 3, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_1, i32 4, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_1, i32 5, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_0, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_0, ptr @out_buff_1, i32 6, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
-  call void @llvm.aie2.acquire(i32 17, i32 -1)
-  call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @sub2mean_buff_1, i64 32) ]
-  call void @mean(ptr @sub2mean_buff_1, ptr @out_buff_1, i32 7, i32 288)
-  call void @llvm.aie2.release(i32 16, i32 1)
   call void @llvm.aie2.release(i32 49, i32 1)
   %8 = add i64 %5, 2
   br label %4
@@ -204,12 +165,12 @@ define void @core_2_2() {
   ret void
 }
 
-define void @core_1_2() {
+define void @core_2_4() {
   br label %1
 
 1:                                                ; preds = %9, %0
   %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
-  %3 = icmp slt i64 %2, 9223372036854775807
+  %3 = icmp slt i64 %2, 14
   br i1 %3, label %4, label %11
 
 4:                                                ; preds = %7, %1
@@ -218,10 +179,18 @@ define void @core_1_2() {
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
-  call void @llvm.aie2.acquire(i32 48, i32 -1)
-  call void @llvm.aie2.release(i32 49, i32 1)
-  call void @llvm.aie2.acquire(i32 48, i32 -1)
-  call void @llvm.aie2.release(i32 49, i32 1)
+  call void @llvm.aie2.acquire(i32 37, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 36, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  call void @llvm.aie2.acquire(i32 37, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 36, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
   %8 = add i64 %5, 2
   br label %4
 
@@ -233,10 +202,482 @@ define void @core_1_2() {
   ret void
 }
 
-; Function Attrs: nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write)
-declare void @llvm.assume(i1 noundef) #0
+define void @core_2_5() {
+  br label %1
 
-attributes #0 = { nocallback nofree nosync nounwind willreturn memory(inaccessiblemem: write) }
+1:                                                ; preds = %9, %0
+  %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %11
+
+4:                                                ; preds = %7, %1
+  %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
+  %6 = icmp slt i64 %5, 16384
+  br i1 %6, label %7, label %9
+
+7:                                                ; preds = %4
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %8 = add i64 %5, 2
+  br label %4
+
+9:                                                ; preds = %4
+  %10 = add i64 %2, 1
+  br label %1
+
+11:                                               ; preds = %1
+  ret void
+}
+
+define void @core_3_3() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
+
+define void @core_3_4() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
+
+define void @core_3_5() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  call void @llvm.aie2.acquire(i32 16, i32 -1)
+  call void @llvm.aie2.release(i32 17, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
+
+define void @core_1_4() {
+  br label %1
+
+1:                                                ; preds = %9, %0
+  %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %11
+
+4:                                                ; preds = %7, %1
+  %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
+  %6 = icmp slt i64 %5, 16384
+  br i1 %6, label %7, label %9
+
+7:                                                ; preds = %4
+  call void @llvm.aie2.acquire(i32 35, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 34, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  call void @llvm.aie2.acquire(i32 35, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 34, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  %8 = add i64 %5, 2
+  br label %4
+
+9:                                                ; preds = %4
+  %10 = add i64 %2, 1
+  br label %1
+
+11:                                               ; preds = %1
+  ret void
+}
+
+define void @core_1_5() {
+  br label %1
+
+1:                                                ; preds = %9, %0
+  %2 = phi i64 [ %10, %9 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %11
+
+4:                                                ; preds = %7, %1
+  %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
+  %6 = icmp slt i64 %5, 16384
+  br i1 %6, label %7, label %9
+
+7:                                                ; preds = %4
+  call void @llvm.aie2.acquire(i32 21, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 20, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  call void @llvm.aie2.acquire(i32 21, i32 -1)
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 20, i32 1)
+  call void @llvm.aie2.release(i32 48, i32 1)
+  %8 = add i64 %5, 2
+  br label %4
+
+9:                                                ; preds = %4
+  %10 = add i64 %2, 1
+  br label %1
+
+11:                                               ; preds = %1
+  ret void
+}
+
+define void @core_0_3() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
+
+define void @core_0_4() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
+
+define void @core_0_5() {
+  br label %1
+
+1:                                                ; preds = %16, %0
+  %2 = phi i64 [ %17, %16 ], [ 0, %0 ]
+  %3 = icmp slt i64 %2, 14
+  br i1 %3, label %4, label %18
+
+4:                                                ; preds = %1
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %5
+
+5:                                                ; preds = %8, %4
+  %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
+  %7 = icmp slt i64 %6, 8192
+  br i1 %7, label %8, label %10
+
+8:                                                ; preds = %5
+  call void @llvm.aie2.acquire(i32 49, i32 -1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %9 = add i64 %6, 2
+  br label %5
+
+10:                                               ; preds = %5
+  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.aie2.acquire(i32 51, i32 -1)
+  br label %11
+
+11:                                               ; preds = %14, %10
+  %12 = phi i64 [ %15, %14 ], [ 0, %10 ]
+  %13 = icmp slt i64 %12, 8192
+  br i1 %13, label %14, label %16
+
+14:                                               ; preds = %11
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.release(i32 53, i32 1)
+  %15 = add i64 %12, 2
+  br label %11
+
+16:                                               ; preds = %11
+  call void @llvm.aie2.release(i32 50, i32 1)
+  %17 = add i64 %2, 2
+  br label %1
+
+18:                                               ; preds = %1
+  ret void
+}
 
 !llvm.module.flags = !{!0}
 

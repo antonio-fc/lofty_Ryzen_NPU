@@ -12,8 +12,8 @@
     },
     "PDIs": [
       {
-        "uuid": "597484fb-5199-4001-a9cb-131ac18af733",
-        "file_name": "./design.pdi",
+        "uuid": "0bf08dcd-f4f5-4e52-89fe-f610cf92c298",
+        "file_name": "design.pdi",
         "cdo_groups": [
           {
             "name": "DPU",

@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x74010, LENGTH = 0xBFF0
+   data (!RX) : ORIGIN = 0x74004, LENGTH = 0xBFFC
 }
 ENTRY(__start)
 SECTIONS
@@ -43,11 +43,11 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the south. */
 . = 0x40000;
 . += 0x10000;
-. = 0x50400;
-sub2mean_buff_0 = .;
+. = 0x68000;
+of_add2real1_0_cons_buff_0 = .;
 . += 0x2400;
-. = 0x54000;
-sub2mean_buff_1 = .;
+. = 0x6C000;
+of_add2real1_0_cons_buff_1 = .;
 . += 0x2400;
 . = 0x60000;
 of_in_mainB0_cons_buff_0 = .;
@@ -57,11 +57,10 @@ of_in_mainB0_cons_buff_1 = .;
 . += 0x2404;
 . = 0x70400;
 out_buff_0 = .;
-. += 0x10;
+. += 0x4;
 . = 0x74000;
 out_buff_1 = .;
-. += 0x10;
+. += 0x4;
   .bss : { *(.bss*) } > data
 }
-INPUT(mean.o)
 PROVIDE(main = core_2_2);

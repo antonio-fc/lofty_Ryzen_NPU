@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C6C0, LENGTH = 0x3940
+   data (!RX) : ORIGIN = 0x7C00C, LENGTH = 0x3FF4
 }
 ENTRY(__start)
 SECTIONS
@@ -40,70 +40,51 @@ SECTIONS
 . = 0x70000;
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
+. = 0x48000;
+of_add2real0_1_cons_buff_0 = .;
+. += 0x2400;
+. = 0x4C000;
+of_add2real0_1_cons_buff_1 = .;
+. += 0x2400;
+. = 0x40000;
+of_in_mainA1_cons_buff_0 = .;
+. += 0x2404;
+. = 0x44000;
+of_in_mainA1_cons_buff_1 = .;
+. += 0x2404;
 /* No tile with memory exists to the west. */
 . = 0x50000;
 . += 0x10000;
-. = 0x61000;
-of_out_mainA02_buff_0 = .;
-. += 0x40;
-. = 0x64C00;
-of_out_mainA02_buff_1 = .;
-. += 0x40;
-. = 0x60400;
-of_in_mainA02_cons_buff_0 = .;
-. += 0x600;
-. = 0x64000;
-of_in_mainA02_cons_buff_1 = .;
-. += 0x600;
 . = 0x68000;
-of_in_mainA02_cons_buff_2 = .;
-. += 0x600;
+of_add_v0_buff_0 = .;
+. += 0x2400;
+. = 0x60400;
+of_in_mainA3_cons_buff_0 = .;
+. += 0x2404;
+. = 0x64000;
+of_in_mainA3_cons_buff_1 = .;
+. += 0x2404;
 . = 0x6C000;
-of_in_mainA02_cons_buff_3 = .;
-. += 0x600;
-. = 0x60A00;
-of_in_mainA02_cons_buff_4 = .;
-. += 0x600;
-. = 0x64600;
-of_in_mainA02_cons_buff_5 = .;
-. += 0x600;
-. = 0x68600;
 in0_1_cons_buff_0 = .;
-. += 0xC0;
-. = 0x6C600;
+. += 0xC;
+. = 0x62804;
 in0_1_cons_buff_1 = .;
-. += 0xC0;
-. = 0x71000;
-of_out_mainA01_buff_0 = .;
-. += 0x40;
-. = 0x74C00;
-of_out_mainA01_buff_1 = .;
-. += 0x40;
-. = 0x70400;
-of_in_mainA01_cons_buff_0 = .;
-. += 0x600;
-. = 0x74000;
-of_in_mainA01_cons_buff_1 = .;
-. += 0x600;
+. += 0xC;
 . = 0x78000;
-of_in_mainA01_cons_buff_2 = .;
-. += 0x600;
+of_add_w0_buff_0 = .;
+. += 0x2400;
+. = 0x70400;
+of_in_mainA4_cons_buff_0 = .;
+. += 0x2404;
+. = 0x74000;
+of_in_mainA4_cons_buff_1 = .;
+. += 0x2404;
 . = 0x7C000;
-of_in_mainA01_cons_buff_3 = .;
-. += 0x600;
-. = 0x70A00;
-of_in_mainA01_cons_buff_4 = .;
-. += 0x600;
-. = 0x74600;
-of_in_mainA01_cons_buff_5 = .;
-. += 0x600;
-. = 0x78600;
-in0_0_cons_buff_0 = .;
-. += 0xC0;
-. = 0x7C600;
-in0_0_cons_buff_1 = .;
-. += 0xC0;
+in0_2_cons_buff_0 = .;
+. += 0xC;
+. = 0x72804;
+in0_2_cons_buff_1 = .;
+. += 0xC;
   .bss : { *(.bss*) } > data
 }
-INPUT(kernels.a)
 PROVIDE(main = core_0_3);

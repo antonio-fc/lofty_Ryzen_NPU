@@ -76,22 +76,27 @@ def loafty(opts):
     TRACE_SIZE = opts.trace_size
     
     # Declaring constant sizes
-    ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
+    ITER_KERNEL = 14 # sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96 only for now
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 or 128*128 typically
-    CV = 8 # how many pixels (lmn) are moved at once
+    CV = 2 # how many pixels (lmn) are moved at once
     N_LMN = 3 # 3 for l, m and n
     ITERS = BSIZE//CV
     
     NINPUTS = 5 # number of inputs in a single stream
-    FREQ_SIZE = 2 # the size of the frequency data points comming in the main input streams
+    MIN_SIZE = 2 # the size of the frequency data points comming in the main input streams
     NCHANNELS = 2 # number of pipeline channels
 
+    # Data movement sizes
     SINGLE_INPUT_SIZE = MSIZE//NCHANNELS # 4608
-    COMP_INPUT_SIZE = SINGLE_INPUT_SIZE + FREQ_SIZE # 9216/2 + 2 = 4610 size of an input per stream
+    COMP_INPUT_SIZE = SINGLE_INPUT_SIZE + MIN_SIZE # 9216/2 + 2 = 4610 size of an input per stream
     FULL_INPUT_SIZE = COMP_INPUT_SIZE*NINPUTS # COMP_INPUT_SIZE * 5 for each main input
+    
+    MAIN_FOLD = 4
+    MAIN_MOVE_SIZE = SINGLE_INPUT_SIZE//MAIN_FOLD
+    
     LMN_MOVE_SIZE = CV * N_LMN
     FULL_LMN_SIZE = BSIZE * N_LMN # IMG_SIZE**2 * 3
     
@@ -102,22 +107,29 @@ def loafty(opts):
     # Device setup
     @device(AIEDevice.npu1_4col)
     def device_body():
+        # STEP1: SIZES DEFINITIONS
+        single_input_ty = np.ndarray[(SINGLE_INPUT_SIZE,), dtype]
         dist_input_ty = np.ndarray[(COMP_INPUT_SIZE,), dtype]
         full_input_ty = np.ndarray[(FULL_INPUT_SIZE,), dtype]
-        out_ty = np.ndarray[(CV,), dtype]
         lmn_broad_ty = np.ndarray[(LMN_MOVE_SIZE,), dtype]
-        single_input_ty = np.ndarray[(SINGLE_INPUT_SIZE,), dtype]
+        main_move_ty = np.ndarray[(MAIN_MOVE_SIZE,), dtype]
+        out_ty = np.ndarray[(CV,), dtype]
 
-
+        # STEP2: KERNEL AND TILES
         # AIE Core Function declarations
         kernels = declaring_kernel_func(out_ty, single_input_ty, dist_input_ty, dtype_k)
 
         # Tile declarations
         st, mt, ct = declaring_tiles(4, 4)
 
-        main_tiles = [[ct[1][1], ct[0][0]], [ct[2][1], ct[3][0]]] # [[mainRA, mainCA], [mainRB, mainCB]]
-        scale_tiles = [[ct[0][3], ct[0][2], ct[0][1]], [ct[3][3], ct[3][2], ct[3][1]]] # [[uA, vA, wA], [uB, vB, wB]]
-        add_tiles = [[ct[1][3], ct[1][2]], [ct[2][3], ct[2][2]]] # [[add1A, add2A], [add1B, add2B]]
+        scale_tiles = [[ct[0][3], ct[0][2], ct[0][1]],
+                       [ct[3][3], ct[3][2], ct[3][1]]] # [[uA, vA, wA], [uB, vB, wB]]
+        add_tiles = [[ct[1][3], ct[1][2]],
+                     [ct[2][3], ct[2][2]]] # [[add1A, add2A], [add1B, add2B]]
+        main_tiles = [[ct[1][1], ct[0][0]],
+                      [ct[2][1], ct[3][0]]] # [[mainRA, mainCA], [mainRB, mainCB]]
+        real_tiles = [main_tiles[0][0], main_tiles[1][0]] # [mainRA, mainRB]
+        imag_tiles = [main_tiles[0][1], main_tiles[1][1]] # [mainCA, mainCB]
         sub_tile = ct[1][0]
         mean_tile = ct[2][0]
 
@@ -130,7 +142,7 @@ def loafty(opts):
         for c in range(NCHANNELS):
             dist_tiles[c] = main_tiles[c] + scale_tiles[c]
 
-        # AIE-array data movement with object fifos
+        # STEP3: DATA MOVEMENTS
         # Inputs
         of_in_lmn = object_fifo("in0", st[1], scale_tiles[0] + scale_tiles[1], 2, lmn_broad_ty)
         of_in_mainA = object_fifo("in1", st[0], memDistA, 2, full_input_ty)       
@@ -145,46 +157,93 @@ def loafty(opts):
             main_in_fifosA.append(object_fifo(f"of_in_mainA{t}", memDistA, dist_tiles[0][t], 2, dist_input_ty))
             main_in_fifosB.append(object_fifo(f"of_in_mainB{t}", memDistB, dist_tiles[1][t], 2, dist_input_ty))
             main_dist_offsets.append(t * COMP_INPUT_SIZE)
+        main_in_fifos = [main_in_fifosA, main_in_fifosB]        
 
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
         object_fifo_link(of_in_mainB, main_in_fifosB, [], main_dist_offsets)
 
-        # Moving sub result to mean tile
-        of_sub2mean = object_fifo("sub2mean", sub_tile, mean_tile, 2, single_input_ty)
+        # Add scaled baselines
+        u_add_fifos = []
+        v_add_fifos = []
+        w_add_fifos = []
+        uv_add_fifos = []
+        bl_add_fifos = []
+        for c in range(NCHANNELS):
+            u_add_fifos.append(object_fifo(f"of_add_u{c}", dist_tiles[c][2], add_tiles[c][0], 1, single_input_ty)) # these are 1 because running out of space, maybe after defining core it works again
+            v_add_fifos.append(object_fifo(f"of_add_v{c}", dist_tiles[c][3], add_tiles[c][0], 1, single_input_ty))
+
+            w_add_fifos.append(object_fifo(f"of_add_w{c}", dist_tiles[c][4], add_tiles[c][1], 1, single_input_ty))
+            uv_add_fifos.append(object_fifo(f"of_add_uv{c}", add_tiles[c][0], add_tiles[c][1], 2, single_input_ty))
+            bl_add_fifos.append([u_add_fifos[c], v_add_fifos[c], w_add_fifos[c]])
+        
+            
+        # Do real and imaginary opeartions in parallel (trig, mult vis and partial reduc)
+        add2mainFIFOs = []
+        for c in range(NCHANNELS):
+            add2mainFIFOs.append(object_fifo(f"of_add2real{c}", add_tiles[c][1], main_tiles[c], 2, single_input_ty))
+                
 
         # Output movement
         of_out = object_fifo("out", mean_tile, st[2], 2, out_ty)
 
-        # DECLARING THE CORES
-        @core(sub_tile)
-        def core_body():
-            for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
-                for _ in range_(BSIZE):
-                    # inputs = of_sub2mean.acquire
-                    output = of_sub2mean.acquire(ObjectFifoPort.Produce, 1) # 4608
-                    
-                    of_sub2mean.release(ObjectFifoPort.Produce, 1)
+        # STEP4: CORE DEFINITIONS
+        for c in range(NCHANNELS):
+            for t in range(len(scale_tiles[c])): # t determines whether using l, m or n
+                input_fifo = main_in_fifos[c][t+2] # adding 2 to skip the vis fifos
+                output_fifo = bl_add_fifos[c][t]
+                @core(scale_tiles[c][t]) # Scaling uvw by lmn
+                def core_body():
+                    for _ in range_(ITER_KERNEL):
+                        inputs = input_fifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                        for _ in range_(BSIZE//MIN_SIZE): # img_size**2 / 2
+                            lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 6
+                            for i in range(MIN_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
+                                output = output_fifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                                # run kernel here
+                                output_fifo.release(ObjectFifoPort.Produce, 1)
+                            of_in_lmn.acquire(ObjectFifoPort.Consume, 1)
+                        input_fifo.release(ObjectFifoPort.Consume, 1)
 
+            @core(add_tiles[c][0]) # Adding scaled u and scaled v
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE):
+                        inputU = u_add_fifos[c].acquire(ObjectFifoPort.Consume, 1) # 4608
+                        inputV = v_add_fifos[c].acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = uv_add_fifos[c].acquire(ObjectFifoPort.Produce, 1) # 4608
+                        # run kernel here
+                        uv_add_fifos[c].release(ObjectFifoPort.Produce, 1)
+                        u_add_fifos[c].release(ObjectFifoPort.Consume, 1)
+                        v_add_fifos[c].release(ObjectFifoPort.Consume, 1)
+
+            @core(add_tiles[c][1]) # Adding scaled u and scaled v
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE):
+                        inputUV = uv_add_fifos[c].acquire(ObjectFifoPort.Consume, 1) # 4608
+                        inputW = w_add_fifos[c].acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = add2mainFIFOs[c].acquire(ObjectFifoPort.Produce, 1) # 4608
+                        # run kernel here
+                        add2mainFIFOs[c].release(ObjectFifoPort.Produce, 1)
+                        uv_add_fifos[c].release(ObjectFifoPort.Consume, 1)
+                        w_add_fifos[c].release(ObjectFifoPort.Consume, 1)
         
-        @core(mean_tile, "mean.o")
+        @core(mean_tile) # output
         def core_body():
-            for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
+            for _ in range_(ITER_KERNEL):
                 for _ in range_(ITERS):
-                    output = of_out.acquire(ObjectFifoPort.Produce, 1) # CV
-                    
-                    for i in range(CV):
-                        inputs = of_sub2mean.acquire(ObjectFifoPort.Consume, 1) # 4608
-                        kernels['mean'](inputs, output, i, SINGLE_INPUT_SIZE)
-                        of_sub2mean.release(ObjectFifoPort.Consume, 1)
+                    output = of_out.acquire(ObjectFifoPort.Produce, 1)
                     
                     of_out.release(ObjectFifoPort.Produce, 1)
-        
+
+        # STEP5: TRACING
         # Set up a packet-switched flow from core to shim for tracing information
         tiles_to_trace = []
         if enableTrace:
             trace_utils.configure_packet_tracing_flow(tiles_to_trace, trace_shim_tile)
 
                     
+        # STEP0: MAIN MEMORY INPUT/OUTPUT STREAMS
         # To/from AIE-array data movement
         @runtime_sequence(full_input_ty, full_input_ty, full_input_ty, full_input_ty)
         def sequence(lmn, mainA, mainB, output):

@@ -55,9 +55,9 @@ build/kernels.a: build/trig.o build/lut_ops.o
 
 build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_sub.o build/vector_mult.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
-	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
-				--no-xchesscc --no-xbridge \
-				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
+		--no-xchesscc --no-xbridge \
+		--xclbin-name=${@F} --npu-insts-name=insts-name.txt $(<:%=../%)
 
 ${targetname}.exe: ${srcdir}/test.cpp
 	rm -rf _build

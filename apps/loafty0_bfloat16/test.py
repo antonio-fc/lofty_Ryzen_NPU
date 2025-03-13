@@ -114,7 +114,7 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     factor = -2 * f * math.pi / SL
     inout0 = np.array([factor, factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
     # inout0 = np.repeat(inout0, IN1_VOL)
-
+    
     # Formatting main inputs (baselines and visibilities)
     visR = np.real(vis).astype(dtype=DATATYPE).flatten()         # vis real
     visRa, visRb = np.split(visR, 2)
@@ -226,7 +226,6 @@ def main(opts):
     # Get device, load the xclbin & kernel and register them
     # ------------------------------------------------------
     (device, kernel) = test_utils.init_xrt_load_kernel(opts)
-
     # ------------------------------------------------------
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------

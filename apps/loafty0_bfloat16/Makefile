@@ -61,15 +61,15 @@ build/kernels.a: build/main_kernel.o build/lut_ops.o
 
 build/final.xclbin: build/aie.mlir build/passthrough.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
-	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
-				--no-xchesscc --no-xbridge \
-				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
+		--no-xchesscc --no-xbridge \
+		--xclbin-name=${@F} --npu-insts-name=insts-name.txt $(<:%=../%)
 
 build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
-	cd ${@D} && aiecc.py -v --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
-    			--no-xchesscc --no-xbridge \
-				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
+		--no-xchesscc --no-xbridge \
+		--xclbin-name=${@F} --npu-insts-name=insts-name.txt $(<:%=../%)
 
 ##==------------------------------------==##
 

@@ -483,6 +483,17 @@ module {
       aie.connect<South : 2, DMA : 1>
       aie.connect<DMA : 0, South : 0>
     }
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_3_4, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_3_3, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_2_5, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_2_4, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_2_3, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_1_5, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_1_4, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_1_3, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_0_5, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_0_4, DMA : 0)
+    aie.flow(%shim_noc_tile_1_0, DMA : 0, %tile_0_3, DMA : 0)
     %switchbox_0_0 = aie.switchbox(%shim_noc_tile_0_0) {
       aie.connect<South : 3, North : 5>
       aie.connect<North : 2, East : 2>
@@ -3317,10 +3328,10 @@ module {
       aie.end
     } {link_with = "kernels.a"}
     aiex.runtime_sequence @sequence(%arg0: memref<23040xbf16>, %arg1: memref<23040xbf16>, %arg2: memref<23040xbf16>, %arg3: memref<23040xbf16>) {
-      aiex.npu.dma_memcpy_nd(0, 0, %arg0[0, 0, 0, 0][1, 1, 1, 49248][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23040xbf16>
-      aiex.npu.dma_memcpy_nd(0, 0, %arg1[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<23040xbf16>
-      aiex.npu.dma_memcpy_nd(0, 0, %arg2[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<23040xbf16>
-      aiex.npu.dma_memcpy_nd(0, 0, %arg3[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 49248][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(%arg1[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(%arg2[0, 0, 0, 0][1, 1, 1, 23040][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<23040xbf16>
+      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23040xbf16>
       aiex.npu.dma_wait {symbol = @out}
     }
     aie.shim_dma_allocation @in0(MM2S, 0, 1)
