@@ -1,11 +1,3 @@
-# test.py -*- Python -*-
-#
-# This file is licensed under the Apache License v2.0 with LLVM Exceptions.
-# See https://llvm.org/LICENSE.txt for license information.
-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-#
-# (c) Copyright 2024 Advanced Micro Devices, Inc. or its affiliates
-
 import numpy as np
 import pyxrt as xrt
 import sys
@@ -191,7 +183,7 @@ def main(opts):
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
-    CV = 8 # number of consecutive values in output stream
+    CV = 32 # number of consecutive values in output stream
     N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
     INOUT0_VOLUME = MSIZE

@@ -1,0 +1,102 @@
+
+MEMORY
+{
+   program (RX) : ORIGIN = 0, LENGTH = 0x0020000
+   data (!RX) : ORIGIN = 0x7D200, LENGTH = 0x2E00
+}
+ENTRY(__start)
+SECTIONS
+{
+  . = 0x0;
+  .text : {
+     /* the __start symbol has to come at address zero. */
+     *crt0.o(.text*)
+     _ctors_start = .;
+     _init_array_start = .;
+     KEEP(SORT(*.init_array))
+     _ctors_end = .;
+     _init_array_end = .;
+     _dtors_start = .;
+     _dtors_end = .;
+     *(.text*)
+  } > program
+  .data : {
+     *(.data*)
+     *(.rodata*)
+  } > data
+  .comment : {
+     *(.comment*)
+  }
+  .symtab : {
+     *(.symtab)
+  }
+  .shstrtab : {
+     *(.shstrtab)
+  }
+  .strtab : {
+     *(.strtab)
+  }
+
+. = 0x70000;
+_sp_start_value_DM_stack = .;
+. += 0x400; /* stack */
+/* No tile with memory exists to the south. */
+. = 0x40000;
+. += 0x10000;
+. = 0x52804;
+of_imagJoin0_buff_0 = .;
+. += 0x900;
+. = 0x56404;
+of_imagJoin0_buff_1 = .;
+. += 0x900;
+. = 0x58000;
+of_add2real0_1_cons_buff_0 = .;
+. += 0x2400;
+. = 0x5C000;
+of_add2real0_1_cons_buff_1 = .;
+. += 0x2400;
+. = 0x50400;
+of_in_mainA1_cons_buff_0 = .;
+. += 0x2404;
+. = 0x54000;
+of_in_mainA1_cons_buff_1 = .;
+. += 0x2404;
+. = 0x62804;
+of_realJoin0_buff_0 = .;
+. += 0x900;
+. = 0x66404;
+of_realJoin0_buff_1 = .;
+. += 0x900;
+. = 0x68000;
+of_add2real0_0_cons_buff_0 = .;
+. += 0x2400;
+. = 0x6C000;
+of_add2real0_0_cons_buff_1 = .;
+. += 0x2400;
+. = 0x60400;
+of_in_mainA0_cons_buff_0 = .;
+. += 0x2404;
+. = 0x64000;
+of_in_mainA0_cons_buff_1 = .;
+. += 0x2404;
+. = 0x70400;
+sub_buff_0 = .;
+. += 0x1200;
+. = 0x74000;
+sub_buff_1 = .;
+. += 0x1200;
+. = 0x78000;
+of_imag_joined_cons_buff_0 = .;
+. += 0x1200;
+. = 0x7C000;
+of_imag_joined_cons_buff_1 = .;
+. += 0x1200;
+. = 0x71600;
+of_real_joined_cons_buff_0 = .;
+. += 0x1200;
+. = 0x75200;
+of_real_joined_cons_buff_1 = .;
+. += 0x1200;
+  .bss : { *(.bss*) } > data
+}
+PROVIDE(main = core_1_2);

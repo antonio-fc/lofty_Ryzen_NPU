@@ -105,7 +105,7 @@ trace: ${targetname}.exe build/trace.xclbin build/insts.txt
 	${parse_trace}
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts-name.txt -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 
 trace_py: build/trace.xclbin
 	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.txt -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1

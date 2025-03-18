@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7E400, LENGTH = 0x1C00
+   data (!RX) : ORIGIN = 0x7A400, LENGTH = 0x5C00
 }
 ENTRY(__start)
 SECTIONS
@@ -41,21 +41,15 @@ SECTIONS
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x40400;
-of_add2real1_buff_0 = .;
+of_add2main1_buff_0 = .;
 . += 0x2400;
 . = 0x44000;
-of_add2real1_buff_1 = .;
-. += 0x2400;
-. = 0x48000;
 of_add_w1_cons_buff_0 = .;
 . += 0x2400;
 . = 0x50400;
 of_add_uv0_buff_0 = .;
 . += 0x2400;
 . = 0x54000;
-of_add_uv0_buff_1 = .;
-. += 0x2400;
-. = 0x58000;
 of_add_v0_cons_buff_0 = .;
 . += 0x2400;
 /* No tile with memory exists to the north. */
@@ -65,12 +59,9 @@ of_add_v0_cons_buff_0 = .;
 of_add_uv1_buff_0 = .;
 . += 0x2400;
 . = 0x74000;
-of_add_uv1_buff_1 = .;
-. += 0x2400;
-. = 0x78000;
 of_add_v1_cons_buff_0 = .;
 . += 0x2400;
-. = 0x7C000;
+. = 0x78000;
 of_add_u1_buff_0 = .;
 . += 0x2400;
   .bss : { *(.bss*) } > data
