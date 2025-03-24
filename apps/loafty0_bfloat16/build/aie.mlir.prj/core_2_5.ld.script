@@ -66,4 +66,5 @@ of_add_u1_buff_0 = .;
 . += 0x2400;
   .bss : { *(.bss*) } > data
 }
+INPUT(add.o)
 PROVIDE(main = core_2_5);

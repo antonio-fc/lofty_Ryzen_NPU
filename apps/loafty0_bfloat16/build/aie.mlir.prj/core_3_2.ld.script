@@ -43,18 +43,12 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the south. */
 . = 0x40000;
 . += 0x10000;
-. = 0x58000;
+. = 0x50400;
 out_buff_0 = .;
 . += 0x40;
-. = 0x5C000;
+. = 0x54000;
 out_buff_1 = .;
 . += 0x40;
-. = 0x50400;
-test_cons_buff_0 = .;
-. += 0x2400;
-. = 0x54000;
-test_cons_buff_1 = .;
-. += 0x2400;
 . = 0x64000;
 of_add_w1_buff_0 = .;
 . += 0x2400;
@@ -63,10 +57,10 @@ of_in_main14_cons_buff_0 = .;
 . += 0x2404;
 . = 0x68000;
 in0_5_cons_buff_0 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x6C000;
 in0_5_cons_buff_1 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x78000;
 of_join_imag1_buff_0 = .;
 . += 0x1200;
@@ -78,4 +72,5 @@ of_in_main11_cons_buff_0 = .;
 . += 0x2404;
   .bss : { *(.bss*) } > data
 }
+INPUT(kernels.a)
 PROVIDE(main = core_3_2);

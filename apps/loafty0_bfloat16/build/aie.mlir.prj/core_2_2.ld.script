@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C040, LENGTH = 0x3FC0
+   data (!RX) : ORIGIN = 0x74040, LENGTH = 0xBFC0
 }
 ENTRY(__start)
 SECTIONS
@@ -44,9 +44,15 @@ _sp_start_value_DM_stack = .;
 . = 0x40000;
 . += 0x10000;
 . = 0x50400;
-of_imag2sub_cons_buff_0 = .;
+of_sub2mean_buff_0 = .;
 . += 0x2400;
 . = 0x54000;
+of_sub2mean_buff_1 = .;
+. += 0x2400;
+. = 0x58000;
+of_imag2sub_cons_buff_0 = .;
+. += 0x2400;
+. = 0x5C000;
 of_real2sub_cons_buff_0 = .;
 . += 0x2400;
 . = 0x68000;
@@ -58,18 +64,12 @@ of_add2main1_0_cons_buff_0 = .;
 . = 0x60400;
 of_in_main10_cons_buff_0 = .;
 . += 0x2404;
-. = 0x78000;
+. = 0x70400;
 out_buff_0 = .;
 . += 0x40;
-. = 0x7C000;
+. = 0x74000;
 out_buff_1 = .;
 . += 0x40;
-. = 0x70400;
-test_cons_buff_0 = .;
-. += 0x2400;
-. = 0x74000;
-test_cons_buff_1 = .;
-. += 0x2400;
   .bss : { *(.bss*) } > data
 }
 INPUT(mean.o)

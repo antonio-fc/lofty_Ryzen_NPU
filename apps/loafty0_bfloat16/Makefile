@@ -40,11 +40,23 @@ build/passthrough.o: ${srcdir}/kernels/passthrough.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-build/mean.o: ${srcdir}/kernels/mean.cc
+build/scale.o: ${srcdir}/kernels/scale.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/add.o: ${srcdir}/kernels/add.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
 build/main_kernel.o: ${srcdir}/kernels/main_kernel.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/sub.o: ${srcdir}/kernels/sub.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/mean.o: ${srcdir}/kernels/mean.cc
 	mkdir -p ${@D}
 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -59,13 +71,13 @@ build/kernels.a: build/main_kernel.o build/lut_ops.o
 
 ##==------- GENERATING NPU CODE -------==##
 
-build/final.xclbin: build/aie.mlir build/passthrough.o build/mean.o build/kernels.a
+build/final.xclbin: build/aie.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
 		--no-xchesscc --no-xbridge \
 		--xclbin-name=${@F} --npu-insts-name=insts-name.txt $(<:%=../%)
 
-build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/kernels.a
+build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
 		--no-xchesscc --no-xbridge \

@@ -17,6 +17,7 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
     img = np.zeros((npix_l, npix_m), dtype=rtype)
     l, m = np.meshgrid(np.linspace(-1, 1, npix_l), np.linspace(1, -1, npix_m))
     n = np.sqrt(1 - l**2 - m**2) - 1
+    nan_mask = np.isnan(n)
     l, m, n = l.astype(rtype), m.astype(rtype), n.astype(rtype)
     for l_ix in range(npix_l):
         for m_ix in range(npix_m):
@@ -34,20 +35,21 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
             # Multiply with visibilities
             real = visR * cos
             imag = visC * sin
-            # Subtract
-            vis_mult = real - imag
-            # Get the average
-            n_split = 12
+
+            splitsR = np.split(real, 2)
+            splitsC = np.split(imag, 2)
+            new_real = (splitsR[0] + splitsR[1])/2.0
+            new_imag = (splitsC[0] + splitsC[1])/2.0
+            diff = new_real - new_imag
+            # diff = real - imag
+            
             if rtype==bfloat16:
-                splits = np.split(vis_mult, n_split)
-                results = np.empty(n_split, dtype=rtype)
-                for i in range(n_split):
-                    results[i] = np.mean(splits[i].astype(np.float32)).astype(bfloat16)
-                result = np.mean(results.astype(np.float32)).astype(bfloat16)
+                result = np.mean(diff.astype(np.float32)).astype(bfloat16)
             else:
-                result = np.mean(vis_mult)
+                result = np.mean(diff)
             # Save result
-            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = result # image is saved from bottom to top so need to reverse at the end for the NPU implementations
+            nan_val = nan_mask[npix_l - l_ix - 1, npix_m - m_ix - 1]
+            img[npix_l - l_ix - 1, npix_m - m_ix - 1] = result if not nan_val else np.nan  # image is saved from bottom to top so need to reverse at the end for the NPU implementations
     return img
 
 def plot_input_data(visibilities, baselines):
@@ -99,7 +101,7 @@ def read_npz_data(path, index, plot):
     # print(file)
     return data
 
-def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, OUT_SIZE, TRACE_SIZE, DATATYPE, verbose):
+def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, OUT_SIZE, TRACE_SIZE, NCHANNELS, DATATYPE, verbose):
     # Formatting the frequency to rads
     f = freq[0] # 50MHz
     SL = 299_792_458 # m/s
@@ -109,26 +111,26 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     
     # Formatting main inputs (baselines and visibilities)
     visR = np.real(vis).astype(dtype=DATATYPE).flatten()         # vis real
-    visRa, visRb = np.split(visR, 2)
+    visRa, visRb = np.split(visR, NCHANNELS)
     
     visC = np.imag(vis).astype(dtype=DATATYPE).flatten()         # vis complex
-    visCa, visCb = np.split(visC, 2)
+    visCa, visCb = np.split(visC, NCHANNELS)
     
     u = blines[:, :, 0].astype(dtype=DATATYPE).flatten()         # baselines u
-    ua, ub = np.split(u, 2)
+    ua, ub = np.split(u, NCHANNELS)
     
     v = blines[:, :, 1].astype(dtype=DATATYPE).flatten()         # baselines v
-    va, vb = np.split(v, 2)
+    va, vb = np.split(v, NCHANNELS)
     
     w = blines[:, :, 2].astype(dtype=DATATYPE).flatten()         # baselines w
-    wa, wb = np.split(w, 2)
+    wa, wb = np.split(w, NCHANNELS)
 
     inputsA = [visRa, visCa, ua, va, wa]
     inputsB = [visRb, visCb, ub, vb, wb]
     inputs = [inputsA, inputsB]
-    for m in range(2):
+    for c in range(NCHANNELS):
         for v in range(NINPUTS):
-            inputs[m][v] = np.concatenate([inout0, inputs[m][v]])
+            inputs[c][v] = np.concatenate((inout0, inputs[c][v]))
     main_inputs = [np.concatenate(inputsA), np.concatenate(inputsB)] # (9216/2 + 2) * 5  (4610 * 5 = 23050) each to then be distributed
 
     # Formatting lmn and combining with the frequency
@@ -193,12 +195,11 @@ def main(opts):
     
     NCORES = 6 # for each distribution
     NINPUTS = 5 # u, v, w, real vis and imag vis
-    NDISTGROUP = 2 # number of ct groups for distribution
+    NCHANNELS = 2 # number of ct groups for distribution
     
     FREQ_VOL = 2
-    INPUT_VOL = MSIZE//NDISTGROUP # split in 2 for each distribution data stream
+    INPUT_VOL = MSIZE//NCHANNELS # split in 2 for each distribution data stream
     FULL_INPUT_VOL = (INPUT_VOL + FREQ_VOL)*NINPUTS
-    print(FULL_INPUT_VOL)
     OUTPUT_VOL = BSIZE
 
     DATATYPE = bfloat16
@@ -245,7 +246,7 @@ def main(opts):
                                                                                    INOUT0_VOLUME, INOUT1_VOLUME, INOUT2_VOLUME,
                                                                                    N_LMN, NINPUTS, CV, MATRIX_DIM_SIZE1,
                                                                                    # INPUT_VOL, FULL_INPUT_VOL,
-                                                                                   OUT_SIZE, TRACE_SIZE,
+                                                                                   OUT_SIZE, TRACE_SIZE, NCHANNELS,
                                                                                    DATATYPE, True)
     
     # Initialize data buffers
@@ -315,12 +316,11 @@ def main(opts):
         # if i == num_iter-1 and opts.verbosity >= 1:
         if i == num_iter-1:
             print("\nOutput:")
-            print(output_buffer.shape)
             for x in output_buffer.reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1)[::32]:
                 print(x)
         
         # outputting image
-        if False:# i == num_iter-1:
+        if i == num_iter-1:
             # Formatting output for plotting
             output_raw = output_buffer[::-1].reshape(MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1).astype(np.float64)
             output = np.select([~nan_mask], [output_raw], np.nan)

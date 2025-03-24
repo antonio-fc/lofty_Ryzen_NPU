@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x76400, LENGTH = 0x9C00
+   data (!RX) : ORIGIN = 0x7E400, LENGTH = 0x1C00
 }
 ENTRY(__start)
 SECTIONS
@@ -52,27 +52,28 @@ of_add2main0_1_cons_buff_0 = .;
 . = 0x50400;
 of_in_main01_cons_buff_0 = .;
 . += 0x2404;
-. = 0x64000;
-test_buff_0 = .;
-. += 0x2400;
 . = 0x68000;
-test_buff_1 = .;
-. += 0x2400;
-. = 0x62804;
 of_join_real0_buff_0 = .;
 . += 0x1200;
-. = 0x6C000;
+. = 0x64000;
 of_add2main0_0_cons_buff_0 = .;
 . += 0x2400;
 . = 0x60400;
 of_in_main00_cons_buff_0 = .;
 . += 0x2404;
 . = 0x70400;
-of_imag2sub_cons_buff_0 = .;
+of_sub2mean_buff_0 = .;
 . += 0x2400;
 . = 0x74000;
+of_sub2mean_buff_1 = .;
+. += 0x2400;
+. = 0x78000;
+of_imag2sub_cons_buff_0 = .;
+. += 0x2400;
+. = 0x7C000;
 of_real2sub_cons_buff_0 = .;
 . += 0x2400;
   .bss : { *(.bss*) } > data
 }
+INPUT(sub.o)
 PROVIDE(main = core_1_2);

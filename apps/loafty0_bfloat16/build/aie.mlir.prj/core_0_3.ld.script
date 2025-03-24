@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C040, LENGTH = 0x3FC0
+   data (!RX) : ORIGIN = 0x7C0C0, LENGTH = 0x3F40
 }
 ENTRY(__start)
 SECTIONS
@@ -60,10 +60,10 @@ of_in_main03_cons_buff_0 = .;
 . += 0x2404;
 . = 0x68000;
 in0_1_cons_buff_0 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x6C000;
 in0_1_cons_buff_1 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x74000;
 of_add_w0_buff_0 = .;
 . += 0x2400;
@@ -72,10 +72,11 @@ of_in_main04_cons_buff_0 = .;
 . += 0x2404;
 . = 0x78000;
 in0_2_cons_buff_0 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x7C000;
 in0_2_cons_buff_1 = .;
-. += 0x40;
+. += 0xC0;
   .bss : { *(.bss*) } > data
 }
+INPUT(scale.o)
 PROVIDE(main = core_0_3);

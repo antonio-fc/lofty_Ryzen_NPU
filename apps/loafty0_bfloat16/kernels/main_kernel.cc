@@ -25,56 +25,46 @@ aie::vector<bfloat16, VEC_SIZE> cos_bfloat16(aie::vector<bfloat16, VEC_SIZE> inp
 
 extern "C" {
 
-void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, bfloat16 *u, bfloat16 *v, bfloat16 *w, bfloat16 *out, uint32_t N) {
-    // Output size is CV
-    bfloat16 *l = lmn;
-    bfloat16 *m = lmn + CV;
-    bfloat16 *n = lmn + CV*2;
-    for(int t = 0; t < CV; t++) // for each pixel/lmn
-    chess_prepare_for_pipelining chess_loop_range(64, 64) { 
-        // Check if calculations can be skipped
-        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
-            continue; // out[t] = n[t]; // hex for NaN
-        }
-        
-        // Initialize the accum for the reduction
-        aie::vector<bfloat16, VEC_SIZE> sum_v = aie::zeros<bfloat16, VEC_SIZE>();
-        aie::accum<accfloat, VEC_SIZE> acc;
-        acc.from_vector(sum_v, 0);
-
+void main_kernel(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N, uint32_t trig) { // N = 4608
+    uint32_t FREQ_SIZE = 2; // How many indeces of visIn is used by the frequency value
+    uint32_t HALF_SIZE = N/2; // new size when folding the output for further joining of the data streams
+    bfloat16 *visInput = visIn + FREQ_SIZE;
+    bfloat16 freq = visIn[0];
+    chess_prepare_for_pipelining chess_loop_range(64, 64) {
         // Intermediate operations
-        for (int i = 0; i < N; i += VEC_SIZE) { // 24 times
+        for (int i = 0; i < HALF_SIZE; i += VEC_SIZE) {
             // Getting baselines vectors
-            auto vecU = aie::load_v<VEC_SIZE>(u + i);
-            auto vecV = aie::load_v<VEC_SIZE>(v + i);
-            auto vecW = aie::load_v<VEC_SIZE>(w + i);
+            auto input0 = aie::load_v<VEC_SIZE>(in + i);
+            auto vis0 = aie::load_v<VEC_SIZE>(visInput + i);
+            auto input1 = aie::load_v<VEC_SIZE>(in + HALF_SIZE + i);
+            auto vis1 = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
 
-            // Scale, Add and Scale
-            auto scaleU = aie::mul(vecU, l[t]);
-            auto scaleV = aie::mul(vecV, m[t]);
-            auto scaleW = aie::mul(vecW, n[t]);
-            auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
-            auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
+            // Scale
+            auto scaleInput0 = aie::mul(input0, freq);
+            auto scaleInput1 = aie::mul(input1, freq);
 
-            // Trig
-            auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
-            auto sin = sin_bfloat16(A);
+            // Apply the trig op
+            aie::vector<bfloat16, VEC_SIZE> trig0;
+            aie::vector<bfloat16, VEC_SIZE> trig1;
 
-            // Mult with visibilities and subtract
-            auto vecR = aie::load_v<VEC_SIZE>(visR + i);
-            auto vecC = aie::load_v<VEC_SIZE>(visC + i);
-            auto R = aie::mul(cos, vecR);
-            auto C = aie::mul(sin, vecC);
-            auto result = aie::sub(R, C);
+            if (trig == 0) { // applying cosine
+                trig0 = cos_bfloat16(scaleInput0);
+                trig1 = cos_bfloat16(scaleInput1);
+            } else { // applying sine
+                trig0 = sin_bfloat16(scaleInput0);
+                trig1 = sin_bfloat16(scaleInput1);
+            }
+
+            // Multiplying by vis
+            auto prod0 = aie::mul(trig0, vis0);
+            auto prod1 = aie::mul(trig1, vis1);
 
             // Adding to acc
-            acc = aie::add(acc, result);
-        }
+            auto result = aie::add(prod0, prod1);
 
-        // Final reduction
-        aie::vector<float, VEC_SIZE> sum = acc.to_vector<float>(0);
-        bfloat16 res = aie::reduce_add(sum);
-        out[t] = res;
+            // Writing result to output
+            aie::store_v(out + i, result.to_vector<bfloat16>());
+        }
     }
 }
 // void sin_float_1024(bfloat16 *a_in, bfloat16 *c_out) {

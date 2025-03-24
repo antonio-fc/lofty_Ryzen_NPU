@@ -40,14 +40,39 @@ def create_argparser():
     )
     return p
 
-def declaring_kernel_func(tile_ty, dtype):
+def declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype):
     # kernel for passthrough (scalar)
     name0 = "passthrough"
     kernel0 = external_func("passthrough",
-        inputs=[tile_ty, tile_ty, dtype],
+        inputs=[dist_ty, dist_ty, dtype],
+    )
+    name1 = "scale"
+    kernel1 = external_func("baseline_scale",
+        inputs=[dist_ty, lmn_move_ty, input_ty, dtype, dtype, dtype, dtype],
+    )
+    name2 = "add"
+    kernel2 = external_func("add_kernel",
+        inputs=[input_ty, input_ty, input_ty, dtype],
+    )
+    name3 = "main"
+    kernel3 = external_func("main_kernel",
+        inputs=[input_ty, dist_ty, join_ty, dtype, dtype],
+    )
+    name4 = "sub"
+    kernel4 = external_func("sub_kernel",
+        inputs=[input_ty, input_ty, input_ty, dtype],
+    )
+    name5 = "mean"
+    kernel5 = external_func("mean",
+        inputs=[input_ty, out_ty, dtype, dtype],
     )
     return {
         name0: kernel0,
+        name1: kernel1,
+        name2: kernel2,
+        name3: kernel3,
+        name4: kernel4,
+        name5: kernel5,
     }
 
 def declaring_tiles(n_cols, n_comp):
@@ -71,15 +96,15 @@ def loafty(opts):
     TRACE_SIZE = opts.trace_size
     
     # Declaring constant sizes
-    ITER_KERNEL = 14 # sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
+    ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
     MIN_SIZE = 2
-    OUT_SIZE = 32 # need to be at least 2
+    OUT_SIZE = 32 # need to be at least 2 and even
     N_LMN = 3 # 3 for l, m and n
-    LMN__MOVE_SIZE = OUT_SIZE 
+    LMN__MOVE_SIZE = OUT_SIZE*N_LMN
     LMN_SIZE = BSIZE*N_LMN
 
     ITERS = BSIZE//OUT_SIZE
@@ -103,7 +128,7 @@ def loafty(opts):
     @device(AIEDevice.npu1_4col)
     def device_body():
         out_ty = np.ndarray[(OUT_SIZE,), dtype]
-        factor_ty = np.ndarray[(LMN__MOVE_SIZE,), dtype]
+        lmn_move_ty = np.ndarray[(LMN__MOVE_SIZE,), dtype]
         input_ty = np.ndarray[(INPUT_SIZE,), dtype]
         dist_ty = np.ndarray[(DIST_SIZE,), dtype]
         full_input_ty = np.ndarray[(FULL_INPUT_SIZE,), dtype]
@@ -111,7 +136,7 @@ def loafty(opts):
 
         # AIE Core Function declarations
 
-        kernels = declaring_kernel_func(factor_ty, dtype_k)
+        kernels = declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype_k)
 
         # Tile declarations
         ST, MT, CT = declaring_tiles(4, 4)
@@ -134,7 +159,7 @@ def loafty(opts):
 
         scale_tiles = [[scaleUtile0, scaleVtile0, scaleWtile0], [scaleUtile1, scaleVtile1, scaleWtile1]]
         add_tiles = [[addBlUVTile0, addBlUVWTile0], [addBlUVTile1, addBlUVWTile1]]
-        main_tiles = [[realTile0, imagTile0], [realTile1, imagTile1]]
+        rc_tiles = [[realTile0, imagTile0], [realTile1, imagTile1]]
 
         memDist0 = MT[0]
         memDist1 = MT[3]
@@ -148,7 +173,7 @@ def loafty(opts):
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_lmn = object_fifo("in0", ST[1], broad_tiles, 2, factor_ty)
+        of_in_lmn = object_fifo("in0", ST[1], broad_tiles, 4, lmn_move_ty)
         of_in_mainA = object_fifo("in1", ST[0], memDist[0], 2, full_input_ty)       
         of_in_mainB = object_fifo("in2", ST[3], memDist[1], 2, full_input_ty)
 
@@ -172,16 +197,16 @@ def loafty(opts):
         # Moving baselines addition result to the main tiles
         add2mainFIFOs = []
         for c in range(NCHANNELS):
-            add2mainFIFOs.append(object_fifo(f"of_add2main{c}", add_tiles[c][1], main_tiles[c], [1, 1, 1], input_ty))
+            add2mainFIFOs.append(object_fifo(f"of_add2main{c}", add_tiles[c][1], rc_tiles[c], [1, 1, 1], input_ty))
 
         # Joining the two channels
         join_offsets = [t * JOIN_SIZE for t in range(NCHANNELS)]
         
-        join_real_fifo0 = object_fifo(f"of_join_real0", main_tiles[0][0], memJoin[0], [1, 1], join_ty)
-        join_real_fifo1 = object_fifo(f"of_join_real1", main_tiles[1][0], memJoin[0], [1, 1], join_ty)
+        join_real_fifo0 = object_fifo(f"of_join_real0", rc_tiles[0][0], memJoin[0], [1, 1], join_ty)
+        join_real_fifo1 = object_fifo(f"of_join_real1", rc_tiles[1][0], memJoin[0], [1, 1], join_ty)
 
-        join_imag_fifo0 = object_fifo(f"of_join_imag0", main_tiles[0][1], memJoin[1], [1, 1], join_ty)
-        join_imag_fifo1 = object_fifo(f"of_join_imag1", main_tiles[1][1], memJoin[1], [1, 1], join_ty)
+        join_imag_fifo0 = object_fifo(f"of_join_imag0", rc_tiles[0][1], memJoin[1], [1, 1], join_ty)
+        join_imag_fifo1 = object_fifo(f"of_join_imag1", rc_tiles[1][1], memJoin[1], [1, 1], join_ty)
         
         real_join_fifos = [join_real_fifo0, join_real_fifo1]
         imag_join_fifos = [join_imag_fifo0, join_imag_fifo1]
@@ -193,238 +218,122 @@ def loafty(opts):
         object_fifo_link(real_join_fifos, real2subFIFO, join_offsets, [])
         object_fifo_link(imag_join_fifos, imag2subFIFO, join_offsets, [])
         
-        # test fifo
-        test_tile = realTile0
-        of_test = object_fifo("test", test_tile, mean_tile, 2, input_ty)
+        # sub to mean tile
+        of_sub2mean = object_fifo("of_sub2mean", sub_tile, mean_tile, 2, input_ty)
 
         # Output
         of_out = object_fifo("out", mean_tile, ST[2], 2, out_ty)
 
         # STEP4: CORE DEFINITIONS
-        inputFifo = main_in_fifos[0][2]
-        outputFifo = bl_add_fifos[0][0]
-        @core(scale_tiles[0][0])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
-        
-        inputFifo = main_in_fifos[0][3]
-        outputFifo = bl_add_fifos[0][1]
-        @core(scale_tiles[0][1])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputFifo = main_in_fifos[0][4]
-        outputFifo = bl_add_fifos[0][2]
-        @core(scale_tiles[0][2])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
-        ### ----------------------------------------------------------------------------------------------------------------- ###
-        inputFifo = main_in_fifos[1][2]
-        outputFifo = bl_add_fifos[1][0]
-        @core(scale_tiles[1][0])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
-        
-        inputFifo = main_in_fifos[1][3]
-        outputFifo = bl_add_fifos[1][1]
-        @core(scale_tiles[1][1])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputFifo = main_in_fifos[1][4]
-        outputFifo = bl_add_fifos[1][2]
-        @core(scale_tiles[1][2])
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
-                    for i in range(OUT_SIZE): # i determines whether to use the first (0) or second (1) set of lmn
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                        # run kernel here
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                    of_in_lmn.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 1)
+        for c in range(NCHANNELS): # repeating the tile definitions for both channels
+            for bl in range(N_LMN): 
+                inputFifo = main_in_fifos[c][bl + 2] # skipping over the visibilities streams/fifos
+                outputFifo = bl_add_fifos[c][bl]
+                @core(scale_tiles[c][bl], "scale.o")
+                def core_body():
+                    for _ in range_(ITER_KERNEL):
+                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                        for _ in range_(ITERS): # img_size**2 / 32
+                            lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1) # 32 * 3 
+                            for i in range(OUT_SIZE): # i determines which index of the set of lmn
+                                output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                                kernels['scale'](inputs, lmn, output, INPUT_SIZE, OUT_SIZE, i, bl) # 0 for l
+                                outputFifo.release(ObjectFifoPort.Produce, 1)
+                            of_in_lmn.release(ObjectFifoPort.Consume, 1)
+                        inputFifo.release(ObjectFifoPort.Consume, 1)
+       
         ##########################################################################################################################
-        inputUFifo = u_add_fifos[0]
-        inputVFifo = v_add_fifos[0]
-        outputFifo = uv_add_fifos[0]
-        @core(addBlUVTile0)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2 / 32
-                    inputU = inputUFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    inputV = inputVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                    # run kernel here
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputUFifo.release(ObjectFifoPort.Consume, 1)
-                    inputVFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputWFifo = w_add_fifos[0]
-        inputUVFifo = uv_add_fifos[0]
-        outputFifo = add2mainFIFOs[0]
-        @core(addBlUVWTile0)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2 / 32
-                    inputW = inputWFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    inputUV = inputUVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                    # run kernel here
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputWFifo.release(ObjectFifoPort.Consume, 1)
-                    inputUVFifo.release(ObjectFifoPort.Consume, 1)
-
-        ### ----------------------------------------------------------------------------------------------------------------- ###
-
-        inputUFifo = u_add_fifos[1]
-        inputVFifo = v_add_fifos[1]
-        outputFifo = uv_add_fifos[1]
-        @core(addBlUVTile1)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2 / 32
-                    inputU = inputUFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    inputV = inputVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                    # run kernel here
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputUFifo.release(ObjectFifoPort.Consume, 1)
-                    inputVFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputWFifo = w_add_fifos[1]
-        inputUVFifo = uv_add_fifos[1]
-        outputFifo = add2mainFIFOs[1]
-        @core(addBlUVWTile1)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2 / 32
-                    inputW = inputWFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    inputUV = inputUVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                    # run kernel here
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputWFifo.release(ObjectFifoPort.Consume, 1)
-                    inputUVFifo.release(ObjectFifoPort.Consume, 1)
+            inputUFifo = u_add_fifos[c]
+            inputVFifo = v_add_fifos[c]
+            outputFifo = uv_add_fifos[c]
+            @core(add_tiles[c][0], "add.o")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE): # img_size**2 / 32
+                        inputU = inputUFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        inputV = inputVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                        kernels['add'](inputU, inputV, output, INPUT_SIZE)
+                        outputFifo.release(ObjectFifoPort.Produce, 1)
+                        inputUFifo.release(ObjectFifoPort.Consume, 1)
+                        inputVFifo.release(ObjectFifoPort.Consume, 1)
+    
+            inputWFifo = w_add_fifos[c]
+            inputUVFifo = uv_add_fifos[c]
+            outputFifo = add2mainFIFOs[c]
+            @core(add_tiles[c][1], "add.o")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE): # img_size**2 / 32
+                        inputW = inputWFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        inputUV = inputUVFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                        kernels['add'](inputW, inputUV, output, INPUT_SIZE)
+                        outputFifo.release(ObjectFifoPort.Produce, 1)
+                        inputWFifo.release(ObjectFifoPort.Consume, 1)
+                        inputUVFifo.release(ObjectFifoPort.Consume, 1)
 
         ##########################################################################################################################
-        inputVisFifo = main_in_fifos[0][0]
-        inputAddFifo = add2mainFIFOs[0]
-        outputFifo = of_test
-        @core(realTile0)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(BSIZE):
-                    inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                    # run kernel here
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputAddFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputVisFifo = main_in_fifos[0][1]
-        inputAddFifo = add2mainFIFOs[0]
-        @core(imagTile0)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(BSIZE):
-                    inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    # run kernel here
-                    inputAddFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 1)
-        ### ----------------------------------------------------------------------------------------------------------------- ###
-        inputVisFifo = main_in_fifos[1][0]
-        inputAddFifo = add2mainFIFOs[1]
-        @core(realTile1)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(BSIZE):
-                    inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    # run kernel here
-                    inputAddFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 1)
-
-        inputVisFifo = main_in_fifos[1][1]
-        inputAddFifo = add2mainFIFOs[1]
-        @core(imagTile1)
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                for _ in range_(BSIZE):
-                    inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
-                    # run kernel here
-                    inputAddFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 1)
+            inputVisFifo = main_in_fifos[c][0]
+            inputAddFifo = add2mainFIFOs[c]
+            outputFifo = real_join_fifos[c]
+            @core(rc_tiles[c][0], "kernels.a")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                    for _ in range_(BSIZE):
+                        inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 2304
+                        kernels['main'](inputAdd, inputVis, output, INPUT_SIZE, 0)
+                        outputFifo.release(ObjectFifoPort.Produce, 1)
+                        inputAddFifo.release(ObjectFifoPort.Consume, 1)
+                    inputVisFifo.release(ObjectFifoPort.Consume, 1)
+    
+            inputVisFifo = main_in_fifos[c][1]
+            inputAddFifo = add2mainFIFOs[c]
+            outputFifo = imag_join_fifos[c]
+            @core(rc_tiles[c][1], "kernels.a")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                    for _ in range_(BSIZE):
+                        inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 2304
+                        kernels['main'](inputAdd, inputVis, output, INPUT_SIZE, 1)
+                        outputFifo.release(ObjectFifoPort.Produce, 1)
+                        inputAddFifo.release(ObjectFifoPort.Consume, 1)
+                    inputVisFifo.release(ObjectFifoPort.Consume, 1)
 
         ##########################################################################################################################
-        @core(sub_tile)
+        inputRfifo = real2subFIFO
+        inputCfifo = imag2subFIFO
+        outputFifo = of_sub2mean
+        @core(sub_tile, "sub.o")
         def core_body():
             for _ in range_(ITER_KERNEL):
                 for _ in range_(BSIZE):
-                    continue
+                    inputR = real2subFIFO.acquire(ObjectFifoPort.Consume, 1) # 4608
+                    inputC = imag2subFIFO.acquire(ObjectFifoPort.Consume, 1) # 4608
+                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                    kernels['sub'](inputR, inputC, output, INPUT_SIZE)
+                    outputFifo.release(ObjectFifoPort.Produce, 1)
+                    real2subFIFO.release(ObjectFifoPort.Consume, 1) # 4608
+                    imag2subFIFO.release(ObjectFifoPort.Consume, 1) # 4608
         
         
         ##########################################################################################################################
-
+        inputFifo = of_sub2mean
+        outputFifo = of_out
         @core(mean_tile, "mean.o")
         def core_body():
             for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
                 for _ in range_(ITERS):
-                    output = of_out.acquire(ObjectFifoPort.Produce, 1) # OUT_SIZE
+                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # OUT_SIZE
                     for i in range(OUT_SIZE):
-                        inputs = of_test.acquire(ObjectFifoPort.Consume, 1) # 4608
-                        # continue
-                        of_test.release(ObjectFifoPort.Consume, 1)
-                    of_out.release(ObjectFifoPort.Produce, 1)
+                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
+                        kernels['mean'](inputs, output, INPUT_SIZE, i)
+                        inputFifo.release(ObjectFifoPort.Consume, 1)
+                    outputFifo.release(ObjectFifoPort.Produce, 1)
 
 
         # Set up a packet-switched flow from core to shim for tracing information

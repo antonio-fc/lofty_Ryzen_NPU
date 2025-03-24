@@ -54,10 +54,10 @@ of_in_main04_cons_buff_0 = .;
 . += 0x2404;
 . = 0x68000;
 in0_2_cons_buff_0 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x6C000;
 in0_2_cons_buff_1 = .;
-. += 0x40;
+. += 0xC0;
 . = 0x78000;
 of_join_imag0_buff_0 = .;
 . += 0x1200;
@@ -69,4 +69,5 @@ of_in_main01_cons_buff_0 = .;
 . += 0x2404;
   .bss : { *(.bss*) } > data
 }
+INPUT(kernels.a)
 PROVIDE(main = core_0_2);
