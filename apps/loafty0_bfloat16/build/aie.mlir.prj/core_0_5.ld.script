@@ -40,18 +40,9 @@ SECTIONS
 . = 0x70000;
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
-. = 0x44000;
-of_add_v0_buff_0 = .;
-. += 0x2400;
 . = 0x40400;
-of_in_main03_cons_buff_0 = .;
-. += 0x2404;
-. = 0x48000;
-in0_1_cons_buff_0 = .;
-. += 0xC0;
-. = 0x4C000;
-in0_1_cons_buff_1 = .;
-. += 0xC0;
+of_add_uv0_buff_0 = .;
+. += 0x2400;
 /* No tile with memory exists to the west. */
 . = 0x50000;
 . += 0x10000;
