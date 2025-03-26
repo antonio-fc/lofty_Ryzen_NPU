@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7A400, LENGTH = 0x5C00
+   data (!RX) : ORIGIN = 0x76400, LENGTH = 0x9C00
 }
 ENTRY(__start)
 SECTIONS
@@ -41,30 +41,33 @@ SECTIONS
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x40400;
-of_add2main1_buff_0 = .;
+of_reduceR_buff_0 = .;
 . += 0x2400;
 . = 0x44000;
-of_add_w1_cons_buff_0 = .;
+of_reduceR_buff_1 = .;
+. += 0x2400;
+. = 0x48000;
+of_in_visR_cons_buff_0 = .;
+. += 0x2400;
+. = 0x4C000;
+of_in_visR_cons_buff_1 = .;
 . += 0x2400;
 . = 0x50400;
-of_add_uv0_buff_0 = .;
+of_addUV_buff_0 = .;
 . += 0x2400;
 . = 0x54000;
-of_add_v0_cons_buff_0 = .;
+of_addV_cons_buff_0 = .;
 . += 0x2400;
 /* No tile with memory exists to the north. */
 . = 0x60000;
 . += 0x10000;
 . = 0x70400;
-of_add_uv1_buff_0 = .;
+of_multTrigR_buff_0 = .;
 . += 0x2400;
 . = 0x74000;
-of_add_v1_cons_buff_0 = .;
-. += 0x2400;
-. = 0x78000;
-of_add_u1_buff_0 = .;
+of_trigFifo_0_cons_buff_0 = .;
 . += 0x2400;
   .bss : { *(.bss*) } > data
 }
-INPUT(add.o)
+INPUT(kernels.a)
 PROVIDE(main = core_2_5);

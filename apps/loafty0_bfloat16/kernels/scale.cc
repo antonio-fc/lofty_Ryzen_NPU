@@ -15,22 +15,26 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 32; // Size of the working vectors
+const int VEC_SIZE = 64; // Size of the working vectors
 
 extern "C" {
 
-void baseline_scale(bfloat16 *in, bfloat16 *lmn, bfloat16 *out,
-                                                        uint32_t N, // number of elements to scale
-                                                        uint32_t CHUNK_SIZE,  // chunk size is how many lmn values are moved every ITER
-                                                        uint32_t lmnIndex, // index of the lmn pointer, goes from 0 to CHUNK_SIZE-1
-                                                        uint32_t lmnChoice) // index to choose l, m or n
+void scale(bfloat16 *in, bfloat16 *lmn, bfloat16 *out, uint32_t N, uint32_t lmnIndex)
 {
-    uint32_t FREQ_SIZE = 2;
-    bfloat16 lmn_value = lmn[CHUNK_SIZE*lmnChoice + lmnIndex];
-    bfloat16 *baseline = in + FREQ_SIZE;
+    bfloat16 lmn_value = lmn[lmnIndex];
     for (int i = 0; i < N; i += VEC_SIZE) {
-        auto input = aie::load_v<VEC_SIZE>(baseline + i);
+        auto input = aie::load_v<VEC_SIZE>(in + i);
         auto result = aie::mul(input, lmn_value).to_vector<bfloat16>();
+        aie::store_v(out + i, result);
+    }
+}
+
+
+void scale_single(bfloat16 *in, bfloat16 *f, bfloat16 *out, uint32_t N)
+{
+    for (int i = 0; i < N; i += VEC_SIZE) {
+        auto input = aie::load_v<VEC_SIZE>(in + i);
+        auto result = aie::mul(input, f[0]).to_vector<bfloat16>();
         aie::store_v(out + i, result);
     }
 }

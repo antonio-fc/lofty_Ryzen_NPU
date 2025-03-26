@@ -36,12 +36,7 @@ def image_reference(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
             real = visR * cos
             imag = visC * sin
 
-            splitsR = np.split(real, 2)
-            splitsC = np.split(imag, 2)
-            new_real = (splitsR[0] + splitsR[1])/2.0
-            new_imag = (splitsC[0] + splitsC[1])/2.0
-            diff = new_real - new_imag
-            # diff = real - imag
+            diff = real - imag
             
             if rtype==bfloat16:
                 result = np.mean(diff.astype(np.float32)).astype(bfloat16)
@@ -107,7 +102,6 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     SL = 299_792_458 # m/s
     factor = -2 * f * math.pi / SL
     inout0 = np.array([factor, factor], dtype=DATATYPE)            # factor (-2 pi f / SPEED_OF_LIGHT)
-    # inout0 = np.repeat(inout0, IN1_VOL)
     
     # Formatting main inputs (baselines and visibilities)
     visR = np.real(vis).astype(dtype=DATATYPE).flatten()         # vis real
@@ -125,15 +119,17 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     w = blines[:, :, 2].astype(dtype=DATATYPE).flatten()         # baselines w
     wa, wb = np.split(w, NCHANNELS)
 
-    inputsA = [visRa, visCa, ua, va, wa]
-    inputsB = [visRb, visCb, ub, vb, wb]
-    inputs = [inputsA, inputsB]
-    for c in range(NCHANNELS):
-        for v in range(NINPUTS):
-            inputs[c][v] = np.concatenate((inout0, inputs[c][v]))
-    main_inputs = [np.concatenate(inputsA), np.concatenate(inputsB)] # (9216/2 + 2) * 5  (4610 * 5 = 23050) each to then be distributed
+    # Formatting the baselines input
+    inputsBaseLines_A = [ua, va, wa]
+    inputsBaseLines_B = [ub, vb, wb]    
+    inputsBaseLines = np.concatenate([np.concatenate(inputsBaseLines_A), np.concatenate(inputsBaseLines_B)]).reshape(2, 3, 4608) # (9216/2) * 3 * 2 (4608 * 3 * 2 = 27648) each to then be distributed
 
-    # Formatting lmn and combining with the frequency
+    # Formatting the visibilities
+    inputsVis_A = [visRa, visCa]
+    inputsVis_B = [visRb, visCb]
+    inputsVis = np.concatenate([np.concatenate(inputsVis_A), np.concatenate(inputsVis_B)]).reshape(2, 2, 4608) # (9216/2) * 2 * 2 (4608 * 2 * 2 = 18432) each to then be distributed
+
+    # Formatting lmn
     inout3 = np.empty((IN2_VOL*N_LMN), dtype=DATATYPE)     # l, m, n
     l, m = np.meshgrid(np.linspace(-1, 1, IMG_DIM_SIZE), np.linspace(1, -1, IMG_DIM_SIZE))
     n = np.sqrt(1 - l**2 - m**2) - 1
@@ -158,17 +154,17 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
         print(f"Frequency: {f/1_000_000}MHz")
         print(f"Factor (-2 pi f / SPEED_OF_LIGHT): {inout0[0]}")
         
-        print("\nFull Input A: ")
-        print(f"VisR: {main_inputs[0][0]}, VisC: {main_inputs[0][1]}, U: {main_inputs[0][2]}, V: {main_inputs[0][3]}, W: {main_inputs[0][4]}")
-        print("\nFull Input B: ")
-        print(f"VisR: {main_inputs[1][0]}, VisC: {main_inputs[1][1]}, U: {main_inputs[1][2]}, V: {main_inputs[1][3]}, W: {main_inputs[1][4]}")
+        print("\nFull Baselines: ")
+        print(f"uA: {inputsBaseLines[0][0]}, vA: {inputsBaseLines[0][1]}, wA: {inputsBaseLines[0][2]}, uB: {inputsBaseLines[1][0]}, vB: {inputsBaseLines[1][1]}, wB: {inputsBaseLines[1][2]}")
+        print("\nFull Vis: ")
+        print(f"VisRA: {inputsVis[0][0]}, VisCA: {inputsVis[0][1]}, visRB: {inputsVis[1][0]}, VisCB: {inputsVis[1][1]}")
 
         print("\nLMN Input: ")
         print(f"l0: {inout3[10][0]}")
         print(f"m0: {inout3[10][1]}")
         print(f"n0: {inout3[10][2]}")
     
-    return (main_inputs[0], main_inputs[1], inout3, out_zero, trace_zero, nan_mask)
+    return (inout0, inputsBaseLines, inputsVis, inout3, out_zero, trace_zero, nan_mask)
 
 def main(opts):
     # Load instruction sequence
@@ -185,30 +181,23 @@ def main(opts):
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
-    CV = 32 # number of consecutive values in output stream
-    N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
-    
-    INOUT0_VOLUME = MSIZE
-    INOUT1_VOLUME = CV*N_LMN # padding the scalar of the frequency factor to be in the same stream as lmn values
-    INOUT2_VOLUME = BSIZE
-    INOUT_LMN_VOLUME = INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
-    
-    NCORES = 6 # for each distribution
-    NINPUTS = 5 # u, v, w, real vis and imag vis
-    NCHANNELS = 2 # number of ct groups for distribution
-    
-    FREQ_VOL = 2
-    INPUT_VOL = MSIZE//NCHANNELS # split in 2 for each distribution data stream
-    FULL_INPUT_VOL = (INPUT_VOL + FREQ_VOL)*NINPUTS
-    OUTPUT_VOL = BSIZE
-
     DATATYPE = bfloat16
     DTYPE_SIZE = 2 # bfloat16 size in bytes
 
-    INOUT0_SIZE = INOUT0_VOLUME * DTYPE_SIZE
-    INOUT1_SIZE = INOUT1_VOLUME * DTYPE_SIZE
-    INOUT2_SIZE = INOUT2_VOLUME * DTYPE_SIZE
-    FULL_INPUT_SIZE = FULL_INPUT_VOL * DTYPE_SIZE
+    CV = 32 # number of consecutive values in output stream
+    N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
+    NCHANNELS = 2 # number of ct groups for distribution
+    
+    FREQ_VOL = 2 # minimum size for input given bfloat16
+    BASELINES_VOLUME = MSIZE * 3
+    VIS_VOLUME = MSIZE * 2
+    INOUT2_VOLUME = BSIZE
+    INOUT_LMN_VOLUME = INOUT2_VOLUME * N_LMN # size of the stream for the lmn values and the frequency factor
+    OUTPUT_VOL = BSIZE
+
+    FREQ_SIZE = FREQ_VOL * DTYPE_SIZE
+    BASELINES_SIZE = BASELINES_VOLUME * DTYPE_SIZE
+    VIS_SIZE = VIS_VOLUME * DTYPE_SIZE
     INOUT_LMN_SIZE = INOUT_LMN_VOLUME * DTYPE_SIZE
 
     OUT_SIZE = OUTPUT_VOL * DTYPE_SIZE
@@ -223,12 +212,13 @@ def main(opts):
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------
     bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
-    bo_inout0 = xrt.bo(device, INOUT_LMN_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
-    bo_inout1 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
-    bo_inout2 = xrt.bo(device, FULL_INPUT_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
-    bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(6))    # output
+    bo_inout0 = xrt.bo(device, FREQ_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT) + lmn
+    bo_inout1 = xrt.bo(device, BASELINES_SIZE, xrt.bo.host_only, kernel.group_id(4)) # main inputs A
+    bo_inout2 = xrt.bo(device, VIS_SIZE, xrt.bo.host_only, kernel.group_id(5)) # main inputs B
+    bo_inout3 = xrt.bo(device, INOUT_LMN_SIZE, xrt.bo.host_only, kernel.group_id(6)) # main inputs B
+    bo_inout4 = xrt.bo(device, OUT_SIZE, xrt.bo.host_only, kernel.group_id(7))    # output
     if do_tracing:
-        bo_trace = xrt.bo(device, TRACE_SIZE, xrt.bo.host_only, kernel.group_id(7))    # trace
+        bo_trace = xrt.bo(device, TRACE_SIZE, xrt.bo.host_only, kernel.group_id(8))    # trace
 
     # Initialize instruction buffer
     bo_instr.write(instr_v, 0)
@@ -242,22 +232,23 @@ def main(opts):
     inputs = read_npz_data(npz_path, input_set, False)
 
     # Formatting input data
-    main_inputsA, main_inputsB, lmn_input, out_zero, trace_zero, nan_mask = format_input0(frequency, visibilities, baselines,
-                                                                                   INOUT0_VOLUME, INOUT1_VOLUME, INOUT2_VOLUME,
-                                                                                   N_LMN, NINPUTS, CV, MATRIX_DIM_SIZE1,
-                                                                                   # INPUT_VOL, FULL_INPUT_VOL,
+    inputFreq, inputBL, inputVis, inputLMN, out_zero, trace_zero, nan_mask = format_input0(frequency, visibilities, baselines,
+                                                                                   0, 0, INOUT2_VOLUME,
+                                                                                   N_LMN, 0, CV, MATRIX_DIM_SIZE1,
                                                                                    OUT_SIZE, TRACE_SIZE, NCHANNELS,
                                                                                    DATATYPE, True)
-    
+
     # Initialize data buffers
     if DATATYPE == bfloat16:
-        bo_inout0.write(lmn_input.view(np.uint16), 0)
-        bo_inout1.write(main_inputsA.view(np.uint16), 0)
-        bo_inout2.write(main_inputsB.view(np.uint16), 0)
+        bo_inout0.write(inputFreq.view(np.uint16), 0)
+        bo_inout1.write(inputBL.view(np.uint16), 0)
+        bo_inout2.write(inputVis.view(np.uint16), 0)
+        bo_inout3.write(inputLMN.view(np.uint16), 0)
     else:
-        bo_inout0.write(lmn_input, 0)
-        bo_inout1.write(main_inputsA, 0)
-        bo_inout2.write(main_inputsB, 0)
+        bo_inout0.write(inputFreq, 0)
+        bo_inout1.write(inputBL, 0)
+        bo_inout2.write(inputVis, 0)
+        bo_inout3.write(inputLMN, 0)
     bo_inout4.write(out_zero, 0)
     if do_tracing:
         bo_trace.write(trace_zero, 0)
@@ -267,10 +258,11 @@ def main(opts):
     bo_inout0.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout1.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout2.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
+    bo_inout3.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
     if do_tracing:
         bo_trace.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_TO_DEVICE)
-
+    
     # ------------------------------------------------------
     # Initialize run configs
     # ------------------------------------------------------
@@ -289,9 +281,9 @@ def main(opts):
         start = time.time_ns()
         opcode = 3
         if do_tracing:
-            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ tracing)
+            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout3, bo_inout4, bo_trace) # only 4 inputs and 1 output (+ tracing)
         else:
-            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout4)  # only 4 inputs and 1 output
+            h = kernel(opcode, bo_instr, len(instr_v), bo_inout0, bo_inout1, bo_inout2, bo_inout3, bo_inout4)  # only 4 inputs and 1 output
         h.wait()
         stop = time.time_ns()
         bo_inout4.sync(xrt.xclBOSyncDirection.XCL_BO_SYNC_BO_FROM_DEVICE)

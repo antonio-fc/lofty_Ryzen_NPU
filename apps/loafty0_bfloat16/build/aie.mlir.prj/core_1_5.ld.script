@@ -41,31 +41,34 @@ SECTIONS
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x40400;
-of_add2main0_buff_0 = .;
+of_scaleAddBL_buff_0 = .;
 . += 0x2400;
 . = 0x44000;
-of_add_w0_cons_buff_0 = .;
+of_addW_cons_buff_0 = .;
 . += 0x2400;
-. = 0x54000;
-of_add_u0_buff_0 = .;
+. = 0x48000;
+of_addW_cons_buff_1 = .;
 . += 0x2400;
 . = 0x50400;
-of_in_main02_cons_buff_0 = .;
-. += 0x2404;
-. = 0x58000;
-in0_0_cons_buff_0 = .;
-. += 0xC0;
+of_addU_buff_0 = .;
+. += 0x2400;
 . = 0x5C000;
-in0_0_cons_buff_1 = .;
-. += 0xC0;
+of_in_l_cons_buff_0 = .;
+. += 0x40;
+. = 0x54000;
+of_in_u_cons_buff_0 = .;
+. += 0x2400;
+. = 0x58000;
+of_in_u_cons_buff_1 = .;
+. += 0x2400;
 /* No tile with memory exists to the north. */
 . = 0x60000;
 . += 0x10000;
 . = 0x70400;
-of_add_uv0_buff_0 = .;
+of_addUV_buff_0 = .;
 . += 0x2400;
 . = 0x74000;
-of_add_v0_cons_buff_0 = .;
+of_addV_cons_buff_0 = .;
 . += 0x2400;
   .bss : { *(.bss*) } > data
 }
