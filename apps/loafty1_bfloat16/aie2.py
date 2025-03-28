@@ -61,19 +61,19 @@ def declaring_kernel_func(out_ty, factor_ty, tile_ty, join_ty, dtype):
     }
 
 def declaring_tiles(n_cols, n_comp):
-    st = [] # Shim Tiles
-    mt = [] # Memory Tiles (currently not used)
-    ct = [] # Compute Tiles
+    ST = [] # Shim Tiles
+    MT = [] # Memory Tiles (currently not used)
+    CT = [] # Compute Tiles
     for i in range(n_cols):
         # Making the shim and mem tiles
-        st.append(tile(i, 0))
-        mt.append(tile(i, 1))
+        ST.append(tile(i, 0))
+        MT.append(tile(i, 1))
         # Making compute tiles
         c = []
         for j in range(n_comp):
             c.append(tile(i, j+2))
-        ct.append(c)
-    return (st, mt, ct)
+        CT.append(c)
+    return (ST, MT, CT)
 
 def loafty(opts):
     # Trace constants
@@ -86,7 +86,7 @@ def loafty(opts):
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 
-    OUT_SIZE = 32
+    OUT_SIZE = 64
     N_LMN = 3 # 3 for l, m and n
     FACTOR_MOVE_SIZE = OUT_SIZE * N_LMN
     FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*N_LMN
@@ -126,22 +126,22 @@ def loafty(opts):
         kernels = declaring_kernel_func(out_ty, factor_ty, main_ct_ty, join_ty, dtype_k)
 
         # Tile declarations
-        st, mt, ct = declaring_tiles(4, 4)
+        ST, MT, CT = declaring_tiles(4, 4)
         
-        mean_tile = ct[1][0]
-        trace_shim_tile = st[1]
+        mean_tile = CT[1][0]
+        trace_shim_tile = ST[1]
         main_compute_tilesA = []
         main_compute_tilesB = []
         for i in COLS:
             for j in ROWS:
-                main_compute_tilesA.append(ct[i][j])
-                main_compute_tilesB.append(ct[i+NCOLS][j])
+                main_compute_tilesA.append(CT[i][j])
+                main_compute_tilesB.append(CT[i+NCOLS][j])
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_factor = object_fifo("in0", st[1], main_compute_tilesA + main_compute_tilesB, 2, factor_ty)
-        of_in_mainA = object_fifo("in1", st[0], mt[0], 2, input_ty)       
-        of_in_mainB = object_fifo("in2", st[3], mt[3], 2, input_ty)
+        of_in_factor = object_fifo("in0", ST[1], main_compute_tilesA + main_compute_tilesB, 2, factor_ty)
+        of_in_mainA = object_fifo("in1", ST[0], MT[0], 2, input_ty)       
+        of_in_mainB = object_fifo("in2", ST[3], MT[3], 2, input_ty)
 
         # Distribution of inputs mainA and mainB
         main_in_fifosA = []
@@ -151,8 +151,8 @@ def loafty(opts):
         for i in COLS:
             for j in ROWS:
                 # Input distribution FIFOs
-                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", mt[0], ct[i][j], 2, main_ct_ty))
-                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", mt[3], ct[i+NCOLS][j], 2, main_ct_ty))
+                main_in_fifosA.append(object_fifo(f"of_in_mainA{i}{j}", MT[0], CT[i][j], 2, main_ct_ty))
+                main_in_fifosB.append(object_fifo(f"of_in_mainB{i+NCOLS}{j}", MT[3], CT[i+NCOLS][j], 2, main_ct_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * MAIN_SIZE)
                 
         object_fifo_link(of_in_mainA, main_in_fifosA, [], main_dist_offsets)
@@ -166,17 +166,17 @@ def loafty(opts):
         for i in COLS:
             for j in ROWS:
                 # Output join FIFOs
-                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", ct[i][j], mt[1], 2, out_ty))
-                main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", ct[i+NCOLS][j], mt[2], 2, out_ty))
+                main_out_fifosA.append(object_fifo(f"of_out_mainA{i}{j}", CT[i][j], MT[1], 2, out_ty))
+                main_out_fifosB.append(object_fifo(f"of_out_mainB{i+NCOLS}{j}", CT[i+NCOLS][j], MT[2], 2, out_ty))
                 main_dist_offsets.append((i*NROWS + j - 1) * OUT_SIZE)
 
-        of_out_mainA = object_fifo("out1", mt[1], mean_tile, 2, join_ty)
-        of_out_mainB = object_fifo("out2", mt[2], mean_tile, 2, join_ty)
+        of_out_mainA = object_fifo("out1", MT[1], mean_tile, 2, join_ty)
+        of_out_mainB = object_fifo("out2", MT[2], mean_tile, 2, join_ty)
         
         object_fifo_link(main_out_fifosA, of_out_mainA, main_dist_offsets, [])
         object_fifo_link(main_out_fifosB, of_out_mainB, main_dist_offsets, [])
 
-        of_out = object_fifo("out", mean_tile, st[1], 2, out_ty)
+        of_out = object_fifo("out", mean_tile, ST[1], 2, out_ty)
 
         # Declaring the cores
 
@@ -204,7 +204,7 @@ def loafty(opts):
                 obf_out_fifoB = main_out_fifosB[index]
 
                 # to only declare cores once
-                cores = [ct[i][j], ct[i+NCOLS][j]]
+                cores = [CT[i][j], CT[i+NCOLS][j]]
                 inFIFOs = [obf_in_fifoA, obf_in_fifoB]
                 outFIFOs = [obf_out_fifoA, obf_out_fifoB]
                 for c in range(NDISTGROUP): # Twice for each distribution group, So GroupA (6) + GroupB (6) = 12

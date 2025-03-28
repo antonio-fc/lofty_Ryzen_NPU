@@ -3,30 +3,30 @@ source_filename = "LLVMDialectModule"
 target datalayout = "e-m:e-p:20:32-i1:8:32-i8:8:32-i16:16:32-i32:32:32-f32:32:32-i64:32-f64:32-a:0:32-n32"
 target triple = "aie2"
 
-@in0_11_cons_buff_1 = external global [96 x bfloat]
-@in0_11_cons_buff_0 = external global [96 x bfloat]
-@in0_10_cons_buff_1 = external global [96 x bfloat]
-@in0_10_cons_buff_0 = external global [96 x bfloat]
-@in0_9_cons_buff_1 = external global [96 x bfloat]
-@in0_9_cons_buff_0 = external global [96 x bfloat]
-@in0_8_cons_buff_1 = external global [96 x bfloat]
-@in0_8_cons_buff_0 = external global [96 x bfloat]
-@in0_7_cons_buff_1 = external global [96 x bfloat]
-@in0_7_cons_buff_0 = external global [96 x bfloat]
-@in0_6_cons_buff_1 = external global [96 x bfloat]
-@in0_6_cons_buff_0 = external global [96 x bfloat]
-@in0_5_cons_buff_1 = external global [96 x bfloat]
-@in0_5_cons_buff_0 = external global [96 x bfloat]
-@in0_4_cons_buff_1 = external global [96 x bfloat]
-@in0_4_cons_buff_0 = external global [96 x bfloat]
-@in0_3_cons_buff_1 = external global [96 x bfloat]
-@in0_3_cons_buff_0 = external global [96 x bfloat]
-@in0_2_cons_buff_1 = external global [96 x bfloat]
-@in0_2_cons_buff_0 = external global [96 x bfloat]
-@in0_1_cons_buff_1 = external global [96 x bfloat]
-@in0_1_cons_buff_0 = external global [96 x bfloat]
-@in0_0_cons_buff_1 = external global [96 x bfloat]
-@in0_0_cons_buff_0 = external global [96 x bfloat]
+@in0_11_cons_buff_1 = external global [192 x bfloat]
+@in0_11_cons_buff_0 = external global [192 x bfloat]
+@in0_10_cons_buff_1 = external global [192 x bfloat]
+@in0_10_cons_buff_0 = external global [192 x bfloat]
+@in0_9_cons_buff_1 = external global [192 x bfloat]
+@in0_9_cons_buff_0 = external global [192 x bfloat]
+@in0_8_cons_buff_1 = external global [192 x bfloat]
+@in0_8_cons_buff_0 = external global [192 x bfloat]
+@in0_7_cons_buff_1 = external global [192 x bfloat]
+@in0_7_cons_buff_0 = external global [192 x bfloat]
+@in0_6_cons_buff_1 = external global [192 x bfloat]
+@in0_6_cons_buff_0 = external global [192 x bfloat]
+@in0_5_cons_buff_1 = external global [192 x bfloat]
+@in0_5_cons_buff_0 = external global [192 x bfloat]
+@in0_4_cons_buff_1 = external global [192 x bfloat]
+@in0_4_cons_buff_0 = external global [192 x bfloat]
+@in0_3_cons_buff_1 = external global [192 x bfloat]
+@in0_3_cons_buff_0 = external global [192 x bfloat]
+@in0_2_cons_buff_1 = external global [192 x bfloat]
+@in0_2_cons_buff_0 = external global [192 x bfloat]
+@in0_1_cons_buff_1 = external global [192 x bfloat]
+@in0_1_cons_buff_0 = external global [192 x bfloat]
+@in0_0_cons_buff_1 = external global [192 x bfloat]
+@in0_0_cons_buff_0 = external global [192 x bfloat]
 @of_in_mainA01_cons_buff_5 = external global [768 x bfloat]
 @of_in_mainA01_cons_buff_4 = external global [768 x bfloat]
 @of_in_mainA01_cons_buff_3 = external global [768 x bfloat]
@@ -99,36 +99,36 @@ target triple = "aie2"
 @of_in_mainB33_cons_buff_2 = external global [768 x bfloat]
 @of_in_mainB33_cons_buff_1 = external global [768 x bfloat]
 @of_in_mainB33_cons_buff_0 = external global [768 x bfloat]
-@of_out_mainA01_buff_1 = external global [32 x bfloat]
-@of_out_mainA01_buff_0 = external global [32 x bfloat]
-@of_out_mainB21_buff_1 = external global [32 x bfloat]
-@of_out_mainB21_buff_0 = external global [32 x bfloat]
-@of_out_mainA02_buff_1 = external global [32 x bfloat]
-@of_out_mainA02_buff_0 = external global [32 x bfloat]
-@of_out_mainB22_buff_1 = external global [32 x bfloat]
-@of_out_mainB22_buff_0 = external global [32 x bfloat]
-@of_out_mainA03_buff_1 = external global [32 x bfloat]
-@of_out_mainA03_buff_0 = external global [32 x bfloat]
-@of_out_mainB23_buff_1 = external global [32 x bfloat]
-@of_out_mainB23_buff_0 = external global [32 x bfloat]
-@of_out_mainA11_buff_1 = external global [32 x bfloat]
-@of_out_mainA11_buff_0 = external global [32 x bfloat]
-@of_out_mainB31_buff_1 = external global [32 x bfloat]
-@of_out_mainB31_buff_0 = external global [32 x bfloat]
-@of_out_mainA12_buff_1 = external global [32 x bfloat]
-@of_out_mainA12_buff_0 = external global [32 x bfloat]
-@of_out_mainB32_buff_1 = external global [32 x bfloat]
-@of_out_mainB32_buff_0 = external global [32 x bfloat]
-@of_out_mainA13_buff_1 = external global [32 x bfloat]
-@of_out_mainA13_buff_0 = external global [32 x bfloat]
-@of_out_mainB33_buff_1 = external global [32 x bfloat]
-@of_out_mainB33_buff_0 = external global [32 x bfloat]
-@out1_cons_buff_1 = external global [192 x bfloat]
-@out1_cons_buff_0 = external global [192 x bfloat]
-@out2_cons_buff_1 = external global [192 x bfloat]
-@out2_cons_buff_0 = external global [192 x bfloat]
-@out_buff_1 = external global [32 x bfloat]
-@out_buff_0 = external global [32 x bfloat]
+@of_out_mainA01_buff_1 = external global [64 x bfloat]
+@of_out_mainA01_buff_0 = external global [64 x bfloat]
+@of_out_mainB21_buff_1 = external global [64 x bfloat]
+@of_out_mainB21_buff_0 = external global [64 x bfloat]
+@of_out_mainA02_buff_1 = external global [64 x bfloat]
+@of_out_mainA02_buff_0 = external global [64 x bfloat]
+@of_out_mainB22_buff_1 = external global [64 x bfloat]
+@of_out_mainB22_buff_0 = external global [64 x bfloat]
+@of_out_mainA03_buff_1 = external global [64 x bfloat]
+@of_out_mainA03_buff_0 = external global [64 x bfloat]
+@of_out_mainB23_buff_1 = external global [64 x bfloat]
+@of_out_mainB23_buff_0 = external global [64 x bfloat]
+@of_out_mainA11_buff_1 = external global [64 x bfloat]
+@of_out_mainA11_buff_0 = external global [64 x bfloat]
+@of_out_mainB31_buff_1 = external global [64 x bfloat]
+@of_out_mainB31_buff_0 = external global [64 x bfloat]
+@of_out_mainA12_buff_1 = external global [64 x bfloat]
+@of_out_mainA12_buff_0 = external global [64 x bfloat]
+@of_out_mainB32_buff_1 = external global [64 x bfloat]
+@of_out_mainB32_buff_0 = external global [64 x bfloat]
+@of_out_mainA13_buff_1 = external global [64 x bfloat]
+@of_out_mainA13_buff_0 = external global [64 x bfloat]
+@of_out_mainB33_buff_1 = external global [64 x bfloat]
+@of_out_mainB33_buff_0 = external global [64 x bfloat]
+@out1_cons_buff_1 = external global [384 x bfloat]
+@out1_cons_buff_0 = external global [384 x bfloat]
+@out2_cons_buff_1 = external global [384 x bfloat]
+@out2_cons_buff_0 = external global [384 x bfloat]
+@out_buff_1 = external global [64 x bfloat]
+@out_buff_0 = external global [64 x bfloat]
 
 ; Function Attrs: nounwind
 declare void @llvm.aie2.acquire(i32, i32) #0
@@ -252,7 +252,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -364,7 +364,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -476,7 +476,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -588,7 +588,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -700,7 +700,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -812,7 +812,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -929,7 +929,7 @@ define void @core_3_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -1049,7 +1049,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -1161,7 +1161,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -1273,7 +1273,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -1385,7 +1385,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -1497,7 +1497,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -1609,7 +1609,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -1726,7 +1726,7 @@ define void @core_1_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -1846,7 +1846,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -1958,7 +1958,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -2070,7 +2070,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -2182,7 +2182,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -2294,7 +2294,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -2406,7 +2406,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -2523,7 +2523,7 @@ define void @core_3_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -2643,7 +2643,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -2755,7 +2755,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -2867,7 +2867,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -2979,7 +2979,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -3091,7 +3091,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -3203,7 +3203,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -3320,7 +3320,7 @@ define void @core_1_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -3440,7 +3440,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -3552,7 +3552,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -3664,7 +3664,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -3776,7 +3776,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -3888,7 +3888,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -4000,7 +4000,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -4117,7 +4117,7 @@ define void @core_3_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -4237,7 +4237,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -4349,7 +4349,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -4461,7 +4461,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -4573,7 +4573,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -4685,7 +4685,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -4797,7 +4797,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -4914,7 +4914,7 @@ define void @core_1_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -5034,7 +5034,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -5146,7 +5146,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -5258,7 +5258,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -5370,7 +5370,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -5482,7 +5482,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -5594,7 +5594,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -5711,7 +5711,7 @@ define void @core_2_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -5831,7 +5831,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -5943,7 +5943,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -6055,7 +6055,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -6167,7 +6167,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -6279,7 +6279,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -6391,7 +6391,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -6508,7 +6508,7 @@ define void @core_0_5() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -6628,7 +6628,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -6740,7 +6740,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -6852,7 +6852,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -6964,7 +6964,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -7076,7 +7076,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -7188,7 +7188,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -7305,7 +7305,7 @@ define void @core_2_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -7425,7 +7425,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -7537,7 +7537,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -7649,7 +7649,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -7761,7 +7761,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -7873,7 +7873,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -7985,7 +7985,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -8102,7 +8102,7 @@ define void @core_0_4() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -8222,7 +8222,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -8334,7 +8334,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -8446,7 +8446,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -8558,7 +8558,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -8670,7 +8670,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -8782,7 +8782,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -8899,7 +8899,7 @@ define void @core_2_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -9019,7 +9019,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %7 = add nuw nsw i64 %5, 8
-  %8 = icmp ult i64 %6, 510
+  %8 = icmp ult i64 %6, 254
   br i1 %8, label %4, label %9
 
 9:                                                ; preds = %4
@@ -9131,7 +9131,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %14 = add nuw nsw i64 %12, 8
-  %15 = icmp ult i64 %13, 510
+  %15 = icmp ult i64 %13, 254
   br i1 %15, label %11, label %16
 
 16:                                               ; preds = %11
@@ -9243,7 +9243,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %21 = add nuw nsw i64 %19, 8
-  %22 = icmp ult i64 %20, 510
+  %22 = icmp ult i64 %20, 254
   br i1 %22, label %18, label %23
 
 23:                                               ; preds = %18
@@ -9355,7 +9355,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %28 = add nuw nsw i64 %26, 8
-  %29 = icmp ult i64 %27, 510
+  %29 = icmp ult i64 %27, 254
   br i1 %29, label %25, label %30
 
 30:                                               ; preds = %25
@@ -9467,7 +9467,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %35 = add nuw nsw i64 %33, 8
-  %36 = icmp ult i64 %34, 510
+  %36 = icmp ult i64 %34, 254
   br i1 %36, label %32, label %37
 
 37:                                               ; preds = %32
@@ -9579,7 +9579,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %42 = add nuw nsw i64 %40, 8
-  %43 = icmp ult i64 %41, 510
+  %43 = icmp ult i64 %41, 254
   br i1 %43, label %39, label %44
 
 44:                                               ; preds = %39
@@ -9696,7 +9696,7 @@ define void @core_0_3() local_unnamed_addr {
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   %51 = add nuw nsw i64 %49, 8
-  %52 = icmp ult i64 %50, 510
+  %52 = icmp ult i64 %50, 254
   br i1 %52, label %48, label %53
 
 53:                                               ; preds = %48
@@ -9719,7 +9719,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9729,7 +9729,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9739,7 +9739,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9749,7 +9749,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9759,7 +9759,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9769,7 +9769,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9780,7 +9780,7 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_0, ptr nonnull @out2_cons_buff_0, ptr nonnull @out_buff_0, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
@@ -9790,12 +9790,12 @@ define void @core_1_2() local_unnamed_addr {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
-  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 32)
+  tail call void @mean(ptr nonnull @out1_cons_buff_1, ptr nonnull @out2_cons_buff_1, ptr nonnull @out_buff_1, i32 64)
   tail call void @llvm.aie2.release(i32 53, i32 1)
   tail call void @llvm.aie2.release(i32 48, i32 1)
   tail call void @llvm.aie2.release(i32 50, i32 1)
   %5 = add nuw nsw i64 %3, 8
-  %6 = icmp ult i64 %4, 510
+  %6 = icmp ult i64 %4, 254
   br i1 %6, label %2, label %7
 
 7:                                                ; preds = %2

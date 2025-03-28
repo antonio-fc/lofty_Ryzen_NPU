@@ -8,16 +8,16 @@ const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
 const int CV = 32; // consecutive lmn values
 
-aie::vector<bfloat16, VEC_SIZE> sin_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
+aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
-        auto bitmap0 = aie::broadcast<uint16, VEC_SIZE>(0x8000);
+        auto bitmap0 = aie::broadcast<uint16, 32>(0x8000);
         auto final_sign = aie::bit_and(input_vec.cast_to<uint16>(), bitmap0); // Obtaining the sign bit, inputs must be uint32 for some reason
         auto scaled_vec = aie::mul(inputs, FACTOR);
         auto resultSin = getSinbFloat16(scaled_vec); // calling function for cos (calling the lut)
         return aie::bit_xor(resultSin.cast_to<uint16>(), final_sign).cast_to<bfloat16>(); // Negating the result for negative angles
 }
 
-aie::vector<bfloat16, VEC_SIZE> cos_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
+aie::vector<bfloat16, 32> cos_bfloat16(aie::vector<bfloat16, 32> input_vec) {
     auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
     auto scaled_vec = aie::mul(inputs, FACTOR);
     return getCosbFloat16(scaled_vec); // calling function for cos (calling the lut)
@@ -40,19 +40,31 @@ void main_kernel(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N, uint3
             auto vis1 = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
 
             // Scale
-            auto scaleInput0 = aie::mul(input0, freq);
-            auto scaleInput1 = aie::mul(input1, freq);
+            auto scaleInput0 = aie::mul(input0, freq).to_vector<bfloat16>();
+            auto scaleInput1 = aie::mul(input1, freq).to_vector<bfloat16>();
 
             // Apply the trig op
             aie::vector<bfloat16, VEC_SIZE> trig0;
             aie::vector<bfloat16, VEC_SIZE> trig1;
 
             if (trig == 0) { // applying cosine
-                trig0 = cos_bfloat16(scaleInput0);
-                trig1 = cos_bfloat16(scaleInput1);
+                auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
+                auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
+                auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
+                auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
+                trig0 = aie::concat(trig0A, trig0B);
+                trig1 = aie::concat(trig1A, trig1B);
+                // trig0 = cos_bfloat16(scaleInput0);
+                // trig1 = cos_bfloat16(scaleInput1);
             } else { // applying sine
-                trig0 = sin_bfloat16(scaleInput0);
-                trig1 = sin_bfloat16(scaleInput1);
+                auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
+                auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
+                auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
+                auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
+                trig0 = aie::concat(trig0A, trig0B);
+                trig1 = aie::concat(trig1A, trig1B);
+                // trig0 = sin_bfloat16(scaleInput0);
+                // trig1 = sin_bfloat16(scaleInput1);
             }
 
             // Multiplying by vis

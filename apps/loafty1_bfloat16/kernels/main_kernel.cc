@@ -6,18 +6,19 @@ const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
-const int CV = 32; // consecutive lmn values
+const int CV = 64; // consecutive lmn values
+const int VEC_SIZE = 32;
 
-aie::vector<bfloat16, VEC_SIZE> sin_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
+aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
-        auto bitmap0 = aie::broadcast<uint16, VEC_SIZE>(0x8000);
+        auto bitmap0 = aie::broadcast<uint16, 32>(0x8000);
         auto final_sign = aie::bit_and(input_vec.cast_to<uint16>(), bitmap0); // Obtaining the sign bit, inputs must be uint32 for some reason
         auto scaled_vec = aie::mul(inputs, FACTOR);
         auto resultSin = getSinbFloat16(scaled_vec); // calling function for cos (calling the lut)
         return aie::bit_xor(resultSin.cast_to<uint16>(), final_sign).cast_to<bfloat16>(); // Negating the result for negative angles
 }
 
-aie::vector<bfloat16, VEC_SIZE> cos_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
+aie::vector<bfloat16, 32> cos_bfloat16(aie::vector<bfloat16, 32> input_vec) {
     auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
     auto scaled_vec = aie::mul(inputs, FACTOR);
     return getCosbFloat16(scaled_vec); // calling function for cos (calling the lut)
@@ -56,12 +57,12 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
             auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
-            // Trig
+            // Trig<bfloat16>()
             auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
             auto sin = sin_bfloat16(A);
 
             // Mult with visibilities and subtract
-            auto vecR = aie::load_v<VEC_SIZE>(visR + i);
+             auto vecR = aie::load_v<VEC_SIZE>(visR + i);
             auto vecC = aie::load_v<VEC_SIZE>(visC + i);
             auto R = aie::mul(cos, vecR);
             auto C = aie::mul(sin, vecC);

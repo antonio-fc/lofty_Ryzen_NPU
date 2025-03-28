@@ -222,7 +222,7 @@ def main(opts):
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
 
-    CV = 32 # number of consecutive values in output stream
+    CV = 64 # number of consecutive values in output stream
     N_LMN = 3 # one for each l, m and n, just to avoid "magic numbers in code"
     
     INOUT0_VOLUME = MSIZE

@@ -2,30 +2,30 @@
 source_filename = "LLVMDialectModule"
 target triple = "aie2"
 
-@in0_11_cons_buff_1 = external global [96 x bfloat]
-@in0_11_cons_buff_0 = external global [96 x bfloat]
-@in0_10_cons_buff_1 = external global [96 x bfloat]
-@in0_10_cons_buff_0 = external global [96 x bfloat]
-@in0_9_cons_buff_1 = external global [96 x bfloat]
-@in0_9_cons_buff_0 = external global [96 x bfloat]
-@in0_8_cons_buff_1 = external global [96 x bfloat]
-@in0_8_cons_buff_0 = external global [96 x bfloat]
-@in0_7_cons_buff_1 = external global [96 x bfloat]
-@in0_7_cons_buff_0 = external global [96 x bfloat]
-@in0_6_cons_buff_1 = external global [96 x bfloat]
-@in0_6_cons_buff_0 = external global [96 x bfloat]
-@in0_5_cons_buff_1 = external global [96 x bfloat]
-@in0_5_cons_buff_0 = external global [96 x bfloat]
-@in0_4_cons_buff_1 = external global [96 x bfloat]
-@in0_4_cons_buff_0 = external global [96 x bfloat]
-@in0_3_cons_buff_1 = external global [96 x bfloat]
-@in0_3_cons_buff_0 = external global [96 x bfloat]
-@in0_2_cons_buff_1 = external global [96 x bfloat]
-@in0_2_cons_buff_0 = external global [96 x bfloat]
-@in0_1_cons_buff_1 = external global [96 x bfloat]
-@in0_1_cons_buff_0 = external global [96 x bfloat]
-@in0_0_cons_buff_1 = external global [96 x bfloat]
-@in0_0_cons_buff_0 = external global [96 x bfloat]
+@in0_11_cons_buff_1 = external global [192 x bfloat]
+@in0_11_cons_buff_0 = external global [192 x bfloat]
+@in0_10_cons_buff_1 = external global [192 x bfloat]
+@in0_10_cons_buff_0 = external global [192 x bfloat]
+@in0_9_cons_buff_1 = external global [192 x bfloat]
+@in0_9_cons_buff_0 = external global [192 x bfloat]
+@in0_8_cons_buff_1 = external global [192 x bfloat]
+@in0_8_cons_buff_0 = external global [192 x bfloat]
+@in0_7_cons_buff_1 = external global [192 x bfloat]
+@in0_7_cons_buff_0 = external global [192 x bfloat]
+@in0_6_cons_buff_1 = external global [192 x bfloat]
+@in0_6_cons_buff_0 = external global [192 x bfloat]
+@in0_5_cons_buff_1 = external global [192 x bfloat]
+@in0_5_cons_buff_0 = external global [192 x bfloat]
+@in0_4_cons_buff_1 = external global [192 x bfloat]
+@in0_4_cons_buff_0 = external global [192 x bfloat]
+@in0_3_cons_buff_1 = external global [192 x bfloat]
+@in0_3_cons_buff_0 = external global [192 x bfloat]
+@in0_2_cons_buff_1 = external global [192 x bfloat]
+@in0_2_cons_buff_0 = external global [192 x bfloat]
+@in0_1_cons_buff_1 = external global [192 x bfloat]
+@in0_1_cons_buff_0 = external global [192 x bfloat]
+@in0_0_cons_buff_1 = external global [192 x bfloat]
+@in0_0_cons_buff_0 = external global [192 x bfloat]
 @in1_cons_buff_1 = external global [4608 x bfloat]
 @in1_cons_buff_0 = external global [4608 x bfloat]
 @in2_cons_buff_1 = external global [4608 x bfloat]
@@ -102,70 +102,70 @@ target triple = "aie2"
 @of_in_mainB33_cons_buff_2 = external global [768 x bfloat]
 @of_in_mainB33_cons_buff_1 = external global [768 x bfloat]
 @of_in_mainB33_cons_buff_0 = external global [768 x bfloat]
-@of_out_mainA01_buff_1 = external global [32 x bfloat]
-@of_out_mainA01_buff_0 = external global [32 x bfloat]
-@of_out_mainB21_buff_1 = external global [32 x bfloat]
-@of_out_mainB21_buff_0 = external global [32 x bfloat]
-@of_out_mainA02_buff_1 = external global [32 x bfloat]
-@of_out_mainA02_buff_0 = external global [32 x bfloat]
-@of_out_mainB22_buff_1 = external global [32 x bfloat]
-@of_out_mainB22_buff_0 = external global [32 x bfloat]
-@of_out_mainA03_buff_1 = external global [32 x bfloat]
-@of_out_mainA03_buff_0 = external global [32 x bfloat]
-@of_out_mainB23_buff_1 = external global [32 x bfloat]
-@of_out_mainB23_buff_0 = external global [32 x bfloat]
-@of_out_mainA11_buff_1 = external global [32 x bfloat]
-@of_out_mainA11_buff_0 = external global [32 x bfloat]
-@of_out_mainB31_buff_1 = external global [32 x bfloat]
-@of_out_mainB31_buff_0 = external global [32 x bfloat]
-@of_out_mainA12_buff_1 = external global [32 x bfloat]
-@of_out_mainA12_buff_0 = external global [32 x bfloat]
-@of_out_mainB32_buff_1 = external global [32 x bfloat]
-@of_out_mainB32_buff_0 = external global [32 x bfloat]
-@of_out_mainA13_buff_1 = external global [32 x bfloat]
-@of_out_mainA13_buff_0 = external global [32 x bfloat]
-@of_out_mainB33_buff_1 = external global [32 x bfloat]
-@of_out_mainB33_buff_0 = external global [32 x bfloat]
-@out1_buff_1 = external global [192 x bfloat]
-@out1_buff_0 = external global [192 x bfloat]
-@out1_cons_buff_1 = external global [192 x bfloat]
-@out1_cons_buff_0 = external global [192 x bfloat]
-@out2_buff_1 = external global [192 x bfloat]
-@out2_buff_0 = external global [192 x bfloat]
-@out2_cons_buff_1 = external global [192 x bfloat]
-@out2_cons_buff_0 = external global [192 x bfloat]
-@out_buff_1 = external global [32 x bfloat]
-@out_buff_0 = external global [32 x bfloat]
-@out_cons = external global [32 x bfloat]
-@out = external global [32 x bfloat]
-@out2_cons = external global [192 x bfloat]
-@out2 = external global [192 x bfloat]
-@out1_cons = external global [192 x bfloat]
-@out1 = external global [192 x bfloat]
-@of_out_mainB33_cons = external global [32 x bfloat]
-@of_out_mainB33 = external global [32 x bfloat]
-@of_out_mainA13_cons = external global [32 x bfloat]
-@of_out_mainA13 = external global [32 x bfloat]
-@of_out_mainB32_cons = external global [32 x bfloat]
-@of_out_mainB32 = external global [32 x bfloat]
-@of_out_mainA12_cons = external global [32 x bfloat]
-@of_out_mainA12 = external global [32 x bfloat]
-@of_out_mainB31_cons = external global [32 x bfloat]
-@of_out_mainB31 = external global [32 x bfloat]
-@of_out_mainA11_cons = external global [32 x bfloat]
-@of_out_mainA11 = external global [32 x bfloat]
-@of_out_mainB23_cons = external global [32 x bfloat]
-@of_out_mainB23 = external global [32 x bfloat]
-@of_out_mainA03_cons = external global [32 x bfloat]
-@of_out_mainA03 = external global [32 x bfloat]
-@of_out_mainB22_cons = external global [32 x bfloat]
-@of_out_mainB22 = external global [32 x bfloat]
-@of_out_mainA02_cons = external global [32 x bfloat]
-@of_out_mainA02 = external global [32 x bfloat]
-@of_out_mainB21_cons = external global [32 x bfloat]
-@of_out_mainB21 = external global [32 x bfloat]
-@of_out_mainA01_cons = external global [32 x bfloat]
-@of_out_mainA01 = external global [32 x bfloat]
+@of_out_mainA01_buff_1 = external global [64 x bfloat]
+@of_out_mainA01_buff_0 = external global [64 x bfloat]
+@of_out_mainB21_buff_1 = external global [64 x bfloat]
+@of_out_mainB21_buff_0 = external global [64 x bfloat]
+@of_out_mainA02_buff_1 = external global [64 x bfloat]
+@of_out_mainA02_buff_0 = external global [64 x bfloat]
+@of_out_mainB22_buff_1 = external global [64 x bfloat]
+@of_out_mainB22_buff_0 = external global [64 x bfloat]
+@of_out_mainA03_buff_1 = external global [64 x bfloat]
+@of_out_mainA03_buff_0 = external global [64 x bfloat]
+@of_out_mainB23_buff_1 = external global [64 x bfloat]
+@of_out_mainB23_buff_0 = external global [64 x bfloat]
+@of_out_mainA11_buff_1 = external global [64 x bfloat]
+@of_out_mainA11_buff_0 = external global [64 x bfloat]
+@of_out_mainB31_buff_1 = external global [64 x bfloat]
+@of_out_mainB31_buff_0 = external global [64 x bfloat]
+@of_out_mainA12_buff_1 = external global [64 x bfloat]
+@of_out_mainA12_buff_0 = external global [64 x bfloat]
+@of_out_mainB32_buff_1 = external global [64 x bfloat]
+@of_out_mainB32_buff_0 = external global [64 x bfloat]
+@of_out_mainA13_buff_1 = external global [64 x bfloat]
+@of_out_mainA13_buff_0 = external global [64 x bfloat]
+@of_out_mainB33_buff_1 = external global [64 x bfloat]
+@of_out_mainB33_buff_0 = external global [64 x bfloat]
+@out1_buff_1 = external global [384 x bfloat]
+@out1_buff_0 = external global [384 x bfloat]
+@out1_cons_buff_1 = external global [384 x bfloat]
+@out1_cons_buff_0 = external global [384 x bfloat]
+@out2_buff_1 = external global [384 x bfloat]
+@out2_buff_0 = external global [384 x bfloat]
+@out2_cons_buff_1 = external global [384 x bfloat]
+@out2_cons_buff_0 = external global [384 x bfloat]
+@out_buff_1 = external global [64 x bfloat]
+@out_buff_0 = external global [64 x bfloat]
+@out_cons = external global [64 x bfloat]
+@out = external global [64 x bfloat]
+@out2_cons = external global [384 x bfloat]
+@out2 = external global [384 x bfloat]
+@out1_cons = external global [384 x bfloat]
+@out1 = external global [384 x bfloat]
+@of_out_mainB33_cons = external global [64 x bfloat]
+@of_out_mainB33 = external global [64 x bfloat]
+@of_out_mainA13_cons = external global [64 x bfloat]
+@of_out_mainA13 = external global [64 x bfloat]
+@of_out_mainB32_cons = external global [64 x bfloat]
+@of_out_mainB32 = external global [64 x bfloat]
+@of_out_mainA12_cons = external global [64 x bfloat]
+@of_out_mainA12 = external global [64 x bfloat]
+@of_out_mainB31_cons = external global [64 x bfloat]
+@of_out_mainB31 = external global [64 x bfloat]
+@of_out_mainA11_cons = external global [64 x bfloat]
+@of_out_mainA11 = external global [64 x bfloat]
+@of_out_mainB23_cons = external global [64 x bfloat]
+@of_out_mainB23 = external global [64 x bfloat]
+@of_out_mainA03_cons = external global [64 x bfloat]
+@of_out_mainA03 = external global [64 x bfloat]
+@of_out_mainB22_cons = external global [64 x bfloat]
+@of_out_mainB22 = external global [64 x bfloat]
+@of_out_mainA02_cons = external global [64 x bfloat]
+@of_out_mainA02 = external global [64 x bfloat]
+@of_out_mainB21_cons = external global [64 x bfloat]
+@of_out_mainB21 = external global [64 x bfloat]
+@of_out_mainA01_cons = external global [64 x bfloat]
+@of_out_mainA01 = external global [64 x bfloat]
 @of_in_mainB33_cons = external global [768 x bfloat]
 @of_in_mainB33 = external global [768 x bfloat]
 @of_in_mainA13_cons = external global [768 x bfloat]
@@ -194,19 +194,19 @@ target triple = "aie2"
 @in2 = external global [4608 x bfloat]
 @in1_cons = external global [4608 x bfloat]
 @in1 = external global [4608 x bfloat]
-@in0_0_cons = external global [96 x bfloat]
-@in0_1_cons = external global [96 x bfloat]
-@in0_2_cons = external global [96 x bfloat]
-@in0_3_cons = external global [96 x bfloat]
-@in0_4_cons = external global [96 x bfloat]
-@in0_5_cons = external global [96 x bfloat]
-@in0_6_cons = external global [96 x bfloat]
-@in0_7_cons = external global [96 x bfloat]
-@in0_8_cons = external global [96 x bfloat]
-@in0_9_cons = external global [96 x bfloat]
-@in0_10_cons = external global [96 x bfloat]
-@in0_11_cons = external global [96 x bfloat]
-@in0 = external global [96 x bfloat]
+@in0_0_cons = external global [192 x bfloat]
+@in0_1_cons = external global [192 x bfloat]
+@in0_2_cons = external global [192 x bfloat]
+@in0_3_cons = external global [192 x bfloat]
+@in0_4_cons = external global [192 x bfloat]
+@in0_5_cons = external global [192 x bfloat]
+@in0_6_cons = external global [192 x bfloat]
+@in0_7_cons = external global [192 x bfloat]
+@in0_8_cons = external global [192 x bfloat]
+@in0_9_cons = external global [192 x bfloat]
+@in0_10_cons = external global [192 x bfloat]
+@in0_11_cons = external global [192 x bfloat]
+@in0 = external global [192 x bfloat]
 
 declare void @debug_i32(i32)
 
@@ -246,7 +246,7 @@ define void @core_3_5() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -288,7 +288,7 @@ define void @core_3_5() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -330,7 +330,7 @@ define void @core_3_5() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -372,7 +372,7 @@ define void @core_3_5() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -414,7 +414,7 @@ define void @core_3_5() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -456,7 +456,7 @@ define void @core_3_5() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -502,7 +502,7 @@ define void @core_3_5() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -556,7 +556,7 @@ define void @core_1_5() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -598,7 +598,7 @@ define void @core_1_5() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -640,7 +640,7 @@ define void @core_1_5() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -682,7 +682,7 @@ define void @core_1_5() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -724,7 +724,7 @@ define void @core_1_5() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -766,7 +766,7 @@ define void @core_1_5() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -812,7 +812,7 @@ define void @core_1_5() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -866,7 +866,7 @@ define void @core_3_4() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -908,7 +908,7 @@ define void @core_3_4() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -950,7 +950,7 @@ define void @core_3_4() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -992,7 +992,7 @@ define void @core_3_4() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -1034,7 +1034,7 @@ define void @core_3_4() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -1076,7 +1076,7 @@ define void @core_3_4() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -1122,7 +1122,7 @@ define void @core_3_4() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -1176,7 +1176,7 @@ define void @core_1_4() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -1218,7 +1218,7 @@ define void @core_1_4() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -1260,7 +1260,7 @@ define void @core_1_4() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -1302,7 +1302,7 @@ define void @core_1_4() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -1344,7 +1344,7 @@ define void @core_1_4() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -1386,7 +1386,7 @@ define void @core_1_4() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -1432,7 +1432,7 @@ define void @core_1_4() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -1486,7 +1486,7 @@ define void @core_3_3() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -1528,7 +1528,7 @@ define void @core_3_3() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -1570,7 +1570,7 @@ define void @core_3_3() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -1612,7 +1612,7 @@ define void @core_3_3() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -1654,7 +1654,7 @@ define void @core_3_3() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -1696,7 +1696,7 @@ define void @core_3_3() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -1742,7 +1742,7 @@ define void @core_3_3() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -1796,7 +1796,7 @@ define void @core_1_3() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -1838,7 +1838,7 @@ define void @core_1_3() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -1880,7 +1880,7 @@ define void @core_1_3() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -1922,7 +1922,7 @@ define void @core_1_3() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -1964,7 +1964,7 @@ define void @core_1_3() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -2006,7 +2006,7 @@ define void @core_1_3() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -2052,7 +2052,7 @@ define void @core_1_3() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -2106,7 +2106,7 @@ define void @core_2_5() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -2148,7 +2148,7 @@ define void @core_2_5() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -2190,7 +2190,7 @@ define void @core_2_5() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -2232,7 +2232,7 @@ define void @core_2_5() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -2274,7 +2274,7 @@ define void @core_2_5() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -2316,7 +2316,7 @@ define void @core_2_5() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -2362,7 +2362,7 @@ define void @core_2_5() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -2416,7 +2416,7 @@ define void @core_0_5() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -2458,7 +2458,7 @@ define void @core_0_5() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -2500,7 +2500,7 @@ define void @core_0_5() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -2542,7 +2542,7 @@ define void @core_0_5() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -2584,7 +2584,7 @@ define void @core_0_5() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -2626,7 +2626,7 @@ define void @core_0_5() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -2672,7 +2672,7 @@ define void @core_0_5() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -2726,7 +2726,7 @@ define void @core_2_4() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -2768,7 +2768,7 @@ define void @core_2_4() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -2810,7 +2810,7 @@ define void @core_2_4() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -2852,7 +2852,7 @@ define void @core_2_4() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -2894,7 +2894,7 @@ define void @core_2_4() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -2936,7 +2936,7 @@ define void @core_2_4() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -2982,7 +2982,7 @@ define void @core_2_4() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -3036,7 +3036,7 @@ define void @core_0_4() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -3078,7 +3078,7 @@ define void @core_0_4() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -3120,7 +3120,7 @@ define void @core_0_4() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -3162,7 +3162,7 @@ define void @core_0_4() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -3204,7 +3204,7 @@ define void @core_0_4() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -3246,7 +3246,7 @@ define void @core_0_4() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -3292,7 +3292,7 @@ define void @core_0_4() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -3346,7 +3346,7 @@ define void @core_2_3() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -3388,7 +3388,7 @@ define void @core_2_3() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -3430,7 +3430,7 @@ define void @core_2_3() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -3472,7 +3472,7 @@ define void @core_2_3() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -3514,7 +3514,7 @@ define void @core_2_3() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -3556,7 +3556,7 @@ define void @core_2_3() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -3602,7 +3602,7 @@ define void @core_2_3() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -3656,7 +3656,7 @@ define void @core_0_3() {
 
 6:                                                ; preds = %9, %4
   %7 = phi i64 [ %10, %9 ], [ 0, %4 ]
-  %8 = icmp slt i64 %7, 512
+  %8 = icmp slt i64 %7, 256
   br i1 %8, label %9, label %11
 
 9:                                                ; preds = %6
@@ -3698,7 +3698,7 @@ define void @core_0_3() {
 
 13:                                               ; preds = %16, %11
   %14 = phi i64 [ %17, %16 ], [ 0, %11 ]
-  %15 = icmp slt i64 %14, 512
+  %15 = icmp slt i64 %14, 256
   br i1 %15, label %16, label %18
 
 16:                                               ; preds = %13
@@ -3740,7 +3740,7 @@ define void @core_0_3() {
 
 20:                                               ; preds = %23, %18
   %21 = phi i64 [ %24, %23 ], [ 0, %18 ]
-  %22 = icmp slt i64 %21, 512
+  %22 = icmp slt i64 %21, 256
   br i1 %22, label %23, label %25
 
 23:                                               ; preds = %20
@@ -3782,7 +3782,7 @@ define void @core_0_3() {
 
 27:                                               ; preds = %30, %25
   %28 = phi i64 [ %31, %30 ], [ 0, %25 ]
-  %29 = icmp slt i64 %28, 512
+  %29 = icmp slt i64 %28, 256
   br i1 %29, label %30, label %32
 
 30:                                               ; preds = %27
@@ -3824,7 +3824,7 @@ define void @core_0_3() {
 
 34:                                               ; preds = %37, %32
   %35 = phi i64 [ %38, %37 ], [ 0, %32 ]
-  %36 = icmp slt i64 %35, 512
+  %36 = icmp slt i64 %35, 256
   br i1 %36, label %37, label %39
 
 37:                                               ; preds = %34
@@ -3866,7 +3866,7 @@ define void @core_0_3() {
 
 41:                                               ; preds = %44, %39
   %42 = phi i64 [ %45, %44 ], [ 0, %39 ]
-  %43 = icmp slt i64 %42, 512
+  %43 = icmp slt i64 %42, 256
   br i1 %43, label %44, label %46
 
 44:                                               ; preds = %41
@@ -3912,7 +3912,7 @@ define void @core_0_3() {
 
 50:                                               ; preds = %53, %48
   %51 = phi i64 [ %54, %53 ], [ 0, %48 ]
-  %52 = icmp slt i64 %51, 512
+  %52 = icmp slt i64 %51, 256
   br i1 %52, label %53, label %55
 
 53:                                               ; preds = %50
@@ -3958,7 +3958,7 @@ define void @core_1_2() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 512
+  %6 = icmp slt i64 %5, 256
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -3968,7 +3968,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_0, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_0, i64 32) ]
-  call void @mean(ptr @out1_cons_buff_0, ptr @out2_cons_buff_0, ptr @out_buff_0, i32 32)
+  call void @mean(ptr @out1_cons_buff_0, ptr @out2_cons_buff_0, ptr @out_buff_0, i32 64)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)
@@ -3978,7 +3978,7 @@ define void @core_1_2() {
   call void @llvm.assume(i1 true) [ "align"(ptr @out_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out2_cons_buff_1, i64 32) ]
   call void @llvm.assume(i1 true) [ "align"(ptr @out1_cons_buff_1, i64 32) ]
-  call void @mean(ptr @out1_cons_buff_1, ptr @out2_cons_buff_1, ptr @out_buff_1, i32 32)
+  call void @mean(ptr @out1_cons_buff_1, ptr @out2_cons_buff_1, ptr @out_buff_1, i32 64)
   call void @llvm.aie2.release(i32 53, i32 1)
   call void @llvm.aie2.release(i32 48, i32 1)
   call void @llvm.aie2.release(i32 50, i32 1)

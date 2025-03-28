@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C6C0, LENGTH = 0x3940
+   data (!RX) : ORIGIN = 0x7C780, LENGTH = 0x3880
 }
 ENTRY(__start)
 SECTIONS
@@ -42,10 +42,10 @@ _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
 . = 0x51000;
 of_out_mainA11_buff_0 = .;
-. += 0x40;
+. += 0x80;
 . = 0x54C00;
 of_out_mainA11_buff_1 = .;
-. += 0x40;
+. += 0x80;
 . = 0x50400;
 of_in_mainA11_cons_buff_0 = .;
 . += 0x600;
@@ -66,16 +66,16 @@ of_in_mainA11_cons_buff_5 = .;
 . += 0x600;
 . = 0x58600;
 in0_3_cons_buff_0 = .;
-. += 0xC0;
+. += 0x180;
 . = 0x5C600;
 in0_3_cons_buff_1 = .;
-. += 0xC0;
+. += 0x180;
 . = 0x61000;
 of_out_mainB22_buff_0 = .;
-. += 0x40;
+. += 0x80;
 . = 0x64C00;
 of_out_mainB22_buff_1 = .;
-. += 0x40;
+. += 0x80;
 . = 0x60400;
 of_in_mainB22_cons_buff_0 = .;
 . += 0x600;
@@ -96,16 +96,16 @@ of_in_mainB22_cons_buff_5 = .;
 . += 0x600;
 . = 0x68600;
 in0_7_cons_buff_0 = .;
-. += 0xC0;
+. += 0x180;
 . = 0x6C600;
 in0_7_cons_buff_1 = .;
-. += 0xC0;
+. += 0x180;
 . = 0x71000;
 of_out_mainB21_buff_0 = .;
-. += 0x40;
+. += 0x80;
 . = 0x74C00;
 of_out_mainB21_buff_1 = .;
-. += 0x40;
+. += 0x80;
 . = 0x70400;
 of_in_mainB21_cons_buff_0 = .;
 . += 0x600;
@@ -126,10 +126,10 @@ of_in_mainB21_cons_buff_5 = .;
 . += 0x600;
 . = 0x78600;
 in0_6_cons_buff_0 = .;
-. += 0xC0;
+. += 0x180;
 . = 0x7C600;
 in0_6_cons_buff_1 = .;
-. += 0xC0;
+. += 0x180;
   .bss : { *(.bss*) } > data
 }
 INPUT(kernels.a)

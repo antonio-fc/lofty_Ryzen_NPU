@@ -14,7 +14,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 32; // Size of the working vectors
+const int VEC_SIZE = 64; // Size of the working vectors
 
 extern "C" {
 
