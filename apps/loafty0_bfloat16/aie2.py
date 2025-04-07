@@ -111,7 +111,7 @@ def loafty(opts):
     TRACE_SIZE = opts.trace_size
     
     # Declaring constant sizes
-    ITER_KERNEL = 14 # sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
+    ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MATRIX_DIM_SIZE0 = opts.anten # size of baselines and vis matrices side (square matrix) which corresponds to the number of antennas
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96

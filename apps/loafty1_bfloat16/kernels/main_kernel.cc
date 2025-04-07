@@ -34,7 +34,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
     for(int t = 0; t < CV; t++) // for each pixel/lmn
     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
         // Check if calculations can be skipped
-        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) { // This is crashing program when not using ITER_KERNEL
+        if ((l[t]*l[t] + m[t]*m[t]) > 1.0) {
             continue; // out[t] = n[t]; // hex for NaN
         }
         
@@ -58,11 +58,19 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
             // Trig<bfloat16>()
+            // auto cos0 = cos_bfloat16(A.extract<32>(0));
+            // auto sin0 = sin_bfloat16(A.extract<32>(0));
+            // auto cos1 = cos_bfloat16(A.extract<32>(1));
+            // auto sin1 = sin_bfloat16(A.extract<32>(1));
+            
+            // auto cos = aie::concat(cos0, cos1);
+            // auto sin = aie::concat(sin0, sin1);
+
             auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
             auto sin = sin_bfloat16(A);
 
             // Mult with visibilities and subtract
-             auto vecR = aie::load_v<VEC_SIZE>(visR + i);
+            auto vecR = aie::load_v<VEC_SIZE>(visR + i);
             auto vecC = aie::load_v<VEC_SIZE>(visC + i);
             auto R = aie::mul(cos, vecR);
             auto C = aie::mul(sin, vecC);
@@ -78,10 +86,4 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
         out[t] = res;
     }
 }
-// void sin_float_1024(bfloat16 *a_in, bfloat16 *c_out) {
-//     sin_bfloat16<1024>(a_in, c_out);
-// }
-// void cos_float_1024(bfloat16 *a_in, bfloat16 *c_out) {
-//     cos_bfloat16<1024>(a_in, c_out);
-// }
 }

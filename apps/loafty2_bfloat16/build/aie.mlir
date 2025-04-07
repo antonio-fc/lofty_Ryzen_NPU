@@ -73,9 +73,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main02(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_u0(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -348,9 +348,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main03(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_v0(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -623,9 +623,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main04(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_w0(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -896,9 +896,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %0 = aie.objectfifo.acquire @of_add_u0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %2 = aie.objectfifo.acquire @of_add_v0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -920,9 +920,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %0 = aie.objectfifo.acquire @of_add_w0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %2 = aie.objectfifo.acquire @of_add_uv0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -946,9 +946,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main00(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %2 = aie.objectfifo.acquire @of_add2main0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %4 = aie.objectfifo.acquire @of_join_real0(Produce, 1) : !aie.objectfifosubview<memref<2304xbf16>>
@@ -971,9 +971,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main01(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %2 = aie.objectfifo.acquire @of_add2main0(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %4 = aie.objectfifo.acquire @of_join_imag0(Produce, 1) : !aie.objectfifosubview<memref<2304xbf16>>
@@ -996,9 +996,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main12(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_u1(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1271,9 +1271,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main13(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_v1(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1546,9 +1546,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main14(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %2 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<96xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<96xbf16>> -> memref<96xbf16>
           %4 = aie.objectfifo.acquire @of_add_w1(Produce, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1819,9 +1819,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %0 = aie.objectfifo.acquire @of_add_u1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %2 = aie.objectfifo.acquire @of_add_v1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1843,9 +1843,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %0 = aie.objectfifo.acquire @of_add_w1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %2 = aie.objectfifo.acquire @of_add_uv1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1869,9 +1869,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main10(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %2 = aie.objectfifo.acquire @of_add2main1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %4 = aie.objectfifo.acquire @of_join_real1(Produce, 1) : !aie.objectfifosubview<memref<2304xbf16>>
@@ -1894,9 +1894,9 @@ module {
         %0 = aie.objectfifo.acquire @of_in_main11(Consume, 1) : !aie.objectfifosubview<memref<4610xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4610xbf16>> -> memref<4610xbf16>
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %2 = aie.objectfifo.acquire @of_add2main1(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %3 = aie.objectfifo.subview.access %2[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %4 = aie.objectfifo.acquire @of_join_imag1(Produce, 1) : !aie.objectfifosubview<memref<2304xbf16>>
@@ -1917,9 +1917,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c16384 = arith.constant 16384 : index
+        %c65536 = arith.constant 65536 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c16384 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c65536 step %c1_1 {
           %0 = aie.objectfifo.acquire @of_real2sub(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<4608xbf16>> -> memref<4608xbf16>
           %2 = aie.objectfifo.acquire @of_imag2sub(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -1941,9 +1941,9 @@ module {
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
         %c0_0 = arith.constant 0 : index
-        %c512 = arith.constant 512 : index
+        %c2048 = arith.constant 2048 : index
         %c1_1 = arith.constant 1 : index
-        scf.for %arg1 = %c0_0 to %c512 step %c1_1 {
+        scf.for %arg1 = %c0_0 to %c2048 step %c1_1 {
           %0 = aie.objectfifo.acquire @out(Produce, 1) : !aie.objectfifosubview<memref<32xbf16>>
           %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<32xbf16>> -> memref<32xbf16>
           %2 = aie.objectfifo.acquire @of_sub2mean(Consume, 1) : !aie.objectfifosubview<memref<4608xbf16>>
@@ -2144,10 +2144,10 @@ module {
       aie.end
     } {link_with = "mean.o"}
     aiex.runtime_sequence @sequence(%arg0: memref<23050xbf16>, %arg1: memref<23050xbf16>, %arg2: memref<23050xbf16>, %arg3: memref<23050xbf16>) {
-      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 49152][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23050xbf16>
+      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 196608][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<23050xbf16>
       aiex.npu.dma_memcpy_nd(%arg1[0, 0, 0, 0][1, 1, 1, 23050][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<23050xbf16>
       aiex.npu.dma_memcpy_nd(%arg2[0, 0, 0, 0][1, 1, 1, 23050][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<23050xbf16>
-      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23050xbf16>
+      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 65536][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<23050xbf16>
       aiex.npu.dma_wait {symbol = @out}
     }
   }

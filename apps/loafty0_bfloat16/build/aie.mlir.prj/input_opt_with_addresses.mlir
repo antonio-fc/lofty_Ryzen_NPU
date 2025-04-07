@@ -152,7 +152,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %43 = llvm.mlir.constant(2 : index) : i64
     %44 = llvm.mlir.constant(512 : index) : i64
     %45 = llvm.mlir.constant(0 : index) : i64
-    %46 = llvm.mlir.constant(14 : index) : i64
+    %46 = llvm.mlir.constant(9223372036854775807 : index) : i64
     %47 = llvm.mlir.constant(1 : index) : i64
     llvm.br ^bb1(%45 : i64)
   ^bb1(%48: i64):  // 2 preds: ^bb0, ^bb4
@@ -514,7 +514,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %13 = llvm.mlir.constant(-1 : i32) : i32
     %14 = llvm.mlir.constant(16384 : index) : i64
     %15 = llvm.mlir.constant(0 : index) : i64
-    %16 = llvm.mlir.constant(14 : index) : i64
+    %16 = llvm.mlir.constant(9223372036854775807 : index) : i64
     %17 = llvm.mlir.constant(1 : index) : i64
     llvm.br ^bb1(%15 : i64)
   ^bb1(%18: i64):  // 2 preds: ^bb0, ^bb4
@@ -564,7 +564,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %15 = llvm.mlir.constant(16384 : index) : i64
     %16 = llvm.mlir.constant(0 : index) : i64
     %17 = llvm.mlir.constant(1 : index) : i64
-    %18 = llvm.mlir.constant(14 : index) : i64
+    %18 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%16 : i64)
   ^bb1(%19: i64):  // 2 preds: ^bb0, ^bb4
     %20 = llvm.icmp "slt" %19, %18 : i64
@@ -619,7 +619,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %15 = llvm.mlir.constant(2 : index) : i64
     %16 = llvm.mlir.constant(0 : index) : i64
     %17 = llvm.mlir.constant(1 : index) : i64
-    %18 = llvm.mlir.constant(14 : index) : i64
+    %18 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%16 : i64)
   ^bb1(%19: i64):  // 2 preds: ^bb0, ^bb4
     %20 = llvm.icmp "slt" %19, %18 : i64
@@ -676,7 +676,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %17 = llvm.mlir.constant(16384 : index) : i64
     %18 = llvm.mlir.constant(-2 : i32) : i32
     %19 = llvm.mlir.constant(0 : index) : i64
-    %20 = llvm.mlir.constant(14 : index) : i64
+    %20 = llvm.mlir.constant(9223372036854775806 : index) : i64
     %21 = llvm.mlir.constant(2 : index) : i64
     llvm.br ^bb1(%19 : i64)
   ^bb1(%22: i64):  // 2 preds: ^bb0, ^bb8
@@ -780,6 +780,53 @@ module attributes {llvm.target_triple = "aie2"} {
     %40 = llvm.add %22, %21 : i64
     llvm.br ^bb1(%40 : i64)
   ^bb9:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%12, %18) : (i32, i32) -> ()
+    llvm.br ^bb10(%19 : i64)
+  ^bb10(%41: i64):  // 2 preds: ^bb9, ^bb11
+    %42 = llvm.icmp "slt" %41, %17 : i64
+    llvm.cond_br %42, ^bb11, ^bb12
+  ^bb11:  // pred: ^bb10
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    %43 = llvm.getelementptr %6[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%43, %4 : !llvm.ptr, i64)] : i1
+    %44 = llvm.getelementptr %3[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    %45 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%45, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %45, %43, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    %46 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%46, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    %47 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%47, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %47, %46, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    llvm.intr.assume %5 ["align"(%43, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%45, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %45, %43, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    llvm.intr.assume %5 ["align"(%46, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%47, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %47, %46, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    %48 = llvm.add %41, %21 : i64
+    llvm.br ^bb10(%48 : i64)
+  ^bb12:  // pred: ^bb10
+    llvm.call @llvm.aie2.release(%7, %13) : (i32, i32) -> ()
     llvm.return
   }
   llvm.func @core_2_4() {
@@ -803,7 +850,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %17 = llvm.mlir.constant(16384 : index) : i64
     %18 = llvm.mlir.constant(-2 : i32) : i32
     %19 = llvm.mlir.constant(0 : index) : i64
-    %20 = llvm.mlir.constant(14 : index) : i64
+    %20 = llvm.mlir.constant(9223372036854775806 : index) : i64
     %21 = llvm.mlir.constant(2 : index) : i64
     llvm.br ^bb1(%19 : i64)
   ^bb1(%22: i64):  // 2 preds: ^bb0, ^bb8
@@ -907,6 +954,53 @@ module attributes {llvm.target_triple = "aie2"} {
     %40 = llvm.add %22, %21 : i64
     llvm.br ^bb1(%40 : i64)
   ^bb9:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%12, %18) : (i32, i32) -> ()
+    llvm.br ^bb10(%19 : i64)
+  ^bb10(%41: i64):  // 2 preds: ^bb9, ^bb11
+    %42 = llvm.icmp "slt" %41, %17 : i64
+    llvm.cond_br %42, ^bb11, ^bb12
+  ^bb11:  // pred: ^bb10
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    %43 = llvm.getelementptr %6[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%43, %4 : !llvm.ptr, i64)] : i1
+    %44 = llvm.getelementptr %3[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    %45 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%45, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %45, %43, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    %46 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%46, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    %47 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %5 ["align"(%47, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %47, %46, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    llvm.intr.assume %5 ["align"(%43, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%45, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %45, %43, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%11, %16) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%10, %16) : (i32, i32) -> ()
+    llvm.intr.assume %5 ["align"(%46, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%44, %4 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %5 ["align"(%47, %4 : !llvm.ptr, i64)] : i1
+    llvm.call @mul_kernel(%44, %47, %46, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%9, %14) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %14) : (i32, i32) -> ()
+    %48 = llvm.add %41, %21 : i64
+    llvm.br ^bb10(%48 : i64)
+  ^bb12:  // pred: ^bb10
+    llvm.call @llvm.aie2.release(%7, %13) : (i32, i32) -> ()
     llvm.return
   }
   llvm.func @core_3_5() {
@@ -925,7 +1019,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %12 = llvm.mlir.constant(2 : index) : i64
     %13 = llvm.mlir.constant(0 : index) : i64
     %14 = llvm.mlir.constant(1 : index) : i64
-    %15 = llvm.mlir.constant(14 : index) : i64
+    %15 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%13 : i64)
   ^bb1(%16: i64):  // 2 preds: ^bb0, ^bb6
     %17 = llvm.icmp "slt" %16, %15 : i64
@@ -973,7 +1067,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %12 = llvm.mlir.constant(2 : index) : i64
     %13 = llvm.mlir.constant(0 : index) : i64
     %14 = llvm.mlir.constant(1 : index) : i64
-    %15 = llvm.mlir.constant(14 : index) : i64
+    %15 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%13 : i64)
   ^bb1(%16: i64):  // 2 preds: ^bb0, ^bb6
     %17 = llvm.icmp "slt" %16, %15 : i64
@@ -1023,12 +1117,12 @@ module attributes {llvm.target_triple = "aie2"} {
     %14 = llvm.mlir.constant(16384 : index) : i64
     %15 = llvm.mlir.constant(-1 : i32) : i32
     %16 = llvm.mlir.constant(0 : index) : i64
-    %17 = llvm.mlir.constant(14 : index) : i64
-    %18 = llvm.mlir.constant(1 : index) : i64
+    %17 = llvm.mlir.constant(1 : index) : i64
+    %18 = llvm.mlir.constant(9223372036854775806 : index) : i64
     %19 = llvm.mlir.constant(2 : index) : i64
     llvm.br ^bb1(%16 : i64)
   ^bb1(%20: i64):  // 2 preds: ^bb0, ^bb12
-    %21 = llvm.icmp "slt" %20, %17 : i64
+    %21 = llvm.icmp "slt" %20, %18 : i64
     llvm.cond_br %21, ^bb2, ^bb13
   ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%11, %15) : (i32, i32) -> ()
@@ -1051,10 +1145,10 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.call @scale_single(%27, %28, %26, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%8, %12) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %12) : (i32, i32) -> ()
-    %29 = llvm.add %24, %18 : i64
+    %29 = llvm.add %24, %17 : i64
     llvm.br ^bb4(%29 : i64)
   ^bb6:  // pred: ^bb4
-    %30 = llvm.add %22, %18 : i64
+    %30 = llvm.add %22, %17 : i64
     llvm.br ^bb3(%30 : i64)
   ^bb7:  // pred: ^bb3
     llvm.call @llvm.aie2.release(%6, %12) : (i32, i32) -> ()
@@ -1078,16 +1172,43 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.call @scale_single(%36, %37, %35, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
     llvm.call @llvm.aie2.release(%8, %12) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %12) : (i32, i32) -> ()
-    %38 = llvm.add %33, %18 : i64
+    %38 = llvm.add %33, %17 : i64
     llvm.br ^bb9(%38 : i64)
   ^bb11:  // pred: ^bb9
-    %39 = llvm.add %31, %18 : i64
+    %39 = llvm.add %31, %17 : i64
     llvm.br ^bb8(%39 : i64)
   ^bb12:  // pred: ^bb8
     llvm.call @llvm.aie2.release(%6, %12) : (i32, i32) -> ()
     %40 = llvm.add %20, %19 : i64
     llvm.br ^bb1(%40 : i64)
   ^bb13:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%11, %15) : (i32, i32) -> ()
+    llvm.br ^bb14(%16 : i64)
+  ^bb14(%41: i64):  // 2 preds: ^bb13, ^bb17
+    %42 = llvm.icmp "slt" %41, %14 : i64
+    llvm.cond_br %42, ^bb15(%16 : i64), ^bb18
+  ^bb15(%43: i64):  // 2 preds: ^bb14, ^bb16
+    %44 = llvm.icmp "slt" %43, %19 : i64
+    llvm.cond_br %44, ^bb16, ^bb17
+  ^bb16:  // pred: ^bb15
+    llvm.call @llvm.aie2.acquire(%10, %15) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %15) : (i32, i32) -> ()
+    %45 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%45, %3 : !llvm.ptr, i64)] : i1
+    %46 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%46, %3 : !llvm.ptr, i64)] : i1
+    %47 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<2 x bf16>
+    llvm.intr.assume %4 ["align"(%47, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale_single(%46, %47, %45, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %12) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%7, %12) : (i32, i32) -> ()
+    %48 = llvm.add %43, %17 : i64
+    llvm.br ^bb15(%48 : i64)
+  ^bb17:  // pred: ^bb15
+    %49 = llvm.add %41, %17 : i64
+    llvm.br ^bb14(%49 : i64)
+  ^bb18:  // pred: ^bb14
+    llvm.call @llvm.aie2.release(%6, %12) : (i32, i32) -> ()
     llvm.return
   }
   llvm.func @core_1_4() {
@@ -1109,7 +1230,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %15 = llvm.mlir.constant(2 : index) : i64
     %16 = llvm.mlir.constant(16384 : index) : i64
     %17 = llvm.mlir.constant(0 : index) : i64
-    %18 = llvm.mlir.constant(14 : index) : i64
+    %18 = llvm.mlir.constant(9223372036854775807 : index) : i64
     %19 = llvm.mlir.constant(1 : index) : i64
     llvm.br ^bb1(%17 : i64)
   ^bb1(%20: i64):  // 2 preds: ^bb0, ^bb4
@@ -1190,7 +1311,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %15 = llvm.mlir.constant(2 : index) : i64
     %16 = llvm.mlir.constant(0 : index) : i64
     %17 = llvm.mlir.constant(1 : index) : i64
-    %18 = llvm.mlir.constant(14 : index) : i64
+    %18 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%16 : i64)
   ^bb1(%19: i64):  // 2 preds: ^bb0, ^bb6
     %20 = llvm.icmp "slt" %19, %18 : i64
@@ -1276,12 +1397,12 @@ module attributes {llvm.target_triple = "aie2"} {
     %46 = llvm.mlir.constant(512 : index) : i64
     %47 = llvm.mlir.constant(-2 : i32) : i32
     %48 = llvm.mlir.constant(0 : index) : i64
-    %49 = llvm.mlir.constant(14 : index) : i64
-    %50 = llvm.mlir.constant(1 : index) : i64
+    %49 = llvm.mlir.constant(1 : index) : i64
+    %50 = llvm.mlir.constant(9223372036854775806 : index) : i64
     %51 = llvm.mlir.constant(2 : index) : i64
     llvm.br ^bb1(%48 : i64)
   ^bb1(%52: i64):  // 2 preds: ^bb0, ^bb8
-    %53 = llvm.icmp "slt" %52, %49 : i64
+    %53 = llvm.icmp "slt" %52, %50 : i64
     llvm.cond_br %53, ^bb2, ^bb9
   ^bb2:  // pred: ^bb1
     llvm.call @llvm.aie2.acquire(%11, %47) : (i32, i32) -> ()
@@ -1680,7 +1801,7 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.call @scale(%59, %57, %56, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
     llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %42) : (i32, i32) -> ()
-    %60 = llvm.add %54, %50 : i64
+    %60 = llvm.add %54, %49 : i64
     llvm.br ^bb3(%60 : i64)
   ^bb5:  // pred: ^bb3
     llvm.call @llvm.aie2.release(%6, %41) : (i32, i32) -> ()
@@ -2080,13 +2201,413 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.call @scale(%66, %64, %63, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
     llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %42) : (i32, i32) -> ()
-    %67 = llvm.add %61, %50 : i64
+    %67 = llvm.add %61, %49 : i64
     llvm.br ^bb6(%67 : i64)
   ^bb8:  // pred: ^bb6
     llvm.call @llvm.aie2.release(%6, %41) : (i32, i32) -> ()
     %68 = llvm.add %52, %51 : i64
     llvm.br ^bb1(%68 : i64)
   ^bb9:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%11, %47) : (i32, i32) -> ()
+    llvm.br ^bb10(%48 : i64)
+  ^bb10(%69: i64):  // 2 preds: ^bb9, ^bb11
+    %70 = llvm.icmp "slt" %69, %46 : i64
+    llvm.cond_br %70, ^bb11, ^bb12
+  ^bb11:  // pred: ^bb10
+    llvm.call @llvm.aie2.acquire(%10, %45) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    %71 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    %72 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<32 x bf16>
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %73 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %74 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%7, %42) : (i32, i32) -> ()
+    %75 = llvm.add %69, %49 : i64
+    llvm.br ^bb10(%75 : i64)
+  ^bb12:  // pred: ^bb10
+    llvm.call @llvm.aie2.release(%6, %41) : (i32, i32) -> ()
     llvm.return
   }
   llvm.func @core_0_4() {
@@ -2141,7 +2662,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %48 = llvm.mlir.constant(2 : index) : i64
     %49 = llvm.mlir.constant(0 : index) : i64
     %50 = llvm.mlir.constant(1 : index) : i64
-    %51 = llvm.mlir.constant(14 : index) : i64
+    %51 = llvm.mlir.constant(9223372036854775806 : index) : i64
     llvm.br ^bb1(%49 : i64)
   ^bb1(%52: i64):  // 2 preds: ^bb0, ^bb8
     %53 = llvm.icmp "slt" %52, %51 : i64
@@ -2950,6 +3471,406 @@ module attributes {llvm.target_triple = "aie2"} {
     %68 = llvm.add %52, %48 : i64
     llvm.br ^bb1(%68 : i64)
   ^bb9:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%11, %47) : (i32, i32) -> ()
+    llvm.br ^bb10(%49 : i64)
+  ^bb10(%69: i64):  // 2 preds: ^bb9, ^bb11
+    %70 = llvm.icmp "slt" %69, %46 : i64
+    llvm.cond_br %70, ^bb11, ^bb12
+  ^bb11:  // pred: ^bb10
+    llvm.call @llvm.aie2.acquire(%10, %45) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    %71 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    %72 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<32 x bf16>
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %73 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %74 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%7, %42) : (i32, i32) -> ()
+    %75 = llvm.add %69, %50 : i64
+    llvm.br ^bb10(%75 : i64)
+  ^bb12:  // pred: ^bb10
+    llvm.call @llvm.aie2.release(%6, %41) : (i32, i32) -> ()
     llvm.return
   }
   llvm.func @core_0_5() {
@@ -3004,7 +3925,7 @@ module attributes {llvm.target_triple = "aie2"} {
     %48 = llvm.mlir.constant(2 : index) : i64
     %49 = llvm.mlir.constant(0 : index) : i64
     %50 = llvm.mlir.constant(1 : index) : i64
-    %51 = llvm.mlir.constant(14 : index) : i64
+    %51 = llvm.mlir.constant(9223372036854775806 : index) : i64
     llvm.br ^bb1(%49 : i64)
   ^bb1(%52: i64):  // 2 preds: ^bb0, ^bb8
     %53 = llvm.icmp "slt" %52, %51 : i64
@@ -3813,6 +4734,406 @@ module attributes {llvm.target_triple = "aie2"} {
     %68 = llvm.add %52, %48 : i64
     llvm.br ^bb1(%68 : i64)
   ^bb9:  // pred: ^bb1
+    llvm.call @llvm.aie2.acquire(%11, %47) : (i32, i32) -> ()
+    llvm.br ^bb10(%49 : i64)
+  ^bb10(%69: i64):  // 2 preds: ^bb9, ^bb11
+    %70 = llvm.icmp "slt" %69, %46 : i64
+    llvm.cond_br %70, ^bb11, ^bb12
+  ^bb11:  // pred: ^bb10
+    llvm.call @llvm.aie2.acquire(%10, %45) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    %71 = llvm.getelementptr %5[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    %72 = llvm.getelementptr %2[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<32 x bf16>
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %73 = llvm.getelementptr %1[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    %74 = llvm.getelementptr %0[0, 0] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<4608 x bf16>
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %43) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %42) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %41) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %40) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %39) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %38) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %37) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %36) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %35) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %34) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %33) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %32) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %31) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %30) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %29) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %28) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %27) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %26) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %25) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %24) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %23) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %22) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %21) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %20) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %19) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %18) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %17) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %16) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %15) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %14) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %13) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%73, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%73, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.acquire(%9, %45) : (i32, i32) -> ()
+    llvm.intr.assume %4 ["align"(%71, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%72, %3 : !llvm.ptr, i64)] : i1
+    llvm.intr.assume %4 ["align"(%74, %3 : !llvm.ptr, i64)] : i1
+    llvm.call @scale(%74, %72, %71, %44, %12) : (!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%8, %42) : (i32, i32) -> ()
+    llvm.call @llvm.aie2.release(%7, %42) : (i32, i32) -> ()
+    %75 = llvm.add %69, %50 : i64
+    llvm.br ^bb10(%75 : i64)
+  ^bb12:  // pred: ^bb10
+    llvm.call @llvm.aie2.release(%6, %41) : (i32, i32) -> ()
     llvm.return
   }
 }

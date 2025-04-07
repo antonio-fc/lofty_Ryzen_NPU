@@ -159,7 +159,7 @@ define void @core_2_2() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 512
+  %6 = icmp slt i64 %5, 2048
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -508,7 +508,7 @@ define void @core_1_2() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 16384
+  %6 = icmp slt i64 %5, 65536
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -557,7 +557,7 @@ define void @core_3_2() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 16384
+  %7 = icmp slt i64 %6, 65536
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -595,7 +595,7 @@ define void @core_2_3() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 16384
+  %7 = icmp slt i64 %6, 65536
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -629,7 +629,7 @@ define void @core_2_4() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 16384
+  %6 = icmp slt i64 %5, 65536
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -664,7 +664,7 @@ define void @core_2_5() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 16384
+  %6 = icmp slt i64 %5, 65536
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -703,7 +703,7 @@ define void @core_3_3() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -1121,7 +1121,7 @@ define void @core_3_4() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -1539,7 +1539,7 @@ define void @core_3_5() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -1957,7 +1957,7 @@ define void @core_0_2() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 16384
+  %7 = icmp slt i64 %6, 65536
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -1995,7 +1995,7 @@ define void @core_1_3() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 16384
+  %7 = icmp slt i64 %6, 65536
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -2029,7 +2029,7 @@ define void @core_1_4() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 16384
+  %6 = icmp slt i64 %5, 65536
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -2064,7 +2064,7 @@ define void @core_1_5() {
 
 4:                                                ; preds = %7, %1
   %5 = phi i64 [ %8, %7 ], [ 0, %1 ]
-  %6 = icmp slt i64 %5, 16384
+  %6 = icmp slt i64 %5, 65536
   br i1 %6, label %7, label %9
 
 7:                                                ; preds = %4
@@ -2103,7 +2103,7 @@ define void @core_0_3() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -2521,7 +2521,7 @@ define void @core_0_4() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
@@ -2939,7 +2939,7 @@ define void @core_0_5() {
 
 5:                                                ; preds = %8, %4
   %6 = phi i64 [ %9, %8 ], [ 0, %4 ]
-  %7 = icmp slt i64 %6, 512
+  %7 = icmp slt i64 %6, 2048
   br i1 %7, label %8, label %10
 
 8:                                                ; preds = %5
