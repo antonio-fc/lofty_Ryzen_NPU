@@ -13,7 +13,10 @@ def write_lut(file_name, values, stride, op, dtype, size):
             for _ in range(2):
                 for j in range(stride):
                     value = values[i * stride + j]
-                    line = line + f"{value:.6f}, "
+                    if dtype in ["float", "bfloat16"]:
+                        line = line + f"{value:.6f}, "
+                    else:
+                        line = line + f"{value}, "
             if i == n_lines - 1: # removing the last comma for the last line
                 line = line[:-2]
             line = line + "\n"
@@ -46,6 +49,13 @@ def get_values(op, size, dtype, lut_type):
         values = np.cos(index_range * max_val / size)
     elif op == "tan":
         values = np.tan(index_range * max_val / size / 2)
+    elif op == "exp":
+        values = np.empty(int(2*size), dtype=dtype)
+        sin_values = np.sin(index_range * max_val / size).astype(bfloat16)
+        cos_values = np.cos(index_range * max_val / size).astype(bfloat16)
+        values[0::2] = sin_values
+        values[1::2] = cos_values
+        values = values.view(np.uint32)        
     
     return values
     
@@ -59,7 +69,7 @@ def main():
     lut_type = args[3]
 
     # Check the arguments are valid
-    valid_ops = set(["sin", "cos", "tan"])
+    valid_ops = set(["sin", "cos", "tan", "exp"])
     valid_sizes = set([128, 256, 512, 1024])
     valid_types = set(["float", "bfloat16"])
     valid_lut_types = set(["full", "half", "quarter"])
@@ -81,6 +91,9 @@ def main():
         stride = 4
     elif dtype == "bfloat16":
         stride = 8
+    if op == "exp":
+        stride = 4
+        dtype = "uint32_t"
     # Writing LUT according to type
     file_name = f"{lut_type}{size}{dtype}_{op}"
     write_lut(file_name, values, stride, op, dtype, size)

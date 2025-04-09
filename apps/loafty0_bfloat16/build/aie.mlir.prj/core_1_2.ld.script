@@ -50,10 +50,10 @@ of_trigFifo_buff_0 = .;
 of_scaleAddBL_cons_buff_0 = .;
 . += 0x2400;
 . = 0x78000;
-in0_cons_buff_0 = .;
+in3_cons_buff_0 = .;
 . += 0x4;
 . = 0x7C000;
-in0_cons_buff_1 = .;
+in3_cons_buff_1 = .;
 . += 0x4;
   .bss : { *(.bss*) } > data
 }

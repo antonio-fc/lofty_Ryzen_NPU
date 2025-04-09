@@ -2,7 +2,7 @@
 MEMORY
 {
    program (RX) : ORIGIN = 0, LENGTH = 0x0020000
-   data (!RX) : ORIGIN = 0x7C004, LENGTH = 0x3FFC
+   data (!RX) : ORIGIN = 0x7D200, LENGTH = 0x2E00
 }
 ENTRY(__start)
 SECTIONS
@@ -43,30 +43,42 @@ _sp_start_value_DM_stack = .;
 /* No tile with memory exists to the south. */
 . = 0x40000;
 . += 0x10000;
-. = 0x58000;
+. = 0x51600;
 m_cons_buff_0 = .;
 . += 0x4;
-. = 0x5C000;
+. = 0x55200;
 m_cons_buff_1 = .;
 . += 0x4;
 . = 0x50400;
 v_cons_buff_0 = .;
-. += 0x800;
+. += 0x1200;
 . = 0x54000;
 v_cons_buff_1 = .;
-. += 0x800;
-. = 0x78000;
+. += 0x1200;
+. = 0x58000;
+v_cons_buff_2 = .;
+. += 0x1200;
+. = 0x5C000;
+v_cons_buff_3 = .;
+. += 0x1200;
+. = 0x71600;
 n_cons_buff_0 = .;
 . += 0x4;
-. = 0x7C000;
+. = 0x75200;
 n_cons_buff_1 = .;
 . += 0x4;
 . = 0x70400;
 w_cons_buff_0 = .;
-. += 0x800;
+. += 0x1200;
 . = 0x74000;
 w_cons_buff_1 = .;
-. += 0x800;
+. += 0x1200;
+. = 0x78000;
+w_cons_buff_2 = .;
+. += 0x1200;
+. = 0x7C000;
+w_cons_buff_3 = .;
+. += 0x1200;
   .bss : { *(.bss*) } > data
 }
 INPUT(scale.o)

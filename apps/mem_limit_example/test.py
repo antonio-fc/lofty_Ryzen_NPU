@@ -19,10 +19,9 @@ from ml_dtypes import bfloat16
 def main(opts):
 
     # Load instruction sequence
-    with open(opts.instr, "r") as f:
-        instr_text = f.read().split("\n")
-        instr_text = [l for l in instr_text if l != ""]
-        instr_v = np.array([int(i, 16) for i in instr_text], dtype=np.uint32)
+    with open(opts.instr, "rb") as f:
+        instr_bin = f.read()
+        instr_v = np.array([i for i in instr_bin], dtype=np.uint8)
 
     # ------------------------------------------------------------
     # Configure this to match your design's buffer size and type
@@ -54,7 +53,7 @@ def main(opts):
     # ------------------------------------------------------
     # Initialize input/ output buffer sizes and sync them
     # ------------------------------------------------------
-    bo_instr = xrt.bo(device, len(instr_v) * 4, xrt.bo.cacheable, kernel.group_id(1))
+    bo_instr = xrt.bo(device, len(instr_v), xrt.bo.cacheable, kernel.group_id(1))
     bo_inout0 = xrt.bo(device, INOUT1_SIZE, xrt.bo.host_only, kernel.group_id(3)) # factor (-2 pi f / SPEED_OF_LIGHT)
     bo_inout1 = xrt.bo(device, INOUT0_SIZE*2, xrt.bo.host_only, kernel.group_id(4)) # vis
     bo_inout2 = xrt.bo(device, INOUT0_SIZE*3, xrt.bo.host_only, kernel.group_id(5)) # baselines (u, v, w)

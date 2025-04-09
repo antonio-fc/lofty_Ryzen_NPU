@@ -33,10 +33,10 @@ module {
     %tile_3_3 = aie.tile(3, 3)
     %tile_3_4 = aie.tile(3, 4)
     %tile_3_5 = aie.tile(3, 5)
-    aie.objectfifo @in0(%shim_noc_tile_0_0, {%tile_1_2}, 2 : i32) : !aie.objectfifo<memref<2xbf16>> 
+    aie.objectfifo @in0(%shim_noc_tile_0_0, {%mem_tile_3_1}, 2 : i32) : !aie.objectfifo<memref<96xbf16>> 
     aie.objectfifo @in1(%shim_noc_tile_1_0, {%mem_tile_1_1}, 2 : i32) : !aie.objectfifo<memref<13824xbf16>> 
     aie.objectfifo @in2(%shim_noc_tile_2_0, {%mem_tile_2_1}, 2 : i32) : !aie.objectfifo<memref<9216xbf16>> 
-    aie.objectfifo @in3(%shim_noc_tile_3_0, {%mem_tile_3_1}, 2 : i32) : !aie.objectfifo<memref<96xbf16>> 
+    aie.objectfifo @in3(%shim_noc_tile_3_0, {%tile_1_3}, 2 : i32) : !aie.objectfifo<memref<2xbf16>> 
     aie.objectfifo @of_in_u(%mem_tile_1_1, {%tile_0_5}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_in_v(%mem_tile_1_1, {%tile_0_4}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_in_w(%mem_tile_1_1, {%tile_0_3}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
@@ -44,7 +44,7 @@ module {
     aie.objectfifo @of_in_l(%mem_tile_3_1, {%tile_0_5}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<32xbf16>> 
     aie.objectfifo @of_in_m(%mem_tile_3_1, {%tile_0_4}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<32xbf16>> 
     aie.objectfifo @of_in_n(%mem_tile_3_1, {%tile_0_3}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<32xbf16>> 
-    aie.objectfifo.link [@in3] -> [@of_in_l, @of_in_m, @of_in_n]([] [0, 32, 64])
+    aie.objectfifo.link [@in0] -> [@of_in_l, @of_in_m, @of_in_n]([] [0, 32, 64])
     aie.objectfifo @of_in_visR(%mem_tile_2_1, {%tile_2_4}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_in_visC(%mem_tile_2_1, {%tile_3_4}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo.link [@in2] -> [@of_in_visR, @of_in_visC]([] [0, 4608])
@@ -52,8 +52,8 @@ module {
     aie.objectfifo @of_addV(%tile_0_4, {%tile_1_5}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_addW(%tile_0_3, {%tile_1_4}, [1 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_addUV(%tile_1_5, {%tile_1_4}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
-    aie.objectfifo @of_scaleAddBL(%tile_1_4, {%tile_1_2}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
-    aie.objectfifo @of_trigFifo(%tile_1_2, {%tile_2_5, %tile_3_5}, [1 : i32, 1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
+    aie.objectfifo @of_scaleAddBL(%tile_1_4, {%tile_1_3}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
+    aie.objectfifo @of_trigFifo(%tile_1_3, {%tile_2_5, %tile_3_5}, [1 : i32, 1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_multTrigR(%tile_2_5, {%tile_2_4}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_multTrigC(%tile_3_5, {%tile_3_4}, [1 : i32, 1 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
     aie.objectfifo @of_reduceR(%tile_2_4, {%tile_2_3}, [2 : i32, 2 : i32]) : !aie.objectfifo<memref<4608xbf16>> 
@@ -1332,12 +1332,12 @@ module {
       }
       aie.end
     } {link_with = "add.o"}
-    %core_1_2 = aie.core(%tile_1_2) {
+    %core_1_3 = aie.core(%tile_1_3) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index
       %c1 = arith.constant 1 : index
       scf.for %arg0 = %c0 to %c9223372036854775807 step %c1 {
-        %0 = aie.objectfifo.acquire @in0(Consume, 1) : !aie.objectfifosubview<memref<2xbf16>>
+        %0 = aie.objectfifo.acquire @in3(Consume, 1) : !aie.objectfifosubview<memref<2xbf16>>
         %1 = aie.objectfifo.subview.access %0[0] : !aie.objectfifosubview<memref<2xbf16>> -> memref<2xbf16>
         %c0_0 = arith.constant 0 : index
         %c16384 = arith.constant 16384 : index
@@ -1357,7 +1357,7 @@ module {
             aie.objectfifo.release @of_scaleAddBL(Consume, 1)
           }
         }
-        aie.objectfifo.release @in0(Consume, 1)
+        aie.objectfifo.release @in3(Consume, 1)
       }
       aie.end
     } {link_with = "scale.o"}
@@ -1756,10 +1756,10 @@ module {
       aie.end
     } {link_with = "mean.o"}
     aiex.runtime_sequence @sequence(%arg0: memref<27648xbf16>, %arg1: memref<27648xbf16>, %arg2: memref<27648xbf16>, %arg3: memref<27648xbf16>, %arg4: memref<27648xbf16>) {
-      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 2][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<27648xbf16>
+      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 2][0, 0, 0, 1]) {id = 1 : i64, metadata = @in3} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg1[0, 0, 0, 0][1, 1, 1, 27648][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg2[0, 0, 0, 0][1, 1, 1, 18432][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<27648xbf16>
-      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 49152][0, 0, 0, 1]) {id = 4 : i64, metadata = @in3} : memref<27648xbf16>
+      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 49152][0, 0, 0, 1]) {id = 4 : i64, metadata = @in0} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg4[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<27648xbf16>
       aiex.npu.dma_wait {symbol = @out}
     }

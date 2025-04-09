@@ -162,7 +162,7 @@ def loafty(opts):
 
         addUVtile, addUVWtile = CT[1][3], CT[1][2]
 
-        scaleFreqTile = CT[1][0]
+        scaleFreqTile = CT[1][1]
 
         cosTile, sinTile = CT[2][3], CT[3][3]
 
@@ -185,10 +185,10 @@ def loafty(opts):
 
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_freq = object_fifo("in0", ST[0], scaleFreqTile, 2, min_ty)
+        of_in_lmn = object_fifo("in0", ST[0], memDisLMN, 2, lmn_move_ty)
         of_in_bl = object_fifo("in1", ST[1], memDisBL, 2, dist_bl_ty)       
         of_in_vis = object_fifo("in2", ST[2], memDisVis, 2, dist_vis_ty)
-        of_in_lmn = object_fifo("in3", ST[3], memDisLMN, 2, lmn_move_ty)
+        of_in_freq = object_fifo("in3", ST[3], scaleFreqTile, 2, min_ty)
 
         # Inner Data Movements
         # Distribution of baselines

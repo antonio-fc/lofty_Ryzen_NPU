@@ -1,12 +1,12 @@
 module attributes {llvm.target_triple = "aie2"} {
-  llvm.mlir.global external @in0_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
-  llvm.mlir.global external @in0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
+  llvm.mlir.global external @in0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
   llvm.mlir.global external @in1_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<13824 x bf16>
   llvm.mlir.global external @in1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<13824 x bf16>
   llvm.mlir.global external @in2_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<9216 x bf16>
   llvm.mlir.global external @in2_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<9216 x bf16>
-  llvm.mlir.global external @in3_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
-  llvm.mlir.global external @in3_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
+  llvm.mlir.global external @in3_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in3_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
   llvm.mlir.global external @of_in_u_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_in_u_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_in_v_cons_buff_1() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
@@ -28,7 +28,6 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.mlir.global external @of_addW_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_addUV_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_scaleAddBL_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
-  llvm.mlir.global external @of_scaleAddBL_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_trigFifo_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_trigFifo_1_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_trigFifo_0_cons_buff_0() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
@@ -64,7 +63,6 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.mlir.global external @of_trigFifo_0_cons() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_trigFifo_1_cons() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_trigFifo() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
-  llvm.mlir.global external @of_scaleAddBL_cons() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_scaleAddBL() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_addUV() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_addW_cons() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
@@ -88,14 +86,14 @@ module attributes {llvm.target_triple = "aie2"} {
   llvm.mlir.global external @of_in_v() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_in_u_cons() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
   llvm.mlir.global external @of_in_u() {addr_space = 0 : i32} : !llvm.array<4608 x bf16>
-  llvm.mlir.global external @in3_cons() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
-  llvm.mlir.global external @in3() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
+  llvm.mlir.global external @in3_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in3() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
   llvm.mlir.global external @in2_cons() {addr_space = 0 : i32} : !llvm.array<9216 x bf16>
   llvm.mlir.global external @in2() {addr_space = 0 : i32} : !llvm.array<9216 x bf16>
   llvm.mlir.global external @in1_cons() {addr_space = 0 : i32} : !llvm.array<13824 x bf16>
   llvm.mlir.global external @in1() {addr_space = 0 : i32} : !llvm.array<13824 x bf16>
-  llvm.mlir.global external @in0_cons() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
-  llvm.mlir.global external @in0() {addr_space = 0 : i32} : !llvm.array<2 x bf16>
+  llvm.mlir.global external @in0_cons() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
+  llvm.mlir.global external @in0() {addr_space = 0 : i32} : !llvm.array<96 x bf16>
   llvm.func @passthrough(!llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
   llvm.func @scale(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32, i32) attributes {sym_visibility = "private"}
   llvm.func @add_kernel(!llvm.ptr, !llvm.ptr, !llvm.ptr, i32) attributes {sym_visibility = "private"}
@@ -1099,18 +1097,18 @@ module attributes {llvm.target_triple = "aie2"} {
   ^bb7:  // pred: ^bb1
     llvm.return
   }
-  llvm.func @core_1_2() {
-    %0 = llvm.mlir.addressof @in0_cons_buff_1 : !llvm.ptr
-    %1 = llvm.mlir.addressof @in0_cons_buff_0 : !llvm.ptr
-    %2 = llvm.mlir.addressof @of_scaleAddBL_cons_buff_0 : !llvm.ptr
+  llvm.func @core_1_3() {
+    %0 = llvm.mlir.addressof @in3_cons_buff_1 : !llvm.ptr
+    %1 = llvm.mlir.addressof @in3_cons_buff_0 : !llvm.ptr
+    %2 = llvm.mlir.addressof @of_scaleAddBL_buff_0 : !llvm.ptr
     %3 = llvm.mlir.constant(32 : index) : i64
     %4 = llvm.mlir.constant(true) : i1
     %5 = llvm.mlir.addressof @of_trigFifo_buff_0 : !llvm.ptr
     %6 = llvm.mlir.constant(48 : i32) : i32
-    %7 = llvm.mlir.constant(50 : i32) : i32
-    %8 = llvm.mlir.constant(53 : i32) : i32
-    %9 = llvm.mlir.constant(52 : i32) : i32
-    %10 = llvm.mlir.constant(51 : i32) : i32
+    %7 = llvm.mlir.constant(34 : i32) : i32
+    %8 = llvm.mlir.constant(51 : i32) : i32
+    %9 = llvm.mlir.constant(50 : i32) : i32
+    %10 = llvm.mlir.constant(35 : i32) : i32
     %11 = llvm.mlir.constant(49 : i32) : i32
     %12 = llvm.mlir.constant(1 : i32) : i32
     %13 = llvm.mlir.constant(4608 : i32) : i32
@@ -1227,17 +1225,17 @@ module attributes {llvm.target_triple = "aie2"} {
     %12 = llvm.mlir.constant(1 : i32) : i32
     %13 = llvm.mlir.constant(4608 : i32) : i32
     %14 = llvm.mlir.constant(-1 : i32) : i32
-    %15 = llvm.mlir.constant(2 : index) : i64
-    %16 = llvm.mlir.constant(16384 : index) : i64
+    %15 = llvm.mlir.constant(16384 : index) : i64
+    %16 = llvm.mlir.constant(2 : index) : i64
     %17 = llvm.mlir.constant(0 : index) : i64
-    %18 = llvm.mlir.constant(9223372036854775807 : index) : i64
-    %19 = llvm.mlir.constant(1 : index) : i64
+    %18 = llvm.mlir.constant(1 : index) : i64
+    %19 = llvm.mlir.constant(9223372036854775807 : index) : i64
     llvm.br ^bb1(%17 : i64)
   ^bb1(%20: i64):  // 2 preds: ^bb0, ^bb4
-    %21 = llvm.icmp "slt" %20, %18 : i64
+    %21 = llvm.icmp "slt" %20, %19 : i64
     llvm.cond_br %21, ^bb2(%17 : i64), ^bb5
   ^bb2(%22: i64):  // 2 preds: ^bb1, ^bb3
-    %23 = llvm.icmp "slt" %22, %16 : i64
+    %23 = llvm.icmp "slt" %22, %15 : i64
     llvm.cond_br %23, ^bb3, ^bb4
   ^bb3:  // pred: ^bb2
     llvm.call @llvm.aie2.acquire(%11, %14) : (i32, i32) -> ()
@@ -1284,10 +1282,10 @@ module attributes {llvm.target_triple = "aie2"} {
     llvm.call @llvm.aie2.release(%8, %12) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%7, %12) : (i32, i32) -> ()
     llvm.call @llvm.aie2.release(%6, %12) : (i32, i32) -> ()
-    %28 = llvm.add %22, %15 : i64
+    %28 = llvm.add %22, %16 : i64
     llvm.br ^bb2(%28 : i64)
   ^bb4:  // pred: ^bb2
-    %29 = llvm.add %20, %19 : i64
+    %29 = llvm.add %20, %18 : i64
     llvm.br ^bb1(%29 : i64)
   ^bb5:  // pred: ^bb1
     llvm.return

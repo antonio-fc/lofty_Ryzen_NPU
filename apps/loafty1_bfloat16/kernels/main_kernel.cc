@@ -24,6 +24,18 @@ aie::vector<bfloat16, 32> cos_bfloat16(aie::vector<bfloat16, 32> input_vec) {
     return getCosbFloat16(scaled_vec); // calling function for cos (calling the lut)
 }
 
+aie::vector<bfloat16, 64> exp_bfloat16(aie::vector<bfloat16, 32> input_vec) {
+    auto inputs = aie::abs(input_vec);
+    auto bitmap0 = aie::broadcast<uint16, 32>(0x8000);
+    auto final_sign = aie::bit_and(input_vec.cast_to<uint16>(), bitmap0);
+    auto scaled_vec = aie::mul(inputs, FACTOR);
+    auto resultExp = getExpUINT32(scaled_vec).cast_to<bfloat16>();
+    aie::vector<bfloat16, 32> sin = aie::filter_even(resultExp);
+    aie::vector<bfloat16, 32> cos = aie::filter_odd(resultExp);
+    sin = aie::bit_xor(sin.cast_to<uint16>(), final_sign).cast_to<bfloat16>();
+    return aie::concat(sin, cos);
+}
+
 extern "C" {
 
 void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, bfloat16 *u, bfloat16 *v, bfloat16 *w, bfloat16 *out, uint32_t N) {
@@ -58,16 +70,23 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
             // Trig<bfloat16>()
+
+            // Method0 (doesnt work)
             // auto cos0 = cos_bfloat16(A.extract<32>(0));
             // auto sin0 = sin_bfloat16(A.extract<32>(0));
             // auto cos1 = cos_bfloat16(A.extract<32>(1));
             // auto sin1 = sin_bfloat16(A.extract<32>(1));
-            
             // auto cos = aie::concat(cos0, cos1);
             // auto sin = aie::concat(sin0, sin1);
 
+            // Method1 (works)
             auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
             auto sin = sin_bfloat16(A);
+
+            // Method2 (???)
+            // auto exp = exp_bfloat16(A);
+            // auto sin = exp.extract<32>(0);
+            // auto cos = exp.extract<32>(1);
 
             // Mult with visibilities and subtract
             auto vecR = aie::load_v<VEC_SIZE>(visR + i);

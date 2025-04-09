@@ -40,6 +40,15 @@ SECTIONS
 . = 0x70000;
 _sp_start_value_DM_stack = .;
 . += 0x400; /* stack */
+. = 0x40400;
+of_trigFifo_buff_0 = .;
+. += 0x2400;
+. = 0x44000;
+in3_cons_buff_0 = .;
+. += 0x4;
+. = 0x48000;
+in3_cons_buff_1 = .;
+. += 0x4;
 . = 0x50400;
 of_addV_buff_0 = .;
 . += 0x2400;

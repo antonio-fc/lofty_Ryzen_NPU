@@ -13,7 +13,6 @@ module {
     memref.global "public" @of_trigFifo_0_cons : memref<4608xbf16>
     memref.global "public" @of_trigFifo_1_cons : memref<4608xbf16>
     memref.global "public" @of_trigFifo : memref<4608xbf16>
-    memref.global "public" @of_scaleAddBL_cons : memref<4608xbf16>
     memref.global "public" @of_scaleAddBL : memref<4608xbf16>
     memref.global "public" @of_addUV : memref<4608xbf16>
     memref.global "public" @of_addW_cons : memref<4608xbf16>
@@ -37,14 +36,14 @@ module {
     memref.global "public" @of_in_v : memref<4608xbf16>
     memref.global "public" @of_in_u_cons : memref<4608xbf16>
     memref.global "public" @of_in_u : memref<4608xbf16>
-    memref.global "public" @in3_cons : memref<96xbf16>
-    memref.global "public" @in3 : memref<96xbf16>
+    memref.global "public" @in3_cons : memref<2xbf16>
+    memref.global "public" @in3 : memref<2xbf16>
     memref.global "public" @in2_cons : memref<9216xbf16>
     memref.global "public" @in2 : memref<9216xbf16>
     memref.global "public" @in1_cons : memref<13824xbf16>
     memref.global "public" @in1 : memref<13824xbf16>
-    memref.global "public" @in0_cons : memref<2xbf16>
-    memref.global "public" @in0 : memref<2xbf16>
+    memref.global "public" @in0_cons : memref<96xbf16>
+    memref.global "public" @in0 : memref<96xbf16>
     func.func private @passthrough(memref<4608xbf16>, memref<4608xbf16>, i32)
     func.func private @scale(memref<4608xbf16>, memref<32xbf16>, memref<4608xbf16>, i32, i32)
     func.func private @add_kernel(memref<4608xbf16>, memref<4608xbf16>, memref<4608xbf16>, i32)
@@ -116,12 +115,9 @@ module {
     %of_trigFifo_1_cons_buff_0 = aie.buffer(%tile_3_5) {address = 16384 : i32, mem_bank = 1 : i32, sym_name = "of_trigFifo_1_cons_buff_0"} : memref<4608xbf16> 
     %of_trigFifo_1_cons_prod_lock_0 = aie.lock(%tile_3_5, 0) {init = 1 : i32, sym_name = "of_trigFifo_1_cons_prod_lock_0"}
     %of_trigFifo_1_cons_cons_lock_0 = aie.lock(%tile_3_5, 1) {init = 0 : i32, sym_name = "of_trigFifo_1_cons_cons_lock_0"}
-    %of_trigFifo_buff_0 = aie.buffer(%tile_1_2) {address = 1024 : i32, mem_bank = 0 : i32, sym_name = "of_trigFifo_buff_0"} : memref<4608xbf16> 
-    %of_trigFifo_prod_lock_0 = aie.lock(%tile_1_2, 4) {init = 1 : i32, sym_name = "of_trigFifo_prod_lock_0"}
-    %of_trigFifo_cons_lock_0 = aie.lock(%tile_1_2, 5) {init = 0 : i32, sym_name = "of_trigFifo_cons_lock_0"}
-    %of_scaleAddBL_cons_buff_0 = aie.buffer(%tile_1_2) {address = 16384 : i32, mem_bank = 1 : i32, sym_name = "of_scaleAddBL_cons_buff_0"} : memref<4608xbf16> 
-    %of_scaleAddBL_cons_prod_lock_0 = aie.lock(%tile_1_2, 2) {init = 1 : i32, sym_name = "of_scaleAddBL_cons_prod_lock_0"}
-    %of_scaleAddBL_cons_cons_lock_0 = aie.lock(%tile_1_2, 3) {init = 0 : i32, sym_name = "of_scaleAddBL_cons_cons_lock_0"}
+    %of_trigFifo_buff_0 = aie.buffer(%tile_1_3) {address = 1024 : i32, mem_bank = 0 : i32, sym_name = "of_trigFifo_buff_0"} : memref<4608xbf16> 
+    %of_trigFifo_prod_lock_0 = aie.lock(%tile_1_3, 2) {init = 1 : i32, sym_name = "of_trigFifo_prod_lock_0"}
+    %of_trigFifo_cons_lock_0 = aie.lock(%tile_1_3, 3) {init = 0 : i32, sym_name = "of_trigFifo_cons_lock_0"}
     %of_scaleAddBL_buff_0 = aie.buffer(%tile_1_4) {address = 1024 : i32, mem_bank = 0 : i32, sym_name = "of_scaleAddBL_buff_0"} : memref<4608xbf16> 
     %of_scaleAddBL_prod_lock_0 = aie.lock(%tile_1_4, 2) {init = 1 : i32, sym_name = "of_scaleAddBL_prod_lock_0"}
     %of_scaleAddBL_cons_lock_0 = aie.lock(%tile_1_4, 3) {init = 0 : i32, sym_name = "of_scaleAddBL_cons_lock_0"}
@@ -173,14 +169,10 @@ module {
     %of_in_u_cons_buff_1 = aie.buffer(%tile_0_5) {address = 32768 : i32, mem_bank = 2 : i32, sym_name = "of_in_u_cons_buff_1"} : memref<4608xbf16> 
     %of_in_u_cons_prod_lock_0 = aie.lock(%tile_0_5, 0) {init = 2 : i32, sym_name = "of_in_u_cons_prod_lock_0"}
     %of_in_u_cons_cons_lock_0 = aie.lock(%tile_0_5, 1) {init = 0 : i32, sym_name = "of_in_u_cons_cons_lock_0"}
-    %in3_cons_buff_0 = aie.buffer(%mem_tile_3_1) {address = 0 : i32, mem_bank = 0 : i32, sym_name = "in3_cons_buff_0"} : memref<96xbf16> 
-    %in3_cons_buff_1 = aie.buffer(%mem_tile_3_1) {address = 65536 : i32, mem_bank = 1 : i32, sym_name = "in3_cons_buff_1"} : memref<96xbf16> 
-    %in3_cons_prod_lock_0 = aie.lock(%mem_tile_3_1, 0) {init = 2 : i32, sym_name = "in3_cons_prod_lock_0"}
-    %in3_cons_cons_lock_0 = aie.lock(%mem_tile_3_1, 1) {init = 0 : i32, sym_name = "in3_cons_cons_lock_0"}
-    %in3_cons_prod_lock_1 = aie.lock(%mem_tile_3_1, 2) {init = 2 : i32, sym_name = "in3_cons_prod_lock_1"}
-    %in3_cons_cons_lock_1 = aie.lock(%mem_tile_3_1, 3) {init = 0 : i32, sym_name = "in3_cons_cons_lock_1"}
-    %in3_cons_prod_lock_2 = aie.lock(%mem_tile_3_1, 4) {init = 2 : i32, sym_name = "in3_cons_prod_lock_2"}
-    %in3_cons_cons_lock_2 = aie.lock(%mem_tile_3_1, 5) {init = 0 : i32, sym_name = "in3_cons_cons_lock_2"}
+    %in3_cons_buff_0 = aie.buffer(%tile_1_3) {address = 16384 : i32, mem_bank = 1 : i32, sym_name = "in3_cons_buff_0"} : memref<2xbf16> 
+    %in3_cons_buff_1 = aie.buffer(%tile_1_3) {address = 32768 : i32, mem_bank = 2 : i32, sym_name = "in3_cons_buff_1"} : memref<2xbf16> 
+    %in3_cons_prod_lock_0 = aie.lock(%tile_1_3, 0) {init = 2 : i32, sym_name = "in3_cons_prod_lock_0"}
+    %in3_cons_cons_lock_0 = aie.lock(%tile_1_3, 1) {init = 0 : i32, sym_name = "in3_cons_cons_lock_0"}
     %in3_prod_lock_0 = aie.lock(%shim_noc_tile_3_0, 0) {init = 1 : i32, sym_name = "in3_prod_lock_0"}
     %in3_cons_lock_0 = aie.lock(%shim_noc_tile_3_0, 1) {init = 0 : i32, sym_name = "in3_cons_lock_0"}
     %in2_cons_buff_0 = aie.buffer(%mem_tile_2_1) {address = 0 : i32, mem_bank = 0 : i32, sym_name = "in2_cons_buff_0"} : memref<9216xbf16> 
@@ -201,16 +193,20 @@ module {
     %in1_cons_cons_lock_2 = aie.lock(%mem_tile_1_1, 5) {init = 0 : i32, sym_name = "in1_cons_cons_lock_2"}
     %in1_prod_lock_0 = aie.lock(%shim_noc_tile_1_0, 0) {init = 1 : i32, sym_name = "in1_prod_lock_0"}
     %in1_cons_lock_0 = aie.lock(%shim_noc_tile_1_0, 1) {init = 0 : i32, sym_name = "in1_cons_lock_0"}
-    %in0_cons_buff_0 = aie.buffer(%tile_1_2) {address = 32768 : i32, mem_bank = 2 : i32, sym_name = "in0_cons_buff_0"} : memref<2xbf16> 
-    %in0_cons_buff_1 = aie.buffer(%tile_1_2) {address = 49152 : i32, mem_bank = 3 : i32, sym_name = "in0_cons_buff_1"} : memref<2xbf16> 
-    %in0_cons_prod_lock_0 = aie.lock(%tile_1_2, 0) {init = 2 : i32, sym_name = "in0_cons_prod_lock_0"}
-    %in0_cons_cons_lock_0 = aie.lock(%tile_1_2, 1) {init = 0 : i32, sym_name = "in0_cons_cons_lock_0"}
+    %in0_cons_buff_0 = aie.buffer(%mem_tile_3_1) {address = 0 : i32, mem_bank = 0 : i32, sym_name = "in0_cons_buff_0"} : memref<96xbf16> 
+    %in0_cons_buff_1 = aie.buffer(%mem_tile_3_1) {address = 65536 : i32, mem_bank = 1 : i32, sym_name = "in0_cons_buff_1"} : memref<96xbf16> 
+    %in0_cons_prod_lock_0 = aie.lock(%mem_tile_3_1, 0) {init = 2 : i32, sym_name = "in0_cons_prod_lock_0"}
+    %in0_cons_cons_lock_0 = aie.lock(%mem_tile_3_1, 1) {init = 0 : i32, sym_name = "in0_cons_cons_lock_0"}
+    %in0_cons_prod_lock_1 = aie.lock(%mem_tile_3_1, 2) {init = 2 : i32, sym_name = "in0_cons_prod_lock_1"}
+    %in0_cons_cons_lock_1 = aie.lock(%mem_tile_3_1, 3) {init = 0 : i32, sym_name = "in0_cons_cons_lock_1"}
+    %in0_cons_prod_lock_2 = aie.lock(%mem_tile_3_1, 4) {init = 2 : i32, sym_name = "in0_cons_prod_lock_2"}
+    %in0_cons_cons_lock_2 = aie.lock(%mem_tile_3_1, 5) {init = 0 : i32, sym_name = "in0_cons_cons_lock_2"}
     %in0_prod_lock_0 = aie.lock(%shim_noc_tile_0_0, 0) {init = 1 : i32, sym_name = "in0_prod_lock_0"}
     %in0_cons_lock_0 = aie.lock(%shim_noc_tile_0_0, 1) {init = 0 : i32, sym_name = "in0_cons_lock_0"}
-    aie.flow(%shim_noc_tile_0_0, DMA : 0, %tile_1_2, DMA : 0)
+    aie.flow(%shim_noc_tile_0_0, DMA : 0, %mem_tile_3_1, DMA : 0)
     aie.flow(%shim_noc_tile_1_0, DMA : 0, %mem_tile_1_1, DMA : 0)
     aie.flow(%shim_noc_tile_2_0, DMA : 0, %mem_tile_2_1, DMA : 0)
-    aie.flow(%shim_noc_tile_3_0, DMA : 0, %mem_tile_3_1, DMA : 0)
+    aie.flow(%shim_noc_tile_3_0, DMA : 0, %tile_1_3, DMA : 0)
     aie.flow(%mem_tile_1_1, DMA : 0, %tile_0_5, DMA : 0)
     aie.flow(%mem_tile_1_1, DMA : 1, %tile_0_4, DMA : 0)
     aie.flow(%mem_tile_1_1, DMA : 2, %tile_0_3, DMA : 0)
@@ -221,9 +217,8 @@ module {
     aie.flow(%mem_tile_2_1, DMA : 1, %tile_3_4, DMA : 0)
     aie.flow(%tile_0_4, DMA : 0, %tile_1_5, DMA : 0)
     aie.flow(%tile_0_3, DMA : 0, %tile_1_4, DMA : 0)
-    aie.flow(%tile_1_4, DMA : 0, %tile_1_2, DMA : 1)
-    aie.flow(%tile_1_2, DMA : 0, %tile_3_5, DMA : 0)
-    aie.flow(%tile_1_2, DMA : 0, %tile_2_5, DMA : 0)
+    aie.flow(%tile_1_3, DMA : 0, %tile_3_5, DMA : 0)
+    aie.flow(%tile_1_3, DMA : 0, %tile_2_5, DMA : 0)
     aie.flow(%tile_2_3, DMA : 0, %tile_3_2, DMA : 0)
     aie.flow(%tile_2_2, DMA : 0, %shim_noc_tile_2_0, DMA : 0)
     %core_0_5 = aie.core(%tile_0_5) {
@@ -3399,7 +3394,7 @@ module {
     ^bb6:  // pred: ^bb1
       aie.end
     } {link_with = "add.o"}
-    %core_1_2 = aie.core(%tile_1_2) {
+    %core_1_3 = aie.core(%tile_1_3) {
       %c0 = arith.constant 0 : index
       %c9223372036854775807 = arith.constant 9223372036854775807 : index
       %c1 = arith.constant 1 : index
@@ -3410,7 +3405,7 @@ module {
       %1 = arith.cmpi slt, %0, %c9223372036854775806 : index
       cf.cond_br %1, ^bb2, ^bb15
     ^bb2:  // pred: ^bb1
-      aie.use_lock(%in0_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%in3_cons_cons_lock_0, AcquireGreaterEqual, 1)
       %c0_0 = arith.constant 0 : index
       %c16384 = arith.constant 16384 : index
       %c1_1 = arith.constant 1 : index
@@ -3427,20 +3422,20 @@ module {
       %5 = arith.cmpi slt, %4, %c2_3 : index
       cf.cond_br %5, ^bb6, ^bb7
     ^bb6:  // pred: ^bb5
-      aie.use_lock(%of_scaleAddBL_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%of_scaleAddBL_cons_lock_0, AcquireGreaterEqual, 1)
       aie.use_lock(%of_trigFifo_prod_lock_0, AcquireGreaterEqual, 1)
       %c4608_i32 = arith.constant 4608 : i32
-      func.call @scale_single(%of_scaleAddBL_cons_buff_0, %in0_cons_buff_0, %of_trigFifo_buff_0, %c4608_i32) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
+      func.call @scale_single(%of_scaleAddBL_buff_0, %in3_cons_buff_0, %of_trigFifo_buff_0, %c4608_i32) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
       aie.use_lock(%of_trigFifo_cons_lock_0, Release, 1)
-      aie.use_lock(%of_scaleAddBL_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%of_scaleAddBL_prod_lock_0, Release, 1)
       %6 = arith.addi %4, %c1_4 : index
       cf.br ^bb5(%6 : index)
     ^bb7:  // pred: ^bb5
       %7 = arith.addi %2, %c1_1 : index
       cf.br ^bb3(%7 : index)
     ^bb8:  // pred: ^bb3
-      aie.use_lock(%in0_cons_prod_lock_0, Release, 1)
-      aie.use_lock(%in0_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%in3_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%in3_cons_cons_lock_0, AcquireGreaterEqual, 1)
       %c0_5 = arith.constant 0 : index
       %c16384_6 = arith.constant 16384 : index
       %c1_7 = arith.constant 1 : index
@@ -3457,23 +3452,23 @@ module {
       %11 = arith.cmpi slt, %10, %c2_9 : index
       cf.cond_br %11, ^bb12, ^bb13
     ^bb12:  // pred: ^bb11
-      aie.use_lock(%of_scaleAddBL_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%of_scaleAddBL_cons_lock_0, AcquireGreaterEqual, 1)
       aie.use_lock(%of_trigFifo_prod_lock_0, AcquireGreaterEqual, 1)
       %c4608_i32_11 = arith.constant 4608 : i32
-      func.call @scale_single(%of_scaleAddBL_cons_buff_0, %in0_cons_buff_1, %of_trigFifo_buff_0, %c4608_i32_11) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
+      func.call @scale_single(%of_scaleAddBL_buff_0, %in3_cons_buff_1, %of_trigFifo_buff_0, %c4608_i32_11) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
       aie.use_lock(%of_trigFifo_cons_lock_0, Release, 1)
-      aie.use_lock(%of_scaleAddBL_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%of_scaleAddBL_prod_lock_0, Release, 1)
       %12 = arith.addi %10, %c1_10 : index
       cf.br ^bb11(%12 : index)
     ^bb13:  // pred: ^bb11
       %13 = arith.addi %8, %c1_7 : index
       cf.br ^bb9(%13 : index)
     ^bb14:  // pred: ^bb9
-      aie.use_lock(%in0_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%in3_cons_prod_lock_0, Release, 1)
       %14 = arith.addi %0, %c2 : index
       cf.br ^bb1(%14 : index)
     ^bb15:  // pred: ^bb1
-      aie.use_lock(%in0_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%in3_cons_cons_lock_0, AcquireGreaterEqual, 1)
       %c0_12 = arith.constant 0 : index
       %c16384_13 = arith.constant 16384 : index
       %c1_14 = arith.constant 1 : index
@@ -3490,19 +3485,19 @@ module {
       %18 = arith.cmpi slt, %17, %c2_16 : index
       cf.cond_br %18, ^bb19, ^bb20
     ^bb19:  // pred: ^bb18
-      aie.use_lock(%of_scaleAddBL_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.use_lock(%of_scaleAddBL_cons_lock_0, AcquireGreaterEqual, 1)
       aie.use_lock(%of_trigFifo_prod_lock_0, AcquireGreaterEqual, 1)
       %c4608_i32_18 = arith.constant 4608 : i32
-      func.call @scale_single(%of_scaleAddBL_cons_buff_0, %in0_cons_buff_0, %of_trigFifo_buff_0, %c4608_i32_18) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
+      func.call @scale_single(%of_scaleAddBL_buff_0, %in3_cons_buff_0, %of_trigFifo_buff_0, %c4608_i32_18) : (memref<4608xbf16>, memref<2xbf16>, memref<4608xbf16>, i32) -> ()
       aie.use_lock(%of_trigFifo_cons_lock_0, Release, 1)
-      aie.use_lock(%of_scaleAddBL_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%of_scaleAddBL_prod_lock_0, Release, 1)
       %19 = arith.addi %17, %c1_17 : index
       cf.br ^bb18(%19 : index)
     ^bb20:  // pred: ^bb18
       %20 = arith.addi %15, %c1_14 : index
       cf.br ^bb16(%20 : index)
     ^bb21:  // pred: ^bb16
-      aie.use_lock(%in0_cons_prod_lock_0, Release, 1)
+      aie.use_lock(%in3_cons_prod_lock_0, Release, 1)
       aie.end
     } {link_with = "scale.o"}
     %core_2_5 = aie.core(%tile_2_5) {
@@ -4309,41 +4304,83 @@ module {
       aie.end
     } {link_with = "mean.o"}
     aiex.runtime_sequence @sequence(%arg0: memref<27648xbf16>, %arg1: memref<27648xbf16>, %arg2: memref<27648xbf16>, %arg3: memref<27648xbf16>, %arg4: memref<27648xbf16>) {
-      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 2][0, 0, 0, 1]) {id = 1 : i64, metadata = @in0} : memref<27648xbf16>
+      aiex.npu.dma_memcpy_nd(%arg0[0, 0, 0, 0][1, 1, 1, 2][0, 0, 0, 1]) {id = 1 : i64, metadata = @in3} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg1[0, 0, 0, 0][1, 1, 1, 27648][0, 0, 0, 1]) {id = 2 : i64, metadata = @in1} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg2[0, 0, 0, 0][1, 1, 1, 18432][0, 0, 0, 1]) {id = 3 : i64, metadata = @in2} : memref<27648xbf16>
-      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 49152][0, 0, 0, 1]) {id = 4 : i64, metadata = @in3} : memref<27648xbf16>
+      aiex.npu.dma_memcpy_nd(%arg3[0, 0, 0, 0][1, 1, 1, 49152][0, 0, 0, 1]) {id = 4 : i64, metadata = @in0} : memref<27648xbf16>
       aiex.npu.dma_memcpy_nd(%arg4[0, 0, 0, 0][1, 1, 1, 16384][0, 0, 0, 1]) {id = 0 : i64, metadata = @out} : memref<27648xbf16>
       aiex.npu.dma_wait {symbol = @out}
     }
     aie.shim_dma_allocation @in0(MM2S, 0, 0)
-    %mem_1_2 = aie.mem(%tile_1_2) {
-      %0 = aie.dma_start(S2MM, 0, ^bb1, ^bb3)
-    ^bb1:  // 2 preds: ^bb0, ^bb2
+    %memtile_dma_3_1 = aie.memtile_dma(%mem_tile_3_1) {
+      %0 = aie.dma_start(S2MM, 0, ^bb1, ^bb7)
+    ^bb1:  // 2 preds: ^bb0, ^bb6
       aie.use_lock(%in0_cons_prod_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in0_cons_buff_0 : memref<2xbf16>, 0, 2) {bd_id = 0 : i32, next_bd_id = 1 : i32}
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 0, 32) {bd_id = 0 : i32, next_bd_id = 1 : i32}
       aie.use_lock(%in0_cons_cons_lock_0, Release, 1)
       aie.next_bd ^bb2
     ^bb2:  // pred: ^bb1
-      aie.use_lock(%in0_cons_prod_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in0_cons_buff_1 : memref<2xbf16>, 0, 2) {bd_id = 1 : i32, next_bd_id = 0 : i32}
-      aie.use_lock(%in0_cons_cons_lock_0, Release, 1)
-      aie.next_bd ^bb1
-    ^bb3:  // pred: ^bb0
-      %1 = aie.dma_start(S2MM, 1, ^bb4, ^bb5)
-    ^bb4:  // 2 preds: ^bb3, ^bb4
-      aie.use_lock(%of_scaleAddBL_cons_prod_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%of_scaleAddBL_cons_buff_0 : memref<4608xbf16>, 0, 4608) {bd_id = 2 : i32, next_bd_id = 2 : i32}
-      aie.use_lock(%of_scaleAddBL_cons_cons_lock_0, Release, 1)
+      aie.use_lock(%in0_cons_prod_lock_1, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 32, 32) {bd_id = 1 : i32, next_bd_id = 2 : i32}
+      aie.use_lock(%in0_cons_cons_lock_1, Release, 1)
+      aie.next_bd ^bb3
+    ^bb3:  // pred: ^bb2
+      aie.use_lock(%in0_cons_prod_lock_2, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 64, 32) {bd_id = 2 : i32, next_bd_id = 3 : i32}
+      aie.use_lock(%in0_cons_cons_lock_2, Release, 1)
       aie.next_bd ^bb4
-    ^bb5:  // pred: ^bb3
-      %2 = aie.dma_start(MM2S, 0, ^bb6, ^bb7)
-    ^bb6:  // 2 preds: ^bb5, ^bb6
-      aie.use_lock(%of_trigFifo_cons_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%of_trigFifo_buff_0 : memref<4608xbf16>, 0, 4608) {bd_id = 3 : i32, next_bd_id = 3 : i32}
-      aie.use_lock(%of_trigFifo_prod_lock_0, Release, 1)
+    ^bb4:  // pred: ^bb3
+      aie.use_lock(%in0_cons_prod_lock_0, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 0, 32) {bd_id = 3 : i32, next_bd_id = 4 : i32}
+      aie.use_lock(%in0_cons_cons_lock_0, Release, 1)
+      aie.next_bd ^bb5
+    ^bb5:  // pred: ^bb4
+      aie.use_lock(%in0_cons_prod_lock_1, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 32, 32) {bd_id = 4 : i32, next_bd_id = 5 : i32}
+      aie.use_lock(%in0_cons_cons_lock_1, Release, 1)
       aie.next_bd ^bb6
-    ^bb7:  // pred: ^bb5
+    ^bb6:  // pred: ^bb5
+      aie.use_lock(%in0_cons_prod_lock_2, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 64, 32) {bd_id = 5 : i32, next_bd_id = 0 : i32}
+      aie.use_lock(%in0_cons_cons_lock_2, Release, 1)
+      aie.next_bd ^bb1
+    ^bb7:  // pred: ^bb0
+      %1 = aie.dma_start(MM2S, 0, ^bb8, ^bb10)
+    ^bb8:  // 2 preds: ^bb7, ^bb9
+      aie.use_lock(%in0_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 0, 32) {bd_id = 6 : i32, next_bd_id = 7 : i32}
+      aie.use_lock(%in0_cons_prod_lock_0, Release, 1)
+      aie.next_bd ^bb9
+    ^bb9:  // pred: ^bb8
+      aie.use_lock(%in0_cons_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 0, 32) {bd_id = 7 : i32, next_bd_id = 6 : i32}
+      aie.use_lock(%in0_cons_prod_lock_0, Release, 1)
+      aie.next_bd ^bb8
+    ^bb10:  // pred: ^bb7
+      %2 = aie.dma_start(MM2S, 1, ^bb11, ^bb13)
+    ^bb11:  // 2 preds: ^bb10, ^bb12
+      aie.use_lock(%in0_cons_cons_lock_1, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 32, 32) {bd_id = 24 : i32, next_bd_id = 25 : i32}
+      aie.use_lock(%in0_cons_prod_lock_1, Release, 1)
+      aie.next_bd ^bb12
+    ^bb12:  // pred: ^bb11
+      aie.use_lock(%in0_cons_cons_lock_1, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 32, 32) {bd_id = 25 : i32, next_bd_id = 24 : i32}
+      aie.use_lock(%in0_cons_prod_lock_1, Release, 1)
+      aie.next_bd ^bb11
+    ^bb13:  // pred: ^bb10
+      %3 = aie.dma_start(MM2S, 2, ^bb14, ^bb16)
+    ^bb14:  // 2 preds: ^bb13, ^bb15
+      aie.use_lock(%in0_cons_cons_lock_2, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_0 : memref<96xbf16>, 64, 32) {bd_id = 8 : i32, next_bd_id = 9 : i32}
+      aie.use_lock(%in0_cons_prod_lock_2, Release, 1)
+      aie.next_bd ^bb15
+    ^bb15:  // pred: ^bb14
+      aie.use_lock(%in0_cons_cons_lock_2, AcquireGreaterEqual, 1)
+      aie.dma_bd(%in0_cons_buff_1 : memref<96xbf16>, 64, 32) {bd_id = 9 : i32, next_bd_id = 8 : i32}
+      aie.use_lock(%in0_cons_prod_lock_2, Release, 1)
+      aie.next_bd ^bb14
+    ^bb16:  // pred: ^bb13
       aie.end
     }
     aie.shim_dma_allocation @in1(MM2S, 0, 1)
@@ -4469,75 +4506,26 @@ module {
       aie.end
     }
     aie.shim_dma_allocation @in3(MM2S, 0, 3)
-    %memtile_dma_3_1 = aie.memtile_dma(%mem_tile_3_1) {
-      %0 = aie.dma_start(S2MM, 0, ^bb1, ^bb7)
-    ^bb1:  // 2 preds: ^bb0, ^bb6
+    %mem_1_3 = aie.mem(%tile_1_3) {
+      %0 = aie.dma_start(S2MM, 0, ^bb1, ^bb3)
+    ^bb1:  // 2 preds: ^bb0, ^bb2
       aie.use_lock(%in3_cons_prod_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 0, 32) {bd_id = 0 : i32, next_bd_id = 1 : i32}
+      aie.dma_bd(%in3_cons_buff_0 : memref<2xbf16>, 0, 2) {bd_id = 0 : i32, next_bd_id = 1 : i32}
       aie.use_lock(%in3_cons_cons_lock_0, Release, 1)
       aie.next_bd ^bb2
     ^bb2:  // pred: ^bb1
-      aie.use_lock(%in3_cons_prod_lock_1, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 32, 32) {bd_id = 1 : i32, next_bd_id = 2 : i32}
-      aie.use_lock(%in3_cons_cons_lock_1, Release, 1)
-      aie.next_bd ^bb3
-    ^bb3:  // pred: ^bb2
-      aie.use_lock(%in3_cons_prod_lock_2, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 64, 32) {bd_id = 2 : i32, next_bd_id = 3 : i32}
-      aie.use_lock(%in3_cons_cons_lock_2, Release, 1)
-      aie.next_bd ^bb4
-    ^bb4:  // pred: ^bb3
       aie.use_lock(%in3_cons_prod_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 0, 32) {bd_id = 3 : i32, next_bd_id = 4 : i32}
+      aie.dma_bd(%in3_cons_buff_1 : memref<2xbf16>, 0, 2) {bd_id = 1 : i32, next_bd_id = 0 : i32}
       aie.use_lock(%in3_cons_cons_lock_0, Release, 1)
-      aie.next_bd ^bb5
-    ^bb5:  // pred: ^bb4
-      aie.use_lock(%in3_cons_prod_lock_1, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 32, 32) {bd_id = 4 : i32, next_bd_id = 5 : i32}
-      aie.use_lock(%in3_cons_cons_lock_1, Release, 1)
-      aie.next_bd ^bb6
-    ^bb6:  // pred: ^bb5
-      aie.use_lock(%in3_cons_prod_lock_2, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 64, 32) {bd_id = 5 : i32, next_bd_id = 0 : i32}
-      aie.use_lock(%in3_cons_cons_lock_2, Release, 1)
       aie.next_bd ^bb1
-    ^bb7:  // pred: ^bb0
-      %1 = aie.dma_start(MM2S, 0, ^bb8, ^bb10)
-    ^bb8:  // 2 preds: ^bb7, ^bb9
-      aie.use_lock(%in3_cons_cons_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 0, 32) {bd_id = 6 : i32, next_bd_id = 7 : i32}
-      aie.use_lock(%in3_cons_prod_lock_0, Release, 1)
-      aie.next_bd ^bb9
-    ^bb9:  // pred: ^bb8
-      aie.use_lock(%in3_cons_cons_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 0, 32) {bd_id = 7 : i32, next_bd_id = 6 : i32}
-      aie.use_lock(%in3_cons_prod_lock_0, Release, 1)
-      aie.next_bd ^bb8
-    ^bb10:  // pred: ^bb7
-      %2 = aie.dma_start(MM2S, 1, ^bb11, ^bb13)
-    ^bb11:  // 2 preds: ^bb10, ^bb12
-      aie.use_lock(%in3_cons_cons_lock_1, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 32, 32) {bd_id = 24 : i32, next_bd_id = 25 : i32}
-      aie.use_lock(%in3_cons_prod_lock_1, Release, 1)
-      aie.next_bd ^bb12
-    ^bb12:  // pred: ^bb11
-      aie.use_lock(%in3_cons_cons_lock_1, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 32, 32) {bd_id = 25 : i32, next_bd_id = 24 : i32}
-      aie.use_lock(%in3_cons_prod_lock_1, Release, 1)
-      aie.next_bd ^bb11
-    ^bb13:  // pred: ^bb10
-      %3 = aie.dma_start(MM2S, 2, ^bb14, ^bb16)
-    ^bb14:  // 2 preds: ^bb13, ^bb15
-      aie.use_lock(%in3_cons_cons_lock_2, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_0 : memref<96xbf16>, 64, 32) {bd_id = 8 : i32, next_bd_id = 9 : i32}
-      aie.use_lock(%in3_cons_prod_lock_2, Release, 1)
-      aie.next_bd ^bb15
-    ^bb15:  // pred: ^bb14
-      aie.use_lock(%in3_cons_cons_lock_2, AcquireGreaterEqual, 1)
-      aie.dma_bd(%in3_cons_buff_1 : memref<96xbf16>, 64, 32) {bd_id = 9 : i32, next_bd_id = 8 : i32}
-      aie.use_lock(%in3_cons_prod_lock_2, Release, 1)
-      aie.next_bd ^bb14
-    ^bb16:  // pred: ^bb13
+    ^bb3:  // pred: ^bb0
+      %1 = aie.dma_start(MM2S, 0, ^bb4, ^bb5)
+    ^bb4:  // 2 preds: ^bb3, ^bb4
+      aie.use_lock(%of_trigFifo_cons_lock_0, AcquireGreaterEqual, 1)
+      aie.dma_bd(%of_trigFifo_buff_0 : memref<4608xbf16>, 0, 4608) {bd_id = 2 : i32, next_bd_id = 2 : i32}
+      aie.use_lock(%of_trigFifo_prod_lock_0, Release, 1)
+      aie.next_bd ^bb4
+    ^bb5:  // pred: ^bb3
       aie.end
     }
     %mem_0_5 = aie.mem(%tile_0_5) {
@@ -4673,13 +4661,6 @@ module {
       aie.use_lock(%of_addW_cons_cons_lock_0, Release, 1)
       aie.next_bd ^bb1
     ^bb3:  // pred: ^bb0
-      %1 = aie.dma_start(MM2S, 0, ^bb4, ^bb5)
-    ^bb4:  // 2 preds: ^bb3, ^bb4
-      aie.use_lock(%of_scaleAddBL_cons_lock_0, AcquireGreaterEqual, 1)
-      aie.dma_bd(%of_scaleAddBL_buff_0 : memref<4608xbf16>, 0, 4608) {bd_id = 2 : i32, next_bd_id = 2 : i32}
-      aie.use_lock(%of_scaleAddBL_prod_lock_0, Release, 1)
-      aie.next_bd ^bb4
-    ^bb5:  // pred: ^bb3
       aie.end
     }
     %mem_2_5 = aie.mem(%tile_2_5) {

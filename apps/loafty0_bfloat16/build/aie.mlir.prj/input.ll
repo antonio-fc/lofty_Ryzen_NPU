@@ -2,14 +2,14 @@
 source_filename = "LLVMDialectModule"
 target triple = "aie2"
 
-@in0_cons_buff_1 = external global [2 x bfloat]
-@in0_cons_buff_0 = external global [2 x bfloat]
+@in0_cons_buff_1 = external global [96 x bfloat]
+@in0_cons_buff_0 = external global [96 x bfloat]
 @in1_cons_buff_1 = external global [13824 x bfloat]
 @in1_cons_buff_0 = external global [13824 x bfloat]
 @in2_cons_buff_1 = external global [9216 x bfloat]
 @in2_cons_buff_0 = external global [9216 x bfloat]
-@in3_cons_buff_1 = external global [96 x bfloat]
-@in3_cons_buff_0 = external global [96 x bfloat]
+@in3_cons_buff_1 = external global [2 x bfloat]
+@in3_cons_buff_0 = external global [2 x bfloat]
 @of_in_u_cons_buff_1 = external global [4608 x bfloat]
 @of_in_u_cons_buff_0 = external global [4608 x bfloat]
 @of_in_v_cons_buff_1 = external global [4608 x bfloat]
@@ -31,7 +31,6 @@ target triple = "aie2"
 @of_addW_cons_buff_0 = external global [4608 x bfloat]
 @of_addUV_buff_0 = external global [4608 x bfloat]
 @of_scaleAddBL_buff_0 = external global [4608 x bfloat]
-@of_scaleAddBL_cons_buff_0 = external global [4608 x bfloat]
 @of_trigFifo_buff_0 = external global [4608 x bfloat]
 @of_trigFifo_1_cons_buff_0 = external global [4608 x bfloat]
 @of_trigFifo_0_cons_buff_0 = external global [4608 x bfloat]
@@ -60,7 +59,6 @@ target triple = "aie2"
 @of_trigFifo_0_cons = external global [4608 x bfloat]
 @of_trigFifo_1_cons = external global [4608 x bfloat]
 @of_trigFifo = external global [4608 x bfloat]
-@of_scaleAddBL_cons = external global [4608 x bfloat]
 @of_scaleAddBL = external global [4608 x bfloat]
 @of_addUV = external global [4608 x bfloat]
 @of_addW_cons = external global [4608 x bfloat]
@@ -84,14 +82,14 @@ target triple = "aie2"
 @of_in_v = external global [4608 x bfloat]
 @of_in_u_cons = external global [4608 x bfloat]
 @of_in_u = external global [4608 x bfloat]
-@in3_cons = external global [96 x bfloat]
-@in3 = external global [96 x bfloat]
+@in3_cons = external global [2 x bfloat]
+@in3 = external global [2 x bfloat]
 @in2_cons = external global [9216 x bfloat]
 @in2 = external global [9216 x bfloat]
 @in1_cons = external global [13824 x bfloat]
 @in1 = external global [13824 x bfloat]
-@in0_cons = external global [2 x bfloat]
-@in0 = external global [2 x bfloat]
+@in0_cons = external global [96 x bfloat]
+@in0 = external global [96 x bfloat]
 
 declare void @debug_i32(i32)
 
@@ -981,7 +979,7 @@ define void @core_2_5() {
   ret void
 }
 
-define void @core_1_2() {
+define void @core_1_3() {
   br label %1
 
 1:                                                ; preds = %26, %0
@@ -1004,14 +1002,14 @@ define void @core_1_2() {
   br i1 %10, label %11, label %13
 
 11:                                               ; preds = %8
-  call void @llvm.aie2.acquire(i32 51, i32 -1)
-  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.acquire(i32 35, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_trigFifo_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_cons_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @scale_single(ptr @of_scaleAddBL_cons_buff_0, ptr @in0_cons_buff_0, ptr @of_trigFifo_buff_0, i32 4608)
-  call void @llvm.aie2.release(i32 53, i32 1)
-  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in3_cons_buff_0, i64 32) ]
+  call void @scale_single(ptr @of_scaleAddBL_buff_0, ptr @in3_cons_buff_0, ptr @of_trigFifo_buff_0, i32 4608)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 34, i32 1)
   %12 = add i64 %9, 1
   br label %8
 
@@ -1035,14 +1033,14 @@ define void @core_1_2() {
   br i1 %21, label %22, label %24
 
 22:                                               ; preds = %19
-  call void @llvm.aie2.acquire(i32 51, i32 -1)
-  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.acquire(i32 35, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_trigFifo_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_cons_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_1, i64 32) ]
-  call void @scale_single(ptr @of_scaleAddBL_cons_buff_0, ptr @in0_cons_buff_1, ptr @of_trigFifo_buff_0, i32 4608)
-  call void @llvm.aie2.release(i32 53, i32 1)
-  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in3_cons_buff_1, i64 32) ]
+  call void @scale_single(ptr @of_scaleAddBL_buff_0, ptr @in3_cons_buff_1, ptr @of_trigFifo_buff_0, i32 4608)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 34, i32 1)
   %23 = add i64 %20, 1
   br label %19
 
@@ -1070,14 +1068,14 @@ define void @core_1_2() {
   br i1 %34, label %35, label %37
 
 35:                                               ; preds = %32
-  call void @llvm.aie2.acquire(i32 51, i32 -1)
-  call void @llvm.aie2.acquire(i32 52, i32 -1)
+  call void @llvm.aie2.acquire(i32 35, i32 -1)
+  call void @llvm.aie2.acquire(i32 50, i32 -1)
   call void @llvm.assume(i1 true) [ "align"(ptr @of_trigFifo_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_cons_buff_0, i64 32) ]
-  call void @llvm.assume(i1 true) [ "align"(ptr @in0_cons_buff_0, i64 32) ]
-  call void @scale_single(ptr @of_scaleAddBL_cons_buff_0, ptr @in0_cons_buff_0, ptr @of_trigFifo_buff_0, i32 4608)
-  call void @llvm.aie2.release(i32 53, i32 1)
-  call void @llvm.aie2.release(i32 50, i32 1)
+  call void @llvm.assume(i1 true) [ "align"(ptr @of_scaleAddBL_buff_0, i64 32) ]
+  call void @llvm.assume(i1 true) [ "align"(ptr @in3_cons_buff_0, i64 32) ]
+  call void @scale_single(ptr @of_scaleAddBL_buff_0, ptr @in3_cons_buff_0, ptr @of_trigFifo_buff_0, i32 4608)
+  call void @llvm.aie2.release(i32 51, i32 1)
+  call void @llvm.aie2.release(i32 34, i32 1)
   %36 = add i64 %33, 1
   br label %32
 

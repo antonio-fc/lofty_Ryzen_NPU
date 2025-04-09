@@ -87,9 +87,8 @@ def loafty():
     ITER_KERNEL = sys.maxsize # This look runs the number of times the kernel is called, so the number of iterations atm
     MSIZE = 9216 # 96x96
     BSIZE = 256*256 # 256X256
-    ITER_M = 1 # this can be any number that can divide MSIZE whose quotient is an even integer, except 1 (doesnt work atm cause of size limitations)
+    ITER_M = 4 # this can be any number that can divide MSIZE whose quotient is an even integer, except 1 (doesnt work atm cause of size limitations)
     TSIZE = MSIZE//ITER_M
-    ITER_B = 9
     
     # Declaring basic types
     dtype = np.dtype[bfloat16]
@@ -120,14 +119,14 @@ def loafty():
         of_in_lmn = object_fifo("in3", st[1], mt[2], 2, scalar_ty3)      # input: baseline scale (lmn)
 
         # Distributing visibilities (real and imaginary)
-        of_visR = object_fifo("visR", mt[3], ct[3][2], 2, tile_ty)
-        of_visC = object_fifo("visC", mt[3], ct[3][3], 2, tile_ty)
+        of_visR = object_fifo("visR", mt[3], ct[3][2], [ITER_M, ITER_M], tile_ty)
+        of_visC = object_fifo("visC", mt[3], ct[3][3], [ITER_M, ITER_M], tile_ty)
         object_fifo_link(of_in_vis, [of_visR, of_visC], [], [0, TSIZE])
         
         # Distributing baselines
-        of_u = object_fifo("u", mt[1], ct[0][0], 2, tile_ty)
-        of_v = object_fifo("v", mt[1], ct[1][0], 2, tile_ty)
-        of_w = object_fifo("w", mt[1], ct[2][0], 2, tile_ty)
+        of_u = object_fifo("u", mt[1], ct[0][0], [ITER_M, ITER_M], tile_ty)
+        of_v = object_fifo("v", mt[1], ct[1][0], [ITER_M, ITER_M], tile_ty)
+        of_w = object_fifo("w", mt[1], ct[2][0], [ITER_M, ITER_M], tile_ty)
         object_fifo_link(of_in_baselines, [of_u, of_v, of_w], [], [0, TSIZE, TSIZE*2])
 
         # Distributing baseline scales
@@ -143,48 +142,43 @@ def loafty():
         def core_body():
             for _ in range_(ITER_KERNEL):
                 l = of_l.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    u = of_u.acquire(ObjectFifoPort.Consume, 1)
-                    
-                    of_u.release(ObjectFifoPort.Consume, 1)
+                u = of_u.acquire(ObjectFifoPort.Consume, ITER_M)
+                
+                of_u.release(ObjectFifoPort.Consume, ITER_M)
                 of_l.release(ObjectFifoPort.Consume, 1)
         
         @core(ct[1][0], "scale.o")  # Multiplying v * m
         def core_body():
             for _ in range_(ITER_KERNEL):
                 m = of_m.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    v = of_v.acquire(ObjectFifoPort.Consume, 1)
-                    
-                    of_v.release(ObjectFifoPort.Consume, 1)
+                v = of_v.acquire(ObjectFifoPort.Consume, ITER_M)
+                
+                of_v.release(ObjectFifoPort.Consume, ITER_M)
                 of_m.release(ObjectFifoPort.Consume, 1)
 
         @core(ct[2][0], "scale.o")  # Multiplying w * n
         def core_body():
             for _ in range_(ITER_KERNEL):
                 n = of_n.acquire(ObjectFifoPort.Consume, 1)
-                for _ in range_(ITER_M):
-                    w = of_w.acquire(ObjectFifoPort.Consume, 1)
-                    
-                    of_w.release(ObjectFifoPort.Consume, 1)
+                w = of_w.acquire(ObjectFifoPort.Consume, ITER_M)
+                
+                of_w.release(ObjectFifoPort.Consume, ITER_M)
                 of_n.release(ObjectFifoPort.Consume, 1)
 
 
         @core(ct[3][3], "vector_mult.o") # Multiplying Dr with the real visibilities [Er]
         def core_body():
             for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in1 = of_visC.acquire(ObjectFifoPort.Consume, 1)
-            
-                    of_visC.release(ObjectFifoPort.Consume, 1)
+                obj_in1 = of_visC.acquire(ObjectFifoPort.Consume, ITER_M)
+        
+                of_visC.release(ObjectFifoPort.Consume, ITER_M)
 
         @core(ct[3][2], "vector_mult.o") # Multiplying Dr with the imaginary visibilities [Ec]
         def core_body():
             for _ in range_(ITER_KERNEL):
-                for _ in range_(ITER_M):
-                    obj_in1 = of_visR.acquire(ObjectFifoPort.Consume, 1)
-                    
-                    of_visR.release(ObjectFifoPort.Consume, 1)
+                obj_in1 = of_visR.acquire(ObjectFifoPort.Consume, ITER_M)
+                
+                of_visR.release(ObjectFifoPort.Consume, ITER_M)
 
 
         @core(ct[3][0], "mean.o") 

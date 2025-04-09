@@ -55,9 +55,9 @@ build/kernels.a: build/trig.o build/lut_ops.o
 
 build/final.xclbin: build/aie.mlir build/scale.o build/passthrough.o build/vector_add.o build/vector_sub.o build/vector_mult.o build/mean.o build/kernels.a
 	mkdir -p ${@D}
-	cd ${@D} && aiecc.py --aie-generate-cdo --no-compile-host --xclbin-name=${@F} \
-				--no-xchesscc --no-xbridge \
-				--aie-generate-npu --npu-insts-name=insts.txt $(<:%=../%)
+	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
+		--no-xchesscc --no-xbridge \
+		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
 
 ${targetname}.exe: ${srcdir}/test.cpp
 	rm -rf _build
@@ -80,7 +80,7 @@ run-10-warmup: ${targetname}.exe build/final.xclbin build/insts.txt
 	${powershell} ./$< -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.txt -k MLIR_AIE --iters 10 --warmup 4
+	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --iters 10 --warmup 4
 
 clean:
 	rm -rf build _build ${targetname}.exe
