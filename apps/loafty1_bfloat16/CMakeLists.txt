@@ -38,6 +38,7 @@ project(${ProjectName})
 
 # Find packages
 find_package(Boost REQUIRED)
+find_package(HDF5 REQUIRED)
 
 add_executable(${currentTarget}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/test_utils.cpp
@@ -45,6 +46,8 @@ add_executable(${currentTarget}
 )
 
 target_compile_definitions(${currentTarget} PUBLIC DISABLE_ABI_CHECK=1)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_include_directories (${currentTarget} PUBLIC 
     ../../utils
@@ -64,6 +67,7 @@ if (NOT WSL)
         xrt_coreutil
         boost_program_options
         boost_filesystem
+        HDF5::HDF5
     )
 else()
     target_link_libraries(${currentTarget} PUBLIC

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <h5cpp/hdf5.hpp>
+#include <hdf5.h>
 
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
@@ -24,7 +24,110 @@
 #endif
 
 namespace po = boost::program_options;
-using namespace hdf5;
+
+typedef struct {
+    float real;
+    float imaginary;
+} MyCompound;
+
+void H5GiterateCallback(hid_t group, const char *name, void *opdata /* in/out: operation data */) {
+    hid_t dataset_id, filespace_id, datatype_id = -1;
+    MyCompound *data = NULL;
+    hsize_t dims[2];
+    size_t total_elements = 0;
+
+    datatype_id = H5Tcreate(H5T_COMPOUND, sizeof(MyCompound));
+    // Insert fields into the compound type
+    H5Tinsert(datatype_id, "x", 0 * sizeof(float), H5T_NATIVE_FLOAT);
+    H5Tinsert(datatype_id, "y", 1 * sizeof(float), H5T_NATIVE_FLOAT);
+
+    // printf("Processing dataset: %s\n", name);
+    // if (oinfo->type != H5O_TYPE_DATASET) {
+    //     return;
+    // }
+
+    /* Open the dataset */
+    dataset_id = H5Dopen2(reinterpret_cast<hid_t>(opdata), name, H5P_DEFAULT);
+    if (dataset_id < 0) {
+        printf("Error opening dataset %s\n", name);
+        return;
+    }
+
+    /* Get the dataset's space and dimensions */
+    filespace_id = H5Dget_space(dataset_id);
+    int ndims = H5Sget_simple_extent_ndims(filespace_id);
+    if (ndims != 2) {
+        printf("Dataset %s is not two-dimensional\n", name);
+        goto error;
+    }
+
+    if (H5Sget_simple_extent_dims(filespace_id, dims, NULL) < 0) {
+        printf("Error getting dimensions for dataset %s\n", name);
+        goto error;
+    }
+
+    total_elements = dims[0] * dims[1];
+    data = (MyCompound *)malloc(total_elements * sizeof(MyCompound));
+    if (!data) {
+        printf("Memory allocation failed for dataset %s\n", name);
+        goto error;
+    }
+
+    /* Read the data */
+    if (H5Dread(dataset_id, datatype_id,
+        H5S_ALL,     // File space (entire dataset)
+        H5S_ALL,     // Memory space (same as file)
+        H5P_DEFAULT, // Transfer properties
+        data) < 0) {
+        printf("Error reading dataset %s\n", name);
+        free(data);
+        goto error;
+    }
+
+    /* Process the data as needed */
+    for (size_t x = 0; x < dims[0]; ++x) {
+        for (size_t y = 0; y < dims[1]; ++y) {
+            printf("Element [%zu][%zu]: real = %.2f, imaginary = %.2f\n", x, y, data[(x * dims[0]) + y].real,
+            data[(x * dims[0]) + y].imaginary);
+        }
+    }
+
+    error:
+    if (data)
+        free(data);
+    if (filespace_id >= 0)
+        H5Sclose(filespace_id);
+    if (dataset_id >= 0)
+        H5Dclose(dataset_id);
+}
+
+// int main(int argc, char **argv) {
+//     if (argc < 2) {
+//         printf("Usage: %s filename.hdf5\n", argv[0]);
+//         return -1;
+//     }
+
+//     const char *filename = argv[1];
+//     hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+//     if (file_id < 0) {
+//         printf("Error opening file %s\n", filename);
+//         return -1;
+//     }
+
+//     hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
+//     if (group_id < 0) {
+//         printf("Error opening root group\n");
+//         goto error_file;
+//     }
+
+//     /* Iterate over the group's datasets */
+//     H5Giterate(group_id, ".", NULL, reinterpret_cast<H5G_iterate_t>(H5GiterateCallback), reinterpret_cast<void *>(file_id));
+
+//     H5Gclose(group_id);
+//     error_file:
+//     H5Fclose(file_id);
+//     return 0;
+// }
 
 
 
@@ -86,9 +189,9 @@ int main(int argc, const char *argv[]) {
     // LOAD INSTRUCTION SEQUENCE
     // ------------------------------------------------------
     
-    std::vector<uint32_t> instr_v = test_utils::load_instr_sequence(vm["instr"].as<std::string>());
-    if (verbosity >= 1)
-        std::cout << "Sequence instr count: " << instr_v.size() << "\n";
+    // std::vector<uint32_t> instr_v = test_utils::load_instr_sequence(vm["instr"].as<std::string>());
+    // if (verbosity >= 1)
+    //     std::cout << "Sequence instr count: " << instr_v.size() << "\n";
 
     // ------------------------------------------------------
     // Get device, load the xclbin & kernel and register them
@@ -137,7 +240,7 @@ int main(int argc, const char *argv[]) {
     // ------------------------------------------------------
     // Initialize input/ output buffer sizes and sync them
     // ------------------------------------------------------
-    auto bo_instr = xrt::bo(device, instr_v.size() * sizeof(int), XCL_BO_FLAGS_CACHEABLE, kernel.group_id(1));
+    // auto bo_instr = xrt::bo(device, instr_v.size() * sizeof(int), XCL_BO_FLAGS_CACHEABLE, kernel.group_id(1));
     auto bo_inout0 = xrt::bo(device, INOUT_FACTOR_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(3));
     auto bo_inout1 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(4));
     auto bo_inout2 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(5));
@@ -152,13 +255,31 @@ int main(int argc, const char *argv[]) {
         std::cout << "Writing data into buffer objects.\n";
     
     // Initialize instruction buffer
-    void *bufInstr = bo_instr.map<void *>();
-    memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
+    // void *bufInstr = bo_instr.map<void *>();
+    // memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Obtaining the input data
-    
-    
+    const char *filename = "./data/hdf5/input1lba.h5";
+    hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+    if (file_id < 0) {
+        printf("Error opening file %s\n", filename);
+        return -1;
+    }
 
+    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
+    if (group_id < 0) {
+        printf("Error opening root group\n");
+        goto error_file;
+    }
+
+    /* Iterate over the group's datasets */
+    H5Giterate(group_id, ".", NULL, reinterpret_cast<H5G_iterate_t>(H5GiterateCallback), reinterpret_cast<void *>(file_id));
+
+    H5Gclose(group_id);
+    error_file:
+    H5Fclose(file_id);
+    
+    exit(32);
     // Separating per input
     DATATYPE freq = 50000000; // 50MHz
     DATATYPE SpeedOfLight = 299792458; // m/s
@@ -232,7 +353,7 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInOut2, main_inputB.data(), FULL_INPUT_SIZE);
     
     // Sync buffers to update input buffer values
-    bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    // bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
@@ -255,11 +376,11 @@ int main(int argc, const char *argv[]) {
         auto start = std::chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
         xrt::run run;
-        if(do_trace)
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-        else
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
-        run.wait();
+        // if(do_trace)
+        //     run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
+        // else
+        //     run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+        // run.wait();
         auto stop = std::chrono::high_resolution_clock::now();
         bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
         if(do_trace)
