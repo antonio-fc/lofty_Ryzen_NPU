@@ -28,15 +28,17 @@ namespace po = boost::program_options;
 typedef struct {
     float real;
     float imaginary;
-} MyCompound;
+} VisData;
 
-void H5GiterateCallback(hid_t group, const char *name, void *opdata /* in/out: operation data */) {
+std::vector<std::vector<VisData>> visVector;
+
+void H5GiterateCallback(hid_t group, const char *name, VisData *opdata /* in/out: operation data */) {
     hid_t dataset_id, filespace_id, datatype_id = -1;
-    MyCompound *data = NULL;
+    VisData *data = NULL;
     hsize_t dims[2];
     size_t total_elements = 0;
 
-    datatype_id = H5Tcreate(H5T_COMPOUND, sizeof(MyCompound));
+    datatype_id = H5Tcreate(H5T_COMPOUND, sizeof(VisData));
     // Insert fields into the compound type
     H5Tinsert(datatype_id, "x", 0 * sizeof(float), H5T_NATIVE_FLOAT);
     H5Tinsert(datatype_id, "y", 1 * sizeof(float), H5T_NATIVE_FLOAT);
@@ -58,19 +60,34 @@ void H5GiterateCallback(hid_t group, const char *name, void *opdata /* in/out: o
     int ndims = H5Sget_simple_extent_ndims(filespace_id);
     if (ndims != 2) {
         printf("Dataset %s is not two-dimensional\n", name);
-        goto error;
+        if (data)
+            free(data);
+        if (filespace_id >= 0)
+            H5Sclose(filespace_id);
+        if (dataset_id >= 0)
+            H5Dclose(dataset_id);
     }
 
     if (H5Sget_simple_extent_dims(filespace_id, dims, NULL) < 0) {
         printf("Error getting dimensions for dataset %s\n", name);
-        goto error;
+        if (data)
+            free(data);
+        if (filespace_id >= 0)
+            H5Sclose(filespace_id);
+        if (dataset_id >= 0)
+            H5Dclose(dataset_id);
     }
 
     total_elements = dims[0] * dims[1];
-    data = (MyCompound *)malloc(total_elements * sizeof(MyCompound));
+    data = (VisData *)malloc(total_elements * sizeof(VisData));
     if (!data) {
         printf("Memory allocation failed for dataset %s\n", name);
-        goto error;
+        if (data)
+            free(data);
+        if (filespace_id >= 0)
+            H5Sclose(filespace_id);
+        if (dataset_id >= 0)
+            H5Dclose(dataset_id);
     }
 
     /* Read the data */
@@ -81,55 +98,24 @@ void H5GiterateCallback(hid_t group, const char *name, void *opdata /* in/out: o
         data) < 0) {
         printf("Error reading dataset %s\n", name);
         free(data);
-        goto error;
+        if (filespace_id >= 0)
+            H5Sclose(filespace_id);
+        if (dataset_id >= 0)
+            H5Dclose(dataset_id);
     }
 
     /* Process the data as needed */
+    printf("%llu" , dims[0]);
+    printf("%llu", dims[1]);
+    std::vector<std::vector<VisData>> visVec(dims[0], std::vector<VisData>(dims[1]));
     for (size_t x = 0; x < dims[0]; ++x) {
         for (size_t y = 0; y < dims[1]; ++y) {
-            printf("Element [%zu][%zu]: real = %.2f, imaginary = %.2f\n", x, y, data[(x * dims[0]) + y].real,
-            data[(x * dims[0]) + y].imaginary);
+            // printf("Element [%zu][%zu]: real = %.2f, imaginary = %.2f\n", x, y, data[(x * dims[0]) + y].real, data[(x * dims[0]) + y].imaginary);
+            visVec[x][y] = data[(x * dims[0]) + y];
         }
     }
-
-    error:
-    if (data)
-        free(data);
-    if (filespace_id >= 0)
-        H5Sclose(filespace_id);
-    if (dataset_id >= 0)
-        H5Dclose(dataset_id);
+    visVector = visVec;
 }
-
-// int main(int argc, char **argv) {
-//     if (argc < 2) {
-//         printf("Usage: %s filename.hdf5\n", argv[0]);
-//         return -1;
-//     }
-
-//     const char *filename = argv[1];
-//     hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-//     if (file_id < 0) {
-//         printf("Error opening file %s\n", filename);
-//         return -1;
-//     }
-
-//     hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
-//     if (group_id < 0) {
-//         printf("Error opening root group\n");
-//         goto error_file;
-//     }
-
-//     /* Iterate over the group's datasets */
-//     H5Giterate(group_id, ".", NULL, reinterpret_cast<H5G_iterate_t>(H5GiterateCallback), reinterpret_cast<void *>(file_id));
-
-//     H5Gclose(group_id);
-//     error_file:
-//     H5Fclose(file_id);
-//     return 0;
-// }
-
-
 
 // ----------------------------------------------------------------------------
 // Main
@@ -258,7 +244,7 @@ int main(int argc, const char *argv[]) {
     // void *bufInstr = bo_instr.map<void *>();
     // memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
-    // Obtaining the input data
+    // OBTAINING INPUT DATA
     const char *filename = "./data/hdf5/input1lba.h5";
     hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
     if (file_id < 0) {
@@ -269,15 +255,16 @@ int main(int argc, const char *argv[]) {
     hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
     if (group_id < 0) {
         printf("Error opening root group\n");
-        goto error_file;
+        H5Fclose(file_id);
     }
-
+    
     /* Iterate over the group's datasets */
     H5Giterate(group_id, ".", NULL, reinterpret_cast<H5G_iterate_t>(H5GiterateCallback), reinterpret_cast<void *>(file_id));
 
     H5Gclose(group_id);
-    error_file:
-    H5Fclose(file_id);
+
+    std::cout << visVector[0][0].real << std::endl;
+    std::cout << visVector[0][0].imaginary << std::endl;
     
     exit(32);
     // Separating per input
