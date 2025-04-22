@@ -26,95 +26,85 @@
 namespace po = boost::program_options;
 
 typedef struct {
-    float real;
-    float imaginary;
-} VisData;
+    float r;  // real part
+    float i;  // imag part
+} complex_t;
 
-std::vector<std::vector<VisData>> visVector;
+std::vector<std::vector<complex_t>> getVisibilitiesVector(const char *filePath, const char *datasetName) {
+    hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
+    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
+    hid_t dataset_id = H5Dopen(group_id, datasetName, H5P_DEFAULT);
+    hid_t dataspace_id = H5Dget_space(dataset_id);
 
-void H5GiterateCallback(hid_t group, const char *name, VisData *opdata /* in/out: operation data */) {
-    hid_t dataset_id, filespace_id, datatype_id = -1;
-    VisData *data = NULL;
-    hsize_t dims[2];
-    size_t total_elements = 0;
-
-    datatype_id = H5Tcreate(H5T_COMPOUND, sizeof(VisData));
-    // Insert fields into the compound type
-    H5Tinsert(datatype_id, "x", 0 * sizeof(float), H5T_NATIVE_FLOAT);
-    H5Tinsert(datatype_id, "y", 1 * sizeof(float), H5T_NATIVE_FLOAT);
-
-    // printf("Processing dataset: %s\n", name);
-    // if (oinfo->type != H5O_TYPE_DATASET) {
-    //     return;
-    // }
-
-    /* Open the dataset */
-    dataset_id = H5Dopen2(reinterpret_cast<hid_t>(opdata), name, H5P_DEFAULT);
-    if (dataset_id < 0) {
-        printf("Error opening dataset %s\n", name);
-        return;
-    }
-
-    /* Get the dataset's space and dimensions */
-    filespace_id = H5Dget_space(dataset_id);
-    int ndims = H5Sget_simple_extent_ndims(filespace_id);
-    if (ndims != 2) {
-        printf("Dataset %s is not two-dimensional\n", name);
-        if (data)
-            free(data);
-        if (filespace_id >= 0)
-            H5Sclose(filespace_id);
-        if (dataset_id >= 0)
-            H5Dclose(dataset_id);
-    }
-
-    if (H5Sget_simple_extent_dims(filespace_id, dims, NULL) < 0) {
-        printf("Error getting dimensions for dataset %s\n", name);
-        if (data)
-            free(data);
-        if (filespace_id >= 0)
-            H5Sclose(filespace_id);
-        if (dataset_id >= 0)
-            H5Dclose(dataset_id);
-    }
-
-    total_elements = dims[0] * dims[1];
-    data = (VisData *)malloc(total_elements * sizeof(VisData));
-    if (!data) {
-        printf("Memory allocation failed for dataset %s\n", name);
-        if (data)
-            free(data);
-        if (filespace_id >= 0)
-            H5Sclose(filespace_id);
-        if (dataset_id >= 0)
-            H5Dclose(dataset_id);
-    }
-
-    /* Read the data */
-    if (H5Dread(dataset_id, datatype_id,
-        H5S_ALL,     // File space (entire dataset)
-        H5S_ALL,     // Memory space (same as file)
-        H5P_DEFAULT, // Transfer properties
-        data) < 0) {
-        printf("Error reading dataset %s\n", name);
-        free(data);
-        if (filespace_id >= 0)
-            H5Sclose(filespace_id);
-        if (dataset_id >= 0)
-            H5Dclose(dataset_id);
-    }
-
-    /* Process the data as needed */
-    printf("%llu" , dims[0]);
-    printf("%llu", dims[1]);
-    std::vector<std::vector<VisData>> visVec(dims[0], std::vector<VisData>(dims[1]));
-    for (size_t x = 0; x < dims[0]; ++x) {
-        for (size_t y = 0; y < dims[1]; ++y) {
-            // printf("Element [%zu][%zu]: real = %.2f, imaginary = %.2f\n", x, y, data[(x * dims[0]) + y].real, data[(x * dims[0]) + y].imaginary);
-            visVec[x][y] = data[(x * dims[0]) + y];
+    hid_t dtype = H5Dget_type(dataset_id);
+    if (H5Tget_class(dtype) == H5T_COMPOUND) {
+        int nmembers = H5Tget_nmembers(dtype);
+        printf("Compound type with %d fields:\n", nmembers);
+        for (int i = 0; i < nmembers; ++i) {
+            const char *name = H5Tget_member_name(dtype, i);
+            H5T_class_t member_class = H5Tget_member_class(dtype, i);
+            printf("  Field %d: %s (class: %d)\n", i, name, member_class);
         }
     }
-    visVector = visVec;
+
+    // Get dimensions
+    hsize_t dims[2];
+    int ndims = H5Sget_simple_extent_dims(dataspace_id, dims, NULL);
+    printf("Dataset has %d dimensions: [%llu x %llu]\n", ndims, dims[0], dims[1]);
+
+    // Define the matching compound datatype
+    hid_t complex_type = H5Tcreate(H5T_COMPOUND, sizeof(complex_t));
+    H5Tinsert(complex_type, "r", HOFFSET(complex_t, r), H5T_NATIVE_FLOAT);
+    H5Tinsert(complex_type, "i", HOFFSET(complex_t, i), H5T_NATIVE_FLOAT);
+
+    // Allocate memory
+    complex_t *data = (complex_t *)malloc(dims[0] * dims[1] * sizeof(complex_t));
+
+    // // Read the dataset into memory
+    herr_t  status = H5Dread(dataset_id, complex_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+    if (status < 0) {
+        fprintf(stderr, "Failed to read dataset.\n");
+        exit(1);
+    }
+
+    std::vector<std::vector<complex_t>> matrix(dims[0], std::vector<complex_t>(dims[1]));
+
+    for (size_t i = 0; i < dims[0]; ++i) {
+        for (size_t j = 0; j < dims[1]; ++j) {
+            complex_t c = data[i * dims[1] + j];
+            matrix[i][j] = c;
+        }
+    }
+
+    free(data);
+    H5Sclose(dataspace_id);
+    H5Dclose(dataset_id);
+    H5Fclose(file_id);
+
+    return matrix;
+}
+
+std::vector<std::vector<float>> getBaselinesVector(const char *filePath) {
+    hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
+    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
+    hid_t attr_id = H5Aopen(group_id, "antenna_reference_itrf", H5P_DEFAULT);
+    hid_t attr_space = H5Aget_space(attr_id);
+    int ndims = H5Sget_simple_extent_ndims(attr_space);
+    hsize_t dims[2];
+    H5Sget_simple_extent_dims(attr_space, dims, NULL);
+    float *data = (float*)malloc(dims[0] * dims[1] * sizeof(float));
+    H5Aread(attr_id, H5T_NATIVE_FLOAT, data);
+    
+    std::vector<std::vector<float>> matrix(dims[0], std::vector<float>(dims[1]));
+
+    for (size_t i = 0; i < dims[0]; ++i) {
+        for (size_t j = 0; j < dims[1]; ++j) {
+            float c = data[i * dims[1] + j];
+            matrix[i][j] = c;
+        }
+    }
+
+    return matrix;
 }
 
 // ----------------------------------------------------------------------------
@@ -175,9 +165,9 @@ int main(int argc, const char *argv[]) {
     // LOAD INSTRUCTION SEQUENCE
     // ------------------------------------------------------
     
-    // std::vector<uint32_t> instr_v = test_utils::load_instr_sequence(vm["instr"].as<std::string>());
-    // if (verbosity >= 1)
-    //     std::cout << "Sequence instr count: " << instr_v.size() << "\n";
+    std::vector<uint32_t> instr_v = test_utils::load_instr_binary(vm["instr"].as<std::string>());
+    if (verbosity >= 1)
+        std::cout << "Sequence instr count: " << instr_v.size() << "\n";
 
     // ------------------------------------------------------
     // Get device, load the xclbin & kernel and register them
@@ -226,7 +216,7 @@ int main(int argc, const char *argv[]) {
     // ------------------------------------------------------
     // Initialize input/ output buffer sizes and sync them
     // ------------------------------------------------------
-    // auto bo_instr = xrt::bo(device, instr_v.size() * sizeof(int), XCL_BO_FLAGS_CACHEABLE, kernel.group_id(1));
+    auto bo_instr = xrt::bo(device, instr_v.size() * sizeof(int), XCL_BO_FLAGS_CACHEABLE, kernel.group_id(1));
     auto bo_inout0 = xrt::bo(device, INOUT_FACTOR_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(3));
     auto bo_inout1 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(4));
     auto bo_inout2 = xrt::bo(device, FULL_INPUT_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(5));
@@ -241,34 +231,23 @@ int main(int argc, const char *argv[]) {
         std::cout << "Writing data into buffer objects.\n";
     
     // Initialize instruction buffer
-    // void *bufInstr = bo_instr.map<void *>();
-    // memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
+    void *bufInstr = bo_instr.map<void *>();
+    memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // OBTAINING INPUT DATA
-    const char *filename = "./data/hdf5/input1lba.h5";
-    hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-    if (file_id < 0) {
-        printf("Error opening file %s\n", filename);
-        return -1;
-    }
-
-    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
-    if (group_id < 0) {
-        printf("Error opening root group\n");
-        H5Fclose(file_id);
-    }
+    auto fileName = "./data/hdf5/input1lba.h5";
+    auto dataSetName = "XST_2025-04-11T07:42:11.000_SB027";
     
-    /* Iterate over the group's datasets */
-    H5Giterate(group_id, ".", NULL, reinterpret_cast<H5G_iterate_t>(H5GiterateCallback), reinterpret_cast<void *>(file_id));
-
-    H5Gclose(group_id);
-
-    std::cout << visVector[0][0].real << std::endl;
-    std::cout << visVector[0][0].imaginary << std::endl;
+    // Get visibilities, baselines and frequency
+    auto visVector = getVisibilitiesVector(fileName, dataSetName);
+    auto baselinesVector = getBaselinesVector(fileName);
+    float frequency = 50000000;
+    // Generating lmn
     
-    exit(32);
+
+    // FORMATTING THE INPUT
     // Separating per input
-    DATATYPE freq = 50000000; // 50MHz
+    DATATYPE freq = (DATATYPE) frequency; // 50MHz
     DATATYPE SpeedOfLight = 299792458; // m/s
     DATATYPE factor = -2 * M_PI / SpeedOfLight;
     DATATYPE ff = freq * factor; // frequency factor
@@ -340,7 +319,7 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInOut2, main_inputB.data(), FULL_INPUT_SIZE);
     
     // Sync buffers to update input buffer values
-    // bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
+    bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
     bo_inout2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
@@ -363,11 +342,11 @@ int main(int argc, const char *argv[]) {
         auto start = std::chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
         xrt::run run;
-        // if(do_trace)
-        //     run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-        // else
-        //     run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
-        // run.wait();
+        if(do_trace)
+            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
+        else
+            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+        run.wait();
         auto stop = std::chrono::high_resolution_clock::now();
         bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
         if(do_trace)
