@@ -48,19 +48,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/mliraie/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake
+CMAKE_COMMAND = /home/user/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake
 
 # The command to remove a file.
-RM = /home/mliraie/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake -E rm -f
+RM = /home/user/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /notebooks/my_mlir-aie/apps/loafty1_bfloat16
+CMAKE_SOURCE_DIR = /home/user/my_mlir-aie/apps/loafty1_bfloat16
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /notebooks/my_mlir-aie/apps/loafty1_bfloat16/_build
+CMAKE_BINARY_DIR = /home/user/my_mlir-aie/apps/loafty1_bfloat16/_build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /notebooks/my_mlir-aie/apps/loafty1_bfloat16/_build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
-	/home/mliraie/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/home/user/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	/home/mliraie/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/home/user/mlir-aie/ironenv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/my_mlir-aie/apps/loafty1_bfloat16/_build/CMakeFiles /notebooks/my_mlir-aie/apps/loafty1_bfloat16/_build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/my_mlir-aie/apps/loafty1_bfloat16/_build/CMakeFiles /home/user/my_mlir-aie/apps/loafty1_bfloat16/_build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /notebooks/my_mlir-aie/apps/loafty1_bfloat16/_build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/my_mlir-aie/apps/loafty1_bfloat16/_build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -153,6 +153,30 @@ test.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/loafty.dir/build.make CMakeFiles/loafty.dir/test.cpp.s
 .PHONY : test.cpp.s
 
+utils/hdf5_utils.o: utils/hdf5_utils.cpp.o
+.PHONY : utils/hdf5_utils.o
+
+# target to build an object file
+utils/hdf5_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/loafty.dir/build.make CMakeFiles/loafty.dir/utils/hdf5_utils.cpp.o
+.PHONY : utils/hdf5_utils.cpp.o
+
+utils/hdf5_utils.i: utils/hdf5_utils.cpp.i
+.PHONY : utils/hdf5_utils.i
+
+# target to preprocess a source file
+utils/hdf5_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/loafty.dir/build.make CMakeFiles/loafty.dir/utils/hdf5_utils.cpp.i
+.PHONY : utils/hdf5_utils.cpp.i
+
+utils/hdf5_utils.s: utils/hdf5_utils.cpp.s
+.PHONY : utils/hdf5_utils.s
+
+# target to generate assembly for a file
+utils/hdf5_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/loafty.dir/build.make CMakeFiles/loafty.dir/utils/hdf5_utils.cpp.s
+.PHONY : utils/hdf5_utils.cpp.s
+
 utils/test_utils.o: utils/test_utils.cpp.o
 .PHONY : utils/test_utils.o
 
@@ -189,6 +213,9 @@ help:
 	@echo "... test.o"
 	@echo "... test.i"
 	@echo "... test.s"
+	@echo "... utils/hdf5_utils.o"
+	@echo "... utils/hdf5_utils.i"
+	@echo "... utils/hdf5_utils.s"
 	@echo "... utils/test_utils.o"
 	@echo "... utils/test_utils.i"
 	@echo "... utils/test_utils.s"

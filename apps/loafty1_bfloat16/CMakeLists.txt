@@ -42,6 +42,7 @@ find_package(HDF5 REQUIRED)
 
 add_executable(${currentTarget}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/test_utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/hdf5_utils.cpp
     test.cpp
 )
 

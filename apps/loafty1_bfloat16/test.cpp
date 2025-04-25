@@ -10,102 +10,21 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <hdf5.h>
 
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
 #include "xrt/xrt_kernel.h"
 
 #include "utils/test_utils.h"
+#include "utils/hdf5_utils.h"
+
+using namespace std;
+namespace po = boost::program_options;
 
 #ifndef DATATYPES_USING_DEFINED
 #define DATATYPES_USING_DEFINED
-    using DATATYPE = std::bfloat16_t;
+    using DATATYPE = bfloat16_t;
 #endif
-
-namespace po = boost::program_options;
-
-typedef struct {
-    float r;  // real part
-    float i;  // imag part
-} complex_t;
-
-std::vector<std::vector<complex_t>> getVisibilitiesVector(const char *filePath, const char *datasetName) {
-    hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
-    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
-    hid_t dataset_id = H5Dopen(group_id, datasetName, H5P_DEFAULT);
-    hid_t dataspace_id = H5Dget_space(dataset_id);
-
-    hid_t dtype = H5Dget_type(dataset_id);
-    if (H5Tget_class(dtype) == H5T_COMPOUND) {
-        int nmembers = H5Tget_nmembers(dtype);
-        printf("Compound type with %d fields:\n", nmembers);
-        for (int i = 0; i < nmembers; ++i) {
-            const char *name = H5Tget_member_name(dtype, i);
-            H5T_class_t member_class = H5Tget_member_class(dtype, i);
-            printf("  Field %d: %s (class: %d)\n", i, name, member_class);
-        }
-    }
-
-    // Get dimensions
-    hsize_t dims[2];
-    int ndims = H5Sget_simple_extent_dims(dataspace_id, dims, NULL);
-    printf("Dataset has %d dimensions: [%llu x %llu]\n", ndims, dims[0], dims[1]);
-
-    // Define the matching compound datatype
-    hid_t complex_type = H5Tcreate(H5T_COMPOUND, sizeof(complex_t));
-    H5Tinsert(complex_type, "r", HOFFSET(complex_t, r), H5T_NATIVE_FLOAT);
-    H5Tinsert(complex_type, "i", HOFFSET(complex_t, i), H5T_NATIVE_FLOAT);
-
-    // Allocate memory
-    complex_t *data = (complex_t *)malloc(dims[0] * dims[1] * sizeof(complex_t));
-
-    // // Read the dataset into memory
-    herr_t  status = H5Dread(dataset_id, complex_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
-    if (status < 0) {
-        fprintf(stderr, "Failed to read dataset.\n");
-        exit(1);
-    }
-
-    std::vector<std::vector<complex_t>> matrix(dims[0], std::vector<complex_t>(dims[1]));
-
-    for (size_t i = 0; i < dims[0]; ++i) {
-        for (size_t j = 0; j < dims[1]; ++j) {
-            complex_t c = data[i * dims[1] + j];
-            matrix[i][j] = c;
-        }
-    }
-
-    free(data);
-    H5Sclose(dataspace_id);
-    H5Dclose(dataset_id);
-    H5Fclose(file_id);
-
-    return matrix;
-}
-
-std::vector<std::vector<float>> getBaselinesVector(const char *filePath) {
-    hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
-    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
-    hid_t attr_id = H5Aopen(group_id, "antenna_reference_itrf", H5P_DEFAULT);
-    hid_t attr_space = H5Aget_space(attr_id);
-    int ndims = H5Sget_simple_extent_ndims(attr_space);
-    hsize_t dims[2];
-    H5Sget_simple_extent_dims(attr_space, dims, NULL);
-    float *data = (float*)malloc(dims[0] * dims[1] * sizeof(float));
-    H5Aread(attr_id, H5T_NATIVE_FLOAT, data);
-    
-    std::vector<std::vector<float>> matrix(dims[0], std::vector<float>(dims[1]));
-
-    for (size_t i = 0; i < dims[0]; ++i) {
-        for (size_t j = 0; j < dims[1]; ++j) {
-            float c = data[i * dims[1] + j];
-            matrix[i][j] = c;
-        }
-    }
-
-    return matrix;
-}
 
 // ----------------------------------------------------------------------------
 // Main
@@ -165,9 +84,9 @@ int main(int argc, const char *argv[]) {
     // LOAD INSTRUCTION SEQUENCE
     // ------------------------------------------------------
     
-    std::vector<uint32_t> instr_v = test_utils::load_instr_binary(vm["instr"].as<std::string>());
+    vector<uint32_t> instr_v = test_utils::load_instr_binary(vm["instr"].as<string>());
     if (verbosity >= 1)
-        std::cout << "Sequence instr count: " << instr_v.size() << "\n";
+        cout << "Sequence instr count: " << instr_v.size() << "\n";
 
     // ------------------------------------------------------
     // Get device, load the xclbin & kernel and register them
@@ -178,21 +97,21 @@ int main(int argc, const char *argv[]) {
     
     // Load the xclbin
     if (verbosity >= 1)
-        std::cout << "Loading xclbin: " << vm["xclbin"].as<std::string>() << "\n";
-    auto xclbin = xrt::xclbin(vm["xclbin"].as<std::string>());
+        cout << "Loading xclbin: " << vm["xclbin"].as<string>() << "\n";
+    auto xclbin = xrt::xclbin(vm["xclbin"].as<string>());
 
     // Load the kernel
     if (verbosity >= 1)
-        std::cout << "Kernel opcode: " << vm["kernel"].as<std::string>() << "\n";
-    std::string Node = vm["kernel"].as<std::string>();
+        cout << "Kernel opcode: " << vm["kernel"].as<string>() << "\n";
+    string Node = vm["kernel"].as<string>();
     
     // Get the kernel from the xclbin
     auto xkernels = xclbin.get_kernels();
-    auto xkernel = *std::find_if(xkernels.begin(), xkernels.end(),
+    auto xkernel = *find_if(xkernels.begin(), xkernels.end(),
                                [Node, verbosity](xrt::xclbin::kernel &k) {
                                  auto name = k.get_name();
                                  if (verbosity >= 1) {
-                                    std::cout << "Name: " << name << std::endl;
+                                    cout << "Name: " << name << endl;
                                  }
                                  return name.rfind(Node, 0) == 0;
                                });
@@ -200,17 +119,17 @@ int main(int argc, const char *argv[]) {
 
     // Register xclbin
     if (verbosity >= 1)
-        std::cout << "Registering xclbin: " << vm["xclbin"].as<std::string>() << "\n";
+        cout << "Registering xclbin: " << vm["xclbin"].as<string>() << "\n";
     device.register_xclbin(xclbin);
     
     // Get a hardware context
     if (verbosity >= 1)
-        std::cout << "Getting hardware context.\n";
+        cout << "Getting hardware context.\n";
     xrt::hw_context context(device, xclbin.get_uuid());
     
     // Get a kernel handle
     if (verbosity >= 1)
-        std::cout << "Getting handle to kernel:" << kernelName << "\n";
+        cout << "Getting handle to kernel:" << kernelName << "\n";
     auto kernel = xrt::kernel(context, kernelName);
 
     // ------------------------------------------------------
@@ -228,7 +147,7 @@ int main(int argc, const char *argv[]) {
         bo_trace = xrt::bo(device, 1, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
     
     if (verbosity >= 1)
-        std::cout << "Writing data into buffer objects.\n";
+        cout << "Writing data into buffer objects.\n";
     
     // Initialize instruction buffer
     void *bufInstr = bo_instr.map<void *>();
@@ -239,11 +158,14 @@ int main(int argc, const char *argv[]) {
     auto dataSetName = "XST_2025-04-11T07:42:11.000_SB027";
     
     // Get visibilities, baselines and frequency
-    auto visVector = getVisibilitiesVector(fileName, dataSetName);
-    auto baselinesVector = getBaselinesVector(fileName);
-    float frequency = 50000000;
+    auto [realVisVector, imagVisVector] = getVisibilitiesVector(fileName, dataSetName); // done
+    auto [uVEctor, vVector, wVector] = computeBaselines(getXYZCoordinates(fileName)); // done
+    float frequency = getFrequency(fileName, dataSetName); // done
     // Generating lmn
-    
+    auto x = linspace(-1.0f, 1.0f, MATRIX_DIM_SIZE1);
+    auto y = linspace(1.0f, -1.0f, MATRIX_DIM_SIZE1);
+    auto [lVector, mVector] = meshgrid(x, y); // done
+    auto nVector = compute_n(lVector, lVector); // done
 
     // FORMATTING THE INPUT
     // Separating per input
@@ -251,29 +173,28 @@ int main(int argc, const char *argv[]) {
     DATATYPE SpeedOfLight = 299792458; // m/s
     DATATYPE factor = -2 * M_PI / SpeedOfLight;
     DATATYPE ff = freq * factor; // frequency factor
-    // DATATYPE ff = 1.5;
     
-    std::vector<DATATYPE> visR(INOUT0_VOLUME, 1); // real component of visibilities
-    std::vector<DATATYPE> visC(INOUT0_VOLUME, 1); // imaginary component of visibilities
+    vector<DATATYPE> visR(INOUT0_VOLUME, 1); // real component of visibilities
+    vector<DATATYPE> visC(INOUT0_VOLUME, 1); // imaginary component of visibilities
     
-    std::vector<DATATYPE> u(INOUT0_VOLUME, 1); // baselines, u
-    std::vector<DATATYPE> v(INOUT0_VOLUME, 1); // baselines, v
-    std::vector<DATATYPE> w(INOUT0_VOLUME, 1); // baselines, w
+    vector<DATATYPE> u(INOUT0_VOLUME, 1); // baselines, u
+    vector<DATATYPE> v(INOUT0_VOLUME, 1); // baselines, v
+    vector<DATATYPE> w(INOUT0_VOLUME, 1); // baselines, w
 
-    std::vector<DATATYPE> l(INOUT2_VOLUME, 1); // l
-    std::vector<DATATYPE> m(INOUT2_VOLUME, 0); // m
-    std::vector<DATATYPE> n(INOUT2_VOLUME, 0); // n
+    vector<DATATYPE> l(INOUT2_VOLUME, 1); // l
+    vector<DATATYPE> m(INOUT2_VOLUME, 0); // m
+    vector<DATATYPE> n(INOUT2_VOLUME, 0); // n
     
 
     // Format input 0 (frequency factor + lmn)
     DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
-    std::vector<DATATYPE> factor_vec(INOUT_FACTOR_VOLUME);
+    vector<DATATYPE> factor_vec(INOUT_FACTOR_VOLUME);
 
-    std::vector<DATATYPE> freq_vector(INOUT1_VOLUME, 0); // Frequency factor with padding to add to the lmn data stream
+    vector<DATATYPE> freq_vector(INOUT1_VOLUME, 0); // Frequency factor with padding to add to the lmn data stream
     freq_vector[0] = ff;
 
-    std::vector<std::vector<DATATYPE>> lmnInputs = {l, m, n};
-    std::vector<DATATYPE> lmn_vector(INOUT2_VOLUME * N_LMN, 0);
+    vector<vector<DATATYPE>> lmnInputs = {l, m, n};
+    vector<DATATYPE> lmn_vector(INOUT2_VOLUME * N_LMN, 0);
     for(int i=0; i<INOUT2_VOLUME/CV; i++) {
         for(int j=0; j<CV; j++) {
             for(int lmn=0; lmn<N_LMN; lmn++) {
@@ -286,19 +207,19 @@ int main(int argc, const char *argv[]) {
     //     for(int lmn=0; lmn<N_LMN; lmn++) 
     //         for(int j=0; j<5; j++) {
     //             auto lmnI = i*N_LMN+lmn;
-    //             std::cout << lmn_vector[lmnI*CV + j] << ", ";
+    //             cout << lmn_vector[lmnI*CV + j] << ", ";
     //         }
-    // std::cout << std::endl;
-    std::copy(std::begin(freq_vector), std::end(freq_vector), std::begin(factor_vec));
-    std::copy(std::begin(lmn_vector), std::end(lmn_vector), std::begin(factor_vec) + freq_vector.size());
+    // cout << endl;
+    copy(begin(freq_vector), end(freq_vector), begin(factor_vec));
+    copy(begin(lmn_vector), end(lmn_vector), begin(factor_vec) + freq_vector.size());
     
 
     // Format inputs 1 and 2 (Main inputs A and B)
     DATATYPE *bufInOut1 = bo_inout1.map<DATATYPE *>();
     DATATYPE *bufInOut2 = bo_inout2.map<DATATYPE *>();
-    std::vector<DATATYPE> main_inputA(FULL_INPUT_VOL);
-    std::vector<DATATYPE> main_inputB(FULL_INPUT_VOL);
-    std::vector<std::vector<DATATYPE>> mainInputs = {visR, visC, u, v, w};
+    vector<DATATYPE> main_inputA(FULL_INPUT_VOL);
+    vector<DATATYPE> main_inputB(FULL_INPUT_VOL);
+    vector<vector<DATATYPE>> mainInputs = {visR, visC, u, v, w};
     
     for(int v=0; v<NINPUTS; v++) {
         for(int i=0; i<INPUT_VOL; i++) {    
@@ -308,9 +229,9 @@ int main(int argc, const char *argv[]) {
     }
     // for(int i=0; i<NINPUTS; i++) {
     //     for(int j=0; j<5; j++) {
-    //         std::cout << main_inputB[i*INPUT_VOL + j] << ", ";
+    //         cout << main_inputB[i*INPUT_VOL + j] << ", ";
     //     }
-    //     std::cout << std::endl;
+    //     cout << endl;
     // }
 
     // Initialize data buffers
@@ -338,8 +259,8 @@ int main(int argc, const char *argv[]) {
     for (unsigned iter = 0; iter < num_iter; iter++) {        
         // Run kernel
         if (verbosity >= 1)
-            std::cout << "Running Kernel " << iter << ".\n";
-        auto start = std::chrono::high_resolution_clock::now();
+            cout << "Running Kernel " << iter << ".\n";
+        auto start = chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
         xrt::run run;
         if(do_trace)
@@ -347,7 +268,7 @@ int main(int argc, const char *argv[]) {
         else
             run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
         run.wait();
-        auto stop = std::chrono::high_resolution_clock::now();
+        auto stop = chrono::high_resolution_clock::now();
         bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
         if(do_trace)
             bo_trace.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
@@ -357,50 +278,50 @@ int main(int argc, const char *argv[]) {
             continue;
         }
         // Copy trace and output to file
-        std::uint32_t *bufTrace = bo_trace.map<std::uint32_t *>();
-        std::vector<std::uint32_t> trace_vec(TRACE_SIZE/4);
+        uint32_t *bufTrace = bo_trace.map<uint32_t *>();
+        vector<uint32_t> trace_vec(TRACE_SIZE/4);
         memcpy(trace_vec.data(), bufTrace, (trace_vec.size() * sizeof(uint32_t)));
     
         // Copy output results and verify they are correct
-        std::bfloat16_t *bufOut = bo_inout4.map<std::bfloat16_t *>();
-        std::vector<DATATYPE> out_vec(OUTPUT_VOL);
+        bfloat16_t *bufOut = bo_inout4.map<bfloat16_t *>();
+        vector<DATATYPE> out_vec(OUTPUT_VOL);
         memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
 
         // Printing part of the output
         if(iter == num_iter-1) {
             for(int i=0; i<MATRIX_DIM_SIZE1; i+=32) {
                 for(int j=0; j<8; j++) {
-                    std::cout << out_vec[i*8 + j] << ", ";
+                    cout << out_vec[i*8 + j] << ", ";
                 }
-                std::cout << std::endl;
+                cout << endl;
             }   
         }
 
         // Verification
         if (do_verify) {
             if (verbosity >= 1) {
-                std::cout << "Verifying results ..." << std::endl;
+                cout << "Verifying results ..." << endl;
             }
-            auto vstart = std::chrono::system_clock::now();
+            auto vstart = chrono::system_clock::now();
             // errors = verify(INOUT1_VOLUME, AVec, CVec, verbosity);
-            auto vstop = std::chrono::system_clock::now();
-            float vtime = std::chrono::duration_cast<std::chrono::seconds>(vstop - vstart).count();
+            auto vstop = chrono::system_clock::now();
+            float vtime = chrono::duration_cast<chrono::seconds>(vstop - vstart).count();
             if (verbosity >= 1) {
-                std::cout << "Verify time: " << vtime << "secs." << std::endl;
+                cout << "Verify time: " << vtime << "secs." << endl;
             }
         } else {
             if (verbosity >= 1)
-                std::cout << "WARNING: results not verified." << std::endl;
+                cout << "WARNING: results not verified." << endl;
         }
         
         // Write trace values if trace_size > 0
         if (trace_size > 0) {
-            test_utils::write_out_trace(((char *)bufOut) + OUT_SIZE, trace_size, vm["trace_file"].as<std::string>());
-            std::cout << vm["trace_file"].as<std::string>() << std::endl;
+            test_utils::write_out_trace(((char *)bufOut) + OUT_SIZE, trace_size, vm["trace_file"].as<string>());
+            cout << vm["trace_file"].as<string>() << endl;
         }
 
         // Accumulate run times
-        float npu_time = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
+        float npu_time = chrono::duration_cast<chrono::microseconds>(stop - start).count();
         npu_time_total += npu_time;
         npu_time_min = (npu_time < npu_time_min) ? npu_time : npu_time_min;
         npu_time_max = (npu_time > npu_time_max) ? npu_time : npu_time_max;
@@ -413,25 +334,25 @@ int main(int argc, const char *argv[]) {
     // TODO - Mac count to guide gflops
     float macs = 0;
     
-    std::cout << std::endl
+    cout << endl
         << "Avg NPU time: " << npu_time_total / n_iterations << "us."
-        << std::endl;
+        << endl;
     if (macs > 0)
-        std::cout << "Avg NPU gflops: "
+        cout << "Avg NPU gflops: "
         << macs / (1000 * npu_time_total / n_iterations)
-        << std::endl;
+        << endl;
     
-    std::cout << std::endl
+    cout << endl
         << "Min NPU time: " << npu_time_min << "us."
-        << std::endl;
+        << endl;
     if (macs > 0)
-        std::cout << "Max NPU gflops: " << macs / (1000 * npu_time_min)
-        << std::endl;
+        cout << "Max NPU gflops: " << macs / (1000 * npu_time_min)
+        << endl;
     
-    std::cout << std::endl
+    cout << endl
         << "Max NPU time: " << npu_time_max << "us."
-        << std::endl;
+        << endl;
     if (macs > 0)
-        std::cout << "Min NPU gflops: " << macs / (1000 * npu_time_max)
-        << std::endl;
+        cout << "Min NPU gflops: " << macs / (1000 * npu_time_max)
+        << endl;
 }
