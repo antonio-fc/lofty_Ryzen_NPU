@@ -17,5 +17,5 @@ Matrix getXYZCoordinates(const char *filePath);
 Baselines computeBaselines(const Matrix& station_xyz);
 float getFrequency(const char *filePath, const char *datasetName);
 vector<float> linspace(float start, float end, int num);
-pair<Matrix, Matrix> meshgrid(const vector<float>& x, const vector<float>& y);
-Matrix compute_n(const Matrix& l, const Matrix& m);
+pair<vector<float>, vector<float>> meshgrid(const vector<float>& x, const vector<float>& y);
+vector<float> compute_n(const vector<float>& l, const vector<float>& m, size_t rows, size_t cols);

@@ -16,7 +16,8 @@
 #include "xrt/xrt_kernel.h"
 
 #include "utils/test_utils.h"
-#include "utils/hdf5_utils.h"
+#include "utils/hdf5/hdf5_utils.h"
+#include "utils/cpp_plotting/plot_utils.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -25,6 +26,16 @@ namespace po = boost::program_options;
 #define DATATYPES_USING_DEFINED
     using DATATYPE = bfloat16_t;
 #endif
+
+template<typename U, typename T>
+std::vector<U> castVector(const std::vector<T>& input) {
+    std::vector<U> output;
+    output.reserve(input.size());
+    for (const T& val : input) {
+        output.push_back(static_cast<U>(val));
+    }
+    return output;
+}
 
 // ----------------------------------------------------------------------------
 // Main
@@ -153,19 +164,19 @@ int main(int argc, const char *argv[]) {
     void *bufInstr = bo_instr.map<void *>();
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
-    // OBTAINING INPUT DATA
+    // GETTING INPUT DATA
     auto fileName = "./data/hdf5/input1lba.h5";
     auto dataSetName = "XST_2025-04-11T07:42:11.000_SB027";
     
     // Get visibilities, baselines and frequency
     auto [realVisVector, imagVisVector] = getVisibilitiesVector(fileName, dataSetName); // done
-    auto [uVEctor, vVector, wVector] = computeBaselines(getXYZCoordinates(fileName)); // done
+    auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(fileName)); // done
     float frequency = getFrequency(fileName, dataSetName); // done
     // Generating lmn
     auto x = linspace(-1.0f, 1.0f, MATRIX_DIM_SIZE1);
     auto y = linspace(1.0f, -1.0f, MATRIX_DIM_SIZE1);
     auto [lVector, mVector] = meshgrid(x, y); // done
-    auto nVector = compute_n(lVector, lVector); // done
+    auto nVector = compute_n(lVector, mVector, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1); // done
 
     // FORMATTING THE INPUT
     // Separating per input
@@ -174,16 +185,16 @@ int main(int argc, const char *argv[]) {
     DATATYPE factor = -2 * M_PI / SpeedOfLight;
     DATATYPE ff = freq * factor; // frequency factor
     
-    vector<DATATYPE> visR(INOUT0_VOLUME, 1); // real component of visibilities
-    vector<DATATYPE> visC(INOUT0_VOLUME, 1); // imaginary component of visibilities
+    vector<DATATYPE> visR = castVector<DATATYPE>(realVisVector); // real component of visibilities
+    vector<DATATYPE> visC = castVector<DATATYPE>(imagVisVector); // imaginary component of visibilities
     
-    vector<DATATYPE> u(INOUT0_VOLUME, 1); // baselines, u
-    vector<DATATYPE> v(INOUT0_VOLUME, 1); // baselines, v
-    vector<DATATYPE> w(INOUT0_VOLUME, 1); // baselines, w
+    vector<DATATYPE> u = castVector<DATATYPE>(uVector); // baselines, u
+    vector<DATATYPE> v = castVector<DATATYPE>(vVector); // baselines, v
+    vector<DATATYPE> w = castVector<DATATYPE>(wVector); // baselines, w
 
-    vector<DATATYPE> l(INOUT2_VOLUME, 1); // l
-    vector<DATATYPE> m(INOUT2_VOLUME, 0); // m
-    vector<DATATYPE> n(INOUT2_VOLUME, 0); // n
+    vector<DATATYPE> l = castVector<DATATYPE>(lVector); // l
+    vector<DATATYPE> m = castVector<DATATYPE>(mVector); // m
+    vector<DATATYPE> n = castVector<DATATYPE>(nVector); // n
     
 
     // Format input 0 (frequency factor + lmn)
@@ -289,9 +300,9 @@ int main(int argc, const char *argv[]) {
 
         // Printing part of the output
         if(iter == num_iter-1) {
-            for(int i=0; i<MATRIX_DIM_SIZE1; i+=32) {
-                for(int j=0; j<8; j++) {
-                    cout << out_vec[i*8 + j] << ", ";
+            for(int i=0; i<MATRIX_DIM_SIZE1; i+=16) {
+                for(int j=0; j<MATRIX_DIM_SIZE1; j+=16) {
+                    cout << out_vec[i*MATRIX_DIM_SIZE1 + j] << ", ";
                 }
                 cout << endl;
             }   

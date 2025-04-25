@@ -265,35 +265,36 @@ vector<float> linspace(float start, float end, int num) {
     return result;
 }
 
-pair<Matrix, Matrix> meshgrid(const vector<float>& x, const vector<float>& y) {
+pair<vector<float>, vector<float>> meshgrid(const vector<float>& x, const vector<float>& y) {
     auto ny = y.size();
     auto nx = x.size();
 
-    Matrix l(ny, vector<float>(nx));
-    Matrix m(ny, vector<float>(nx));
+    auto total_size = ny*nx;
+    vector<float> l(total_size);
+    vector<float> m(total_size);
 
     for (auto i = 0; i < ny; ++i) {
         for (auto j = 0; j < nx; ++j) {
-            l[i][j] = x[j];
-            m[i][j] = y[i];
+            auto index = i*nx + j;
+            l[index] = x[j];
+            m[index] = y[i];
         }
     }
 
     return {l, m};
 }
 
-Matrix compute_n(const Matrix& l, const Matrix& m) {
-    auto rows = l.size();
-    auto cols = l[0].size();
-    Matrix n(rows, vector<float>(cols));
+vector<float> compute_n(const vector<float>& l, const vector<float>& m, size_t rows, size_t cols) {
+    vector<float> n(rows*cols);
 
     for (auto i = 0; i < rows; ++i) {
         for (auto j = 0; j < cols; ++j) {
-            float val = 1.0f - l[i][j]*l[i][j] - m[i][j]*m[i][j];
+            auto index = i*cols + j;
+            float val = 1.0f - l[index]*l[index] - m[index]*m[index];
             if (val >= 0.0f)
-                n[i][j] = sqrtf(val) - 1.0f;
+                n[index] = sqrtf(val) - 1.0f;
             else
-                n[i][j] = -1.0f;  // Handle domain error gracefully
+                n[index] = nanf("0");  // nan values
         }
     }
 
