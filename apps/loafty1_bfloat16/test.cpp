@@ -28,13 +28,38 @@ namespace po = boost::program_options;
 #endif
 
 template<typename U, typename T>
-std::vector<U> castVector(const std::vector<T>& input) {
-    std::vector<U> output;
+vector<U> castVector(const vector<T>& input) {
+    vector<U> output;
     output.reserve(input.size());
     for (const T& val : input) {
         output.push_back(static_cast<U>(val));
     }
     return output;
+}
+
+vector<float> load1DCSV(const string& filename) {
+    vector<float> data;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw runtime_error("Could not open file: " + filename);
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string value;
+        while (getline(ss, value, ',')) {
+            try {
+                data.push_back(stof(value));
+            } catch (const invalid_argument& e) {
+                cerr << "Warning: invalid value '" << value << "' skipped.\n";
+            }
+        }
+    }
+
+    file.close();
+    return data;
 }
 
 // ----------------------------------------------------------------------------
@@ -68,7 +93,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 32; // number of consecutive values in output stream
+    const int CV = 64; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int INOUT0_VOLUME = MSIZE;
@@ -166,12 +191,13 @@ int main(int argc, const char *argv[]) {
 
     // GETTING INPUT DATA
     auto fileName = "./data/hdf5/input1lba.h5";
-    auto dataSetName = "XST_2025-04-11T07:42:11.000_SB027";
+    auto dataSetName = "XST_2025-04-11T07:45:44.000_SB240";
     
     // Get visibilities, baselines and frequency
     auto [realVisVector, imagVisVector] = getVisibilitiesVector(fileName, dataSetName); // done
     auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(fileName)); // done
     float frequency = getFrequency(fileName, dataSetName); // done
+    cout << "Frequency: " << frequency << endl;
     // Generating lmn
     auto x = linspace(-1.0f, 1.0f, MATRIX_DIM_SIZE1);
     auto y = linspace(1.0f, -1.0f, MATRIX_DIM_SIZE1);
@@ -180,7 +206,7 @@ int main(int argc, const char *argv[]) {
 
     // FORMATTING THE INPUT
     // Separating per input
-    DATATYPE freq = (DATATYPE) frequency; // 50MHz
+    DATATYPE freq = (DATATYPE) frequency;
     DATATYPE SpeedOfLight = 299792458; // m/s
     DATATYPE factor = -2 * M_PI / SpeedOfLight;
     DATATYPE ff = freq * factor; // frequency factor
@@ -196,6 +222,9 @@ int main(int argc, const char *argv[]) {
     vector<DATATYPE> m = castVector<DATATYPE>(mVector); // m
     vector<DATATYPE> n = castVector<DATATYPE>(nVector); // n
     
+    // Generating nan_mask
+    auto nan_mask = n | views::transform([](float x) { return x != x; });
+    vector<bool> nan_mask_v(nan_mask.begin(), nan_mask.end());
 
     // Format input 0 (frequency factor + lmn)
     DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
@@ -214,17 +243,9 @@ int main(int argc, const char *argv[]) {
             }
         }
     }
-    // for(int i=0; i<2; i++)
-    //     for(int lmn=0; lmn<N_LMN; lmn++) 
-    //         for(int j=0; j<5; j++) {
-    //             auto lmnI = i*N_LMN+lmn;
-    //             cout << lmn_vector[lmnI*CV + j] << ", ";
-    //         }
-    // cout << endl;
     copy(begin(freq_vector), end(freq_vector), begin(factor_vec));
     copy(begin(lmn_vector), end(lmn_vector), begin(factor_vec) + freq_vector.size());
     
-
     // Format inputs 1 and 2 (Main inputs A and B)
     DATATYPE *bufInOut1 = bo_inout1.map<DATATYPE *>();
     DATATYPE *bufInOut2 = bo_inout2.map<DATATYPE *>();
@@ -238,12 +259,6 @@ int main(int argc, const char *argv[]) {
             main_inputB[i + v*INPUT_VOL] = mainInputs[v][i + INPUT_VOL];
         }
     }
-    // for(int i=0; i<NINPUTS; i++) {
-    //     for(int j=0; j<5; j++) {
-    //         cout << main_inputB[i*INPUT_VOL + j] << ", ";
-    //     }
-    //     cout << endl;
-    // }
 
     // Initialize data buffers
     memcpy(bufInOut0, factor_vec.data(), INOUT_FACTOR_SIZE);
@@ -274,61 +289,26 @@ int main(int argc, const char *argv[]) {
         auto start = chrono::high_resolution_clock::now();
         unsigned int opcode = 3;
         xrt::run run;
-        if(do_trace)
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-        else
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+        run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
         run.wait();
         auto stop = chrono::high_resolution_clock::now();
         bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-        if(do_trace)
-            bo_trace.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
         
         if (iter < n_warmup_iterations) {
             /* Warmup iterations do not count towards average runtime. */
             continue;
         }
-        // Copy trace and output to file
-        uint32_t *bufTrace = bo_trace.map<uint32_t *>();
-        vector<uint32_t> trace_vec(TRACE_SIZE/4);
-        memcpy(trace_vec.data(), bufTrace, (trace_vec.size() * sizeof(uint32_t)));
     
         // Copy output results and verify they are correct
-        bfloat16_t *bufOut = bo_inout4.map<bfloat16_t *>();
-        vector<DATATYPE> out_vec(OUTPUT_VOL);
-        memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
-
-        // Printing part of the output
-        if(iter == num_iter-1) {
-            for(int i=0; i<MATRIX_DIM_SIZE1; i+=16) {
-                for(int j=0; j<MATRIX_DIM_SIZE1; j+=16) {
-                    cout << out_vec[i*MATRIX_DIM_SIZE1 + j] << ", ";
-                }
-                cout << endl;
-            }   
-        }
-
-        // Verification
-        if (do_verify) {
-            if (verbosity >= 1) {
-                cout << "Verifying results ..." << endl;
-            }
-            auto vstart = chrono::system_clock::now();
-            // errors = verify(INOUT1_VOLUME, AVec, CVec, verbosity);
-            auto vstop = chrono::system_clock::now();
-            float vtime = chrono::duration_cast<chrono::seconds>(vstop - vstart).count();
-            if (verbosity >= 1) {
-                cout << "Verify time: " << vtime << "secs." << endl;
-            }
-        } else {
-            if (verbosity >= 1)
-                cout << "WARNING: results not verified." << endl;
-        }
-        
-        // Write trace values if trace_size > 0
-        if (trace_size > 0) {
-            test_utils::write_out_trace(((char *)bufOut) + OUT_SIZE, trace_size, vm["trace_file"].as<string>());
-            cout << vm["trace_file"].as<string>() << endl;
+        DATATYPE *bufOut;
+        if (iter == num_iter - 1) {
+            bufOut = bo_inout4.map<DATATYPE *>();
+            vector<DATATYPE> out_vec(OUTPUT_VOL);
+            memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
+            for(auto i=0; i<OUT_SIZE; i++)
+                out_vec[i] = nan_mask_v[i] ? nan("0") : out_vec[i];
+            reverse(out_vec.begin(), out_vec.end());
+            save1DArrayToCSV(castVector<float>(out_vec), "./utils/cpp_plotting/csv_files/output_cpp.csv");
         }
 
         // Accumulate run times
@@ -342,28 +322,15 @@ int main(int argc, const char *argv[]) {
     // Print verification and timing results
     // ------------------------------------------------------
     
-    // TODO - Mac count to guide gflops
-    float macs = 0;
-    
     cout << endl
         << "Avg NPU time: " << npu_time_total / n_iterations << "us."
-        << endl;
-    if (macs > 0)
-        cout << "Avg NPU gflops: "
-        << macs / (1000 * npu_time_total / n_iterations)
         << endl;
     
     cout << endl
         << "Min NPU time: " << npu_time_min << "us."
         << endl;
-    if (macs > 0)
-        cout << "Max NPU gflops: " << macs / (1000 * npu_time_min)
-        << endl;
     
     cout << endl
         << "Max NPU time: " << npu_time_max << "us."
-        << endl;
-    if (macs > 0)
-        cout << "Min NPU gflops: " << macs / (1000 * npu_time_max)
         << endl;
 }

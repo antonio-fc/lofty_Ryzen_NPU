@@ -14,7 +14,7 @@ using Baselines = tuple<vector<float>, vector<float>, vector<float>>;
 VisibilitiesPolar getPolarVisibilitiesVector(const char *filePath, const char *datasetName);
 Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName);
 Matrix getXYZCoordinates(const char *filePath);
-Baselines computeBaselines(const Matrix& station_xyz);
+Baselines computeBaselines(const Matrix& coordXYZ);
 float getFrequency(const char *filePath, const char *datasetName);
 vector<float> linspace(float start, float end, int num);
 pair<vector<float>, vector<float>> meshgrid(const vector<float>& x, const vector<float>& y);

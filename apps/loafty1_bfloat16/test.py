@@ -82,7 +82,7 @@ def image_reference2(visR, visC, u, v, w, freq, npix_l, npix_m, rtype):
             real = visR * cos
             imag = visC * sin
             # Subtract
-            # vis_mult = real - imag
+            vis_mult = real - imag
             # Get the average
             if rtype==bfloat16:
                 result = np.mean(real.astype(np.float32)) - np.mean(imag.astype(np.float32)) # np.mean(vis_mult.astype(np.float32)).astype(bfloat16)
@@ -102,15 +102,15 @@ def plot_input_data(visibilities, baselines):
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 0], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/l.png")  # Save as image
+    plt.savefig("plots/inputs/u.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 1], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/m.png")  # Save as image
+    plt.savefig("plots/inputs/v.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
     sns.heatmap(baselines[:, :, 2], cmap="viridis", annot=False, cbar=True)  # Create heatmap
-    plt.savefig("plots/inputs/n.png")  # Save as image
+    plt.savefig("plots/inputs/w.png")  # Save as image
     plt.close()  # Close the plot to free memory
 
 def read_npy_data(path, plot):
@@ -240,9 +240,6 @@ def main(opts):
     DATATYPE = bfloat16
     DTYPE_SIZE = 2 # bfloat16 size in bytes
 
-    INOUT0_SIZE = INOUT0_VOLUME * DTYPE_SIZE
-    INOUT1_SIZE = INOUT1_VOLUME * DTYPE_SIZE
-    INOUT2_SIZE = INOUT2_VOLUME * DTYPE_SIZE
     FULL_INPUT_SIZE = FULL_INPUT_VOL * DTYPE_SIZE
     INOUT_FACTOR_SIZE = INOUT_FACTOR_VOLUME * DTYPE_SIZE
 

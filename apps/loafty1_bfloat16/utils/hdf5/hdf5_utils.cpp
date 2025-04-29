@@ -96,7 +96,7 @@ Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName
     complex_t *data = (complex_t *)malloc(dims[0] * dims[1] * sizeof(complex_t));
 
     // Read the dataset into memory
-    herr_t  status = H5Dread(dataset_id, complex_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+    herr_t status = H5Dread(dataset_id, complex_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
     if (status < 0) {
         fprintf(stderr, "Failed to read dataset.\n");
         exit(1);
@@ -118,7 +118,7 @@ Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName
         for (int j=0; j<dims[1]/2; j++) {
             auto cube_index = i * dims[1]/2 + j;
             auto data_index_xx = (i*2*dims[1]) + j*2;
-            auto data_index_yy = (i*2*dims[1] + 1) + j*2 + 1;
+            auto data_index_yy = ((i*2+1)*dims[1]) + j*2 + 1;
             cube_xx[cube_index] = data[data_index_xx];
             cube_yy[cube_index] = data[data_index_yy];
         }
@@ -201,33 +201,36 @@ Matrix getXYZCoordinates(const char *filePath) {
 
     // Convert PQR to XYZ (From https://git.astron.nl/bassa/lofty/-/blob/main/lofty/utility/_station_xyz.py)
     Matrix rotationMatrix = { // identity matrix for now
-        {1, 0, 0},
-        {0, 1, 0},
-        {0, 0, 1},
+        // {1, 0, 0},
+        // {0, 1, 0},
+        // {0, 0, 1},
+        {-0.1195951054, 0.9928227484, 0.0000330969},
+        {-0.7919544517, -0.0954186800, 0.6030782884},
+        {0.5987530018, 0.0720990002, 0.7976820024},
     };
-    Matrix matrixXYZ = transposeMatrix(MatrixMult(rotationMatrix, transposeMatrix(matrixPQR))); 
+    Matrix matrixXYZ = transposeMatrix(MatrixMult(rotationMatrix, transposeMatrix(matrixPQR)));
 
     return matrixXYZ;
 }
 
-Baselines computeBaselines(const Matrix& station_xyz) { // From https://git.astron.nl/bassa/lofty/-/blob/main/lofty/entry/imaging/xst.py#L66
-    auto N = station_xyz.size();  // number of stations
+Baselines computeBaselines(const Matrix& coordXYZ) { // From https://git.astron.nl/bassa/lofty/-/blob/main/lofty/entry/imaging/xst.py#L66
+    auto N = coordXYZ.size();  // number of stations
     auto total_size = N*N;
     vector<float> matrixU(total_size);
     vector<float> matrixV(total_size);
     vector<float> matrixW(total_size);
 
-    for(auto i = 0; i < N; ++i) {
-        for(auto j = 0; j < N; ++j) {
+    for(auto i = 0; i < N; i++) {
+        for(auto j = 0; j < N; j++) {
             auto index = i*N + j;
-            matrixU[index] = station_xyz[i][0] - station_xyz[j][0];
-            matrixV[index] = station_xyz[i][1] - station_xyz[j][1];
-            matrixW[index] = station_xyz[i][2] - station_xyz[j][2];
+            matrixU[index] = coordXYZ[i][0] - coordXYZ[j][0];
+            matrixV[index] = coordXYZ[i][1] - coordXYZ[j][1];
+            matrixW[index] = coordXYZ[i][2] - coordXYZ[j][2];
+            // cout << "(" << i << ", " << j << ") " << coordXYZ[i][0] << ", " << coordXYZ[i][1] << ", " << coordXYZ[i][2] << " - " << coordXYZ[j][0] << ", " << coordXYZ[j][1] << ", " << coordXYZ[j][2] << " = " << matrixU[index] << ", " << matrixV[index] << ", " << matrixW[index] << endl;
         }
     }
-    Baselines baselines(matrixU, matrixV, matrixW);
 
-    return baselines;
+    return {matrixU, matrixV, matrixW};
 }
 
 float getFrequency(const char *filePath, const char *datasetName) {
