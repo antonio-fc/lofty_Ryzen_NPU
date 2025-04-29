@@ -18,6 +18,7 @@
 #include "utils/test_utils.h"
 #include "utils/hdf5/hdf5_utils.h"
 #include "utils/cpp_plotting/plot_utils.h"
+#include "utils/vector_utils.hpp"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -26,16 +27,6 @@ namespace po = boost::program_options;
 #define DATATYPES_USING_DEFINED
     using DATATYPE = bfloat16_t;
 #endif
-
-template<typename U, typename T>
-vector<U> castVector(const vector<T>& input) {
-    vector<U> output;
-    output.reserve(input.size());
-    for (const T& val : input) {
-        output.push_back(static_cast<U>(val));
-    }
-    return output;
-}
 
 vector<float> load1DCSV(const string& filename) {
     vector<float> data;
@@ -60,6 +51,43 @@ vector<float> load1DCSV(const string& filename) {
 
     file.close();
     return data;
+}
+
+vector<float> image_reference(vector<float> visR, vector<float> visI, vector<float> u, vector<float> v, vector<float> w, float freq, size_t npix_l, size_t npix_m) {
+    const float SL = 299792458; // m/s
+    float factor = -2 * freq * M_PI / SL;
+    vector<float> img(npix_l*npix_m);
+    auto x = linspace(-1.0f, 1.0f, npix_l);
+    auto y = linspace(1.0f, -1.0f, npix_m); 
+    auto [l, m] = meshgrid(x, y);
+    auto n = compute_n(l, m, npix_l, npix_m);
+    for(auto i=0; i<npix_l; i++) {
+        for(auto j=0; j<npix_m; j++) {
+            // Scale baselines with l, m and n
+            auto index = i*npix_m + j;
+            auto scaleU = u * l[index];
+            auto scaleV = v * m[index];
+            auto scaleW = w * n[index];
+            // Add scaled baselines
+            auto blAdd = scaleU + scaleV + scaleW;
+            // Multiply by frequency factor
+            auto scaleFactor = blAdd * factor;
+            // Multiply with visibilties
+            auto cos_v = cos(scaleFactor);
+            auto sin_v = sin(scaleFactor);
+            // Multiply with visibilities
+            auto real = visR * cos_v;
+            auto imag = visI * sin_v;
+            // Subtract real and imag
+            auto vis_mult = real - imag;
+            // Get the mean
+            auto result = mean(vis_mult);
+            // Save result
+            auto index_out = (npix_l - i - 1)*npix_m + npix_m - j - 1;
+            img[index_out] = result;
+        }
+    }
+    return img;
 }
 
 // ----------------------------------------------------------------------------
