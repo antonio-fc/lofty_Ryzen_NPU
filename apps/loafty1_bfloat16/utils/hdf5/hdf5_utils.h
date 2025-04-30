@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <cstring>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ using VisibilitiesPolar = pair<Matrix, Matrix>;
 using Visibilities = pair<vector<float>, vector<float>>;
 using Baselines = tuple<vector<float>, vector<float>, vector<float>>;
 
+vector<string> getDatasetNames(const char *filePath);
 VisibilitiesPolar getPolarVisibilitiesVector(const char *filePath, const char *datasetName);
 Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName);
 Matrix getXYZCoordinates(const char *filePath);

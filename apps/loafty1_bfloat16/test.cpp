@@ -218,8 +218,11 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // GETTING INPUT DATA
-    auto fileName = "./data/hdf5/input1lba.h5";
-    auto dataSetName = "XST_2025-04-11T07:45:44.000_SB240";
+    auto fileName = "./data/hdf5/inputLBA0.h5";
+    auto datasetNames = getDatasetNames(fileName);
+    auto dataSetName = (const char*) datasetNames[213].data();
+    cout << "Dataset Name: " << dataSetName << endl;
+    cout << "Subband: " << 1 << endl;
     
     // Get visibilities, baselines and frequency
     auto [realVisVector, imagVisVector] = getVisibilitiesVector(fileName, dataSetName); // done

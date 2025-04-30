@@ -5,6 +5,31 @@ typedef struct {
     float i;  // imag part
 } complex_t;
 
+vector<string> getDatasetNames(const char *filePath) {
+    std::vector<std::string> dataset_names;
+    // Openning file and group
+    hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
+    hid_t group_id = H5Gopen2(file_id, "/", H5P_DEFAULT);
+    // Get the number of objects in the group
+    hsize_t num_objs;
+    H5Gget_num_objs(group_id, &num_objs);
+    // Iterate through objects
+    for (hsize_t i = 0; i < num_objs; ++i) {
+        char name[128];
+        ssize_t len = H5Gget_objname_by_idx(group_id, i, name, sizeof(name));
+
+        if (len < 0) continue;
+
+        int obj_type = H5Gget_objtype_by_idx(group_id, i);
+        if (obj_type == H5G_DATASET) {
+            dataset_names.emplace_back(name);
+        }
+    }
+    H5Gclose(group_id);
+    H5Fclose(file_id);
+    return dataset_names;
+}
+
 VisibilitiesPolar getPolarVisibilitiesVector(const char *filePath, const char *datasetName) {
     // Openning file, group and dataset
     hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
