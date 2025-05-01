@@ -17,6 +17,7 @@ VisibilitiesPolar getPolarVisibilitiesVector(const char *filePath, const char *d
 Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName);
 Matrix getXYZCoordinates(const char *filePath);
 Baselines computeBaselines(const Matrix& coordXYZ);
+int getSubbandIndex(string dataSetName);
 float getFrequency(const char *filePath, const char *datasetName);
 vector<float> linspace(float start, float end, int num);
 pair<vector<float>, vector<float>> meshgrid(const vector<float>& x, const vector<float>& y);

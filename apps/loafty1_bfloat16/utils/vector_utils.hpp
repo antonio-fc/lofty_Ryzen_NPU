@@ -88,3 +88,45 @@ T mean(vector<T> v){
     auto const count = static_cast<T>(v.size());
     return reduce(v.begin(), v.end()) / count;
 }
+
+template<typename T>
+std::vector<T> filter_vector(const std::vector<T>& data, const std::vector<bool>& filter) {
+    if (data.size() != filter.size()) {
+        throw std::invalid_argument("Data and filter vectors dont have the same size.");
+    }
+
+    std::vector<T> result(data.size());
+    for (auto i = 0; i < data.size(); i++) {
+        if (!filter[i]) {
+            result[i] = data[i];
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
+vector<T> load1DCSV(const string& filename) {
+    vector<T> data;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw runtime_error("Could not open file: " + filename);
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string value;
+        while (getline(ss, value, ',')) {
+            try {
+                data.push_back(stof(value));
+            } catch (const invalid_argument& e) {
+                cerr << "Warning: invalid value '" << value << "' skipped.\n";
+            }
+        }
+    }
+
+    file.close();
+    return data;
+}

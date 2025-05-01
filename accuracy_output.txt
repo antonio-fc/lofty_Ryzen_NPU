@@ -1,0 +1,351 @@
+Dataset Name: XST_2025-04-11T07:42:11.000_SB027
+   Subband: 27
+   Frequency: 5.27344e+06
+   Range: [0, 12580.2]
+   Range Size: 12580.2
+   Average Error: 64.7982
+   Average Error Percentage: 0.51508
+   Avg NPU time: 27691.3us.
+   Min NPU time: 27435us.
+   Max NPU time: 27945us.
+
+Dataset Name: XST_2025-04-11T07:42:27.000_SB043
+   Subband: 43
+   Frequency: 8.39844e+06
+   Range: [0, 2.20377e+06]
+   Range Size: 2.20377e+06
+   Average Error: 6797.89
+   Average Error Percentage: 0.308466
+   Avg NPU time: 27741.2us.
+   Min NPU time: 27698us.
+   Max NPU time: 27859us.
+
+Dataset Name: XST_2025-04-11T07:42:43.000_SB059
+   Subband: 59
+   Frequency: 1.15234e+07
+   Range: [0, 1.27746e+09]
+   Range Size: 1.27746e+09
+   Average Error: 4.88207e+06
+   Average Error Percentage: 0.382171
+   Avg NPU time: 27776.4us.
+   Min NPU time: 27497us.
+   Max NPU time: 27938us.
+
+Dataset Name: XST_2025-04-11T07:42:59.000_SB075
+   Subband: 75
+   Frequency: 1.46484e+07
+   Range: [0, 1.28931e+09]
+   Range Size: 1.28931e+09
+   Average Error: 5.41684e+06
+   Average Error Percentage: 0.420136
+   Avg NPU time: 27739.4us.
+   Min NPU time: 27555us.
+   Max NPU time: 27910us.
+
+Dataset Name: XST_2025-04-11T07:43:15.000_SB091
+   Subband: 91
+   Frequency: 1.77734e+07
+   Range: [0, 2.52801e+09]
+   Range Size: 2.52801e+09
+   Average Error: 1.10646e+07
+   Average Error Percentage: 0.437679
+   Avg NPU time: 27758.6us.
+   Min NPU time: 27673us.
+   Max NPU time: 27926us.
+
+Dataset Name: XST_2025-04-11T07:43:31.000_SB107
+   Subband: 107
+   Frequency: 2.08984e+07
+   Range: [0, 881423]
+   Range Size: 881423
+   Average Error: 4723.32
+   Average Error Percentage: 0.535874
+   Avg NPU time: 27739.7us.
+   Min NPU time: 27719us.
+   Max NPU time: 27825us.
+
+Dataset Name: XST_2025-04-11T07:43:47.000_SB123
+   Subband: 123
+   Frequency: 2.40234e+07
+   Range: [0, 365556]
+   Range Size: 365556
+   Average Error: 2274.43
+   Average Error Percentage: 0.622184
+   Avg NPU time: 27752.5us.
+   Min NPU time: 27495us.
+   Max NPU time: 27910us.
+
+Dataset Name: XST_2025-04-11T07:44:03.000_SB139
+   Subband: 139
+   Frequency: 2.71484e+07
+   Range: [0, 1.45872e+06]
+   Range Size: 1.45872e+06
+   Average Error: 7299.53
+   Average Error Percentage: 0.500407
+   Avg NPU time: 27712.9us.
+   Min NPU time: 27666us.
+   Max NPU time: 27868us.
+
+Dataset Name: XST_2025-04-11T07:44:19.000_SB155
+   Subband: 155
+   Frequency: 3.02734e+07
+   Range: [0, 297971]
+   Range Size: 297971
+   Average Error: 1488.62
+   Average Error Percentage: 0.499587
+   Avg NPU time: 27708.3us.
+   Min NPU time: 27669us.
+   Max NPU time: 27882us.
+
+Dataset Name: XST_2025-04-11T07:44:35.000_SB171
+   Subband: 171
+   Frequency: 3.33984e+07
+   Range: [0, 327288]
+   Range Size: 327288
+   Average Error: 1670.16
+   Average Error Percentage: 0.510304
+   Avg NPU time: 27739.8us.
+   Min NPU time: 27693us.
+   Max NPU time: 27910us.
+
+Dataset Name: XST_2025-04-11T07:44:51.000_SB187
+   Subband: 187
+   Frequency: 3.65234e+07
+   Range: [0, 372914]
+   Range Size: 372914
+   Average Error: 2072.57
+   Average Error Percentage: 0.555776
+   Avg NPU time: 27732.2us.
+   Min NPU time: 27706us.
+   Max NPU time: 27791us.
+
+Dataset Name: XST_2025-04-11T07:45:07.000_SB203
+   Subband: 203
+   Frequency: 3.96484e+07
+   Range: [0, 412962]
+   Range Size: 412962
+   Average Error: 2401.3
+   Average Error Percentage: 0.581481
+   Avg NPU time: 27742.7us.
+   Min NPU time: 27717us.
+   Max NPU time: 27856us.
+
+Dataset Name: XST_2025-04-11T07:45:23.000_SB219
+   Subband: 219
+   Frequency: 4.27734e+07
+   Range: [0, 492964]
+   Range Size: 492964
+   Average Error: 3003.36
+   Average Error Percentage: 0.609245
+   Avg NPU time: 27819.2us.
+   Min NPU time: 27725us.
+   Max NPU time: 28033us.
+
+Dataset Name: XST_2025-04-11T07:45:39.000_SB235
+   Subband: 235
+   Frequency: 4.58984e+07
+   Range: [0, 636283]
+   Range Size: 636283
+   Average Error: 4265.69
+   Average Error Percentage: 0.670407
+   Avg NPU time: 27717us.
+   Min NPU time: 27507us.
+   Max NPU time: 27856us.
+
+Dataset Name: XST_2025-04-11T07:45:55.000_SB251
+   Subband: 251
+   Frequency: 4.90234e+07
+   Range: [0, 951283]
+   Range Size: 951283
+   Average Error: 5960.49
+   Average Error Percentage: 0.626574
+   Avg NPU time: 27731.7us.
+   Min NPU time: 27695us.
+   Max NPU time: 27859us.
+
+Dataset Name: XST_2025-04-11T07:46:11.000_SB267
+   Subband: 267
+   Frequency: 5.21484e+07
+   Range: [0, 1.60853e+06]
+   Range Size: 1.60853e+06
+   Average Error: 10073.1
+   Average Error Percentage: 0.626233
+   Avg NPU time: 27724.4us.
+   Min NPU time: 27686us.
+   Max NPU time: 27825us.
+
+Dataset Name: XST_2025-04-11T07:46:27.000_SB283
+   Subband: 283
+   Frequency: 5.52734e+07
+   Range: [0, 3.07655e+06]
+   Range Size: 3.07655e+06
+   Average Error: 16796.5
+   Average Error Percentage: 0.545954
+   Avg NPU time: 27758.4us.
+   Min NPU time: 27722us.
+   Max NPU time: 27937us.
+
+Dataset Name: XST_2025-04-11T07:46:43.000_SB299
+   Subband: 299
+   Frequency: 5.83984e+07
+   Range: [0, 4.12425e+06]
+   Range Size: 4.12425e+06
+   Average Error: 19468.5
+   Average Error Percentage: 0.472049
+   Avg NPU time: 27740.7us.
+   Min NPU time: 27716us.
+   Max NPU time: 27861us.
+
+Dataset Name: XST_2025-04-11T07:46:59.000_SB315
+   Subband: 315
+   Frequency: 6.15234e+07
+   Range: [0, 2.19422e+06]
+   Range Size: 2.19422e+06
+   Average Error: 10610.5
+   Average Error Percentage: 0.483564
+   Avg NPU time: 27727.6us.
+   Min NPU time: 27472us.
+   Max NPU time: 27947us.
+
+Dataset Name: XST_2025-04-11T07:47:15.000_SB331
+   Subband: 331
+   Frequency: 6.46484e+07
+   Range: [0, 1.23601e+06]
+   Range Size: 1.23601e+06
+   Average Error: 7892.78
+   Average Error Percentage: 0.638571
+   Avg NPU time: 27752.8us.
+   Min NPU time: 27720us.
+   Max NPU time: 27946us.
+
+Dataset Name: XST_2025-04-11T07:47:31.000_SB347
+   Subband: 347
+   Frequency: 6.77734e+07
+   Range: [0, 508825]
+   Range Size: 508825
+   Average Error: 2936.26
+   Average Error Percentage: 0.577067
+   Avg NPU time: 27746.5us.
+   Min NPU time: 27726us.
+   Max NPU time: 27828us.
+
+Dataset Name: XST_2025-04-11T07:47:47.000_SB363
+   Subband: 363
+   Frequency: 7.08984e+07
+   Range: [0, 258766]
+   Range Size: 258766
+   Average Error: 1549.74
+   Average Error Percentage: 0.598898
+   Avg NPU time: 27742.4us.
+   Min NPU time: 27723us.
+   Max NPU time: 27849us.
+
+Dataset Name: XST_2025-04-11T07:48:03.000_SB379
+   Subband: 379
+   Frequency: 7.40234e+07
+   Range: [0, 143102]
+   Range Size: 143102
+   Average Error: 812.496
+   Average Error Percentage: 0.567776
+   Avg NPU time: 27740.7us.
+   Min NPU time: 27720us.
+   Max NPU time: 27866us.
+
+Dataset Name: XST_2025-04-11T07:48:19.000_SB395
+   Subband: 395
+   Frequency: 7.71484e+07
+   Range: [0, 81366.5]
+   Range Size: 81366.5
+   Average Error: 426.067
+   Average Error Percentage: 0.523639
+   Avg NPU time: 27728.6us.
+   Min NPU time: 27466us.
+   Max NPU time: 27890us.
+
+Dataset Name: XST_2025-04-11T07:48:35.000_SB411
+   Subband: 411
+   Frequency: 8.02734e+07
+   Range: [0, 33818]
+   Range Size: 33818
+   Average Error: 174.863
+   Average Error Percentage: 0.517071
+   Avg NPU time: 27763.2us.
+   Min NPU time: 27695us.
+   Max NPU time: 27872us.
+
+Dataset Name: XST_2025-04-11T07:48:51.000_SB427
+   Subband: 427
+   Frequency: 8.33984e+07
+   Range: [0, 13965.6]
+   Range Size: 13965.6
+   Average Error: 73.5647
+   Average Error Percentage: 0.526756
+   Avg NPU time: 27729.2us.
+   Min NPU time: 27655us.
+   Max NPU time: 27805us.
+
+Dataset Name: XST_2025-04-11T07:49:07.000_SB443
+   Subband: 443
+   Frequency: 8.65234e+07
+   Range: [0, 10825.4]
+   Range Size: 10825.4
+   Average Error: 60.356
+   Average Error Percentage: 0.557539
+   Avg NPU time: 27750.2us.
+   Min NPU time: 27494us.
+   Max NPU time: 27946us.
+
+Dataset Name: XST_2025-04-11T07:49:23.000_SB459
+   Subband: 459
+   Frequency: 8.96484e+07
+   Range: [0, 68721.9]
+   Range Size: 68721.9
+   Average Error: 424.084
+   Average Error Percentage: 0.617102
+   Avg NPU time: 27738.3us.
+   Min NPU time: 27691us.
+   Max NPU time: 27885us.
+
+Dataset Name: XST_2025-04-11T07:49:39.000_SB475
+   Subband: 475
+   Frequency: 9.27734e+07
+   Range: [0, 10924.6]
+   Range Size: 10924.6
+   Average Error: 52.7406
+   Average Error Percentage: 0.482768
+   Avg NPU time: 27731.1us.
+   Min NPU time: 27702us.
+   Max NPU time: 27862us.
+
+Dataset Name: XST_2025-04-11T07:49:55.000_SB491
+   Subband: 491
+   Frequency: 9.58984e+07
+   Range: [0, 10788.6]
+   Range Size: 10788.6
+   Average Error: 51.7824
+   Average Error Percentage: 0.479974
+   Avg NPU time: 27755.7us.
+   Min NPU time: 27729us.
+   Max NPU time: 27864us.
+
+Dataset Name: XST_2025-04-11T07:50:11.000_SB507
+   Subband: 507
+   Frequency: 9.90234e+07
+   Range: [0, 10771.5]
+   Range Size: 10771.5
+   Average Error: 55.602
+   Average Error Percentage: 0.516197
+   Avg NPU time: 27688.6us.
+   Min NPU time: 27450us.
+   Max NPU time: 27865us.
+
+Dataset Name: XST_2025-04-11T07:50:27.000_SB011
+   Subband: 11
+   Frequency: 2.14844e+06
+   Range: [0, 14218]
+   Range Size: 14218
+   Average Error: 56.8084
+   Average Error Percentage: 0.399553
+   Avg NPU time: 27792.2us.
+   Min NPU time: 27693us.
+   Max NPU time: 28089us.

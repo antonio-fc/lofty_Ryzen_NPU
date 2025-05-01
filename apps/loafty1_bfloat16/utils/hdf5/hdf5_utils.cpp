@@ -258,6 +258,14 @@ Baselines computeBaselines(const Matrix& coordXYZ) { // From https://git.astron.
     return {matrixU, matrixV, matrixW};
 }
 
+int getSubbandIndex(string dataSetName) {
+    auto subbandString = dataSetName.substr(dataSetName.length() - 3, dataSetName.length() - 1);
+    if(dataSetName[dataSetName.length() - 3] == 'B') {
+        subbandString = dataSetName.substr(dataSetName.length() - 2, dataSetName.length() - 1);
+    }
+    return stoi(subbandString);
+}
+
 float getFrequency(const char *filePath, const char *datasetName) {
     // Getting the subband data
     hid_t file_id = H5Fopen(filePath, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -271,9 +279,7 @@ float getFrequency(const char *filePath, const char *datasetName) {
     H5Aread(attr_id, H5T_NATIVE_FLOAT, data);
 
     // Getting the frequency index
-    string dataSetName = datasetName;
-    auto subbandString = dataSetName.substr(dataSetName.length() - 3, dataSetName.length() - 1);
-    auto subbandIndex = stoi(subbandString);
+    auto subbandIndex = getSubbandIndex(datasetName);
     auto subband = data[subbandIndex];
     
     return subband;

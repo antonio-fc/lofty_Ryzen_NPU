@@ -12,7 +12,11 @@ __pycache__
 **.cmake
 include/**/Makefile
 lib/**/Makefile
-**.h5
+**/*.h5
+**/*.csv
+**/*.png
+**/build
+**/_build
 
 
 /platforms/vck190_bare/petalinux/build
