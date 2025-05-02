@@ -127,7 +127,7 @@ Visibilities getVisibilitiesVector(const char *filePath, const char *datasetName
         exit(1);
     }
 
-    // Separating the visibilities by polarization
+    // Separating the visibilities by polarization (https://git.astron.nl/bassa/lofty/-/blob/main/lofty/entry/imaging/xst.py)
     complex_t *cube_xx = (complex_t *)malloc(dims[0]/2 * dims[1]/2 * sizeof(complex_t)); // 96x96
     // complex_t *cube_xy = (complex_t *)malloc(dims[0]/2 * dims[1]/2 * sizeof(complex_t));
     // complex_t *cube_yx = (complex_t *)malloc(dims[0]/2 * dims[1]/2 * sizeof(complex_t));

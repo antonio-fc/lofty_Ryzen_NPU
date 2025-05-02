@@ -39,6 +39,8 @@ project(${ProjectName})
 # Find packages
 find_package(Boost REQUIRED)
 find_package(HDF5 REQUIRED)
+set(CMAKE_PREFIX_PATH "/home/user/local") # this is necessary because for some reason cmake cannot find pmt otherwise
+find_package(pmt REQUIRED)
 
 add_executable(${currentTarget}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/test_utils.cpp
@@ -71,6 +73,7 @@ if (NOT WSL)
         boost_program_options
         boost_filesystem
         HDF5::HDF5
+        pmt
     )
 else()
     target_link_libraries(${currentTarget} PUBLIC

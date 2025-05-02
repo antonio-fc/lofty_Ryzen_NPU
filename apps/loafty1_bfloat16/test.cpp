@@ -22,6 +22,8 @@
 #include "utils/cpp_plotting/plot_utils.h"
 #include "utils/vector_utils.hpp"
 
+#include "pmt.h"
+
 using namespace std;
 namespace po = boost::program_options;
 
@@ -194,6 +196,21 @@ int main(int argc, const char *argv[]) {
     if (verbosity >= 1)
         cout << "Getting handle to kernel:" << kernelName << "\n";
     auto kernel = xrt::kernel(context, kernelName);
+
+    // Power measure stuff
+    std::unique_ptr<pmt::PMT> sensor(pmt::Create("powersensor3"));
+    // std::unique_ptr<pmt::PMT> sensor(pmt::Create("nvml"));
+    pmt::State start, end_;
+    start = sensor->Read();
+    auto sum = 0;
+    for(auto i=0; i<1000000000; i++)
+        sum+=1;
+    end_ = sensor->Read();
+    cout<<sensor->joules(start, end_) <<" [J]"<<endl;
+    cout<<sensor->watts(start, end_) <<" [W]"<<endl;
+    cout<<sensor->seconds(start, end_)<<" [S]"<<endl;
+    exit(0);
+
 
     // ------------------------------------------------------
     // Initialize input/ output buffer sizes and sync them
