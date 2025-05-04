@@ -26,6 +26,9 @@ else()
 endif()
 
 set(TARGET_NAME test CACHE STRING "Target to be built")
+set(APP_VERSION "-1" CACHE STRING "Version of the loafty app")
+
+message(STATUS "Compiling Loafty ${APP_VERSION}")
 
 SET (ProjectName ${TARGET_NAME})
 SET (currentTarget ${TARGET_NAME})
@@ -47,7 +50,7 @@ add_executable(${currentTarget}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/hdf5/hdf5_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/cpp_plotting/plot_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/vector_utils.hpp
-    test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src_v${APP_VERSION}/test.cpp
 )
 
 target_compile_definitions(${currentTarget} PUBLIC DISABLE_ABI_CHECK=1)

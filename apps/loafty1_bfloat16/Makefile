@@ -15,20 +15,36 @@ include ${srcdir}/utils/makefile-common
 all: build/final.xclbin
 
 targetname = loafty
+app_version = 1
 trace_size = 256000
 n_antenna = 96 # make sure to run 'make clean' after changing this
 image_size = 128 # make sure to run 'make clean' after changing this
 trace_file = tracing/trace.txt
+ifeq ($(app_version), 0)
+    cpp_host := ${srcdir}/src_v0/test.cpp
+    py_host := ${srcdir}/src_v0/test.py
+    npu_code := ${srcdir}/src_v0/aie2.py
+else ifeq ($(app_version), 1)
+    cpp_host := ${srcdir}/src_v1/test.cpp
+    py_host := ${srcdir}/src_v1/test.py
+    npu_code := ${srcdir}/src_v1/aie2.py
+else ifeq ($(app_version), 2)
+    cpp_host := ${srcdir}/src_v2/test.cpp
+    py_host := ${srcdir}/src_v2/test.py
+    npu_code := ${srcdir}/src_v2/aie2.py
+else
+    $(error Unsupported app_version: $(app_version))
+endif
 
 ##==------------------------------==##
 
 ##== COMPILING PYTHON AIE TO MLIR ==##
 
-build/aie.mlir: ${srcdir}/aie2.py
+build/aie.mlir: ${npu_code}
 	mkdir -p ${@D}
 	python3 $< --anten ${n_antenna} --imgsz ${image_size} > $@
 
-build/aie_trace.mlir: ${srcdir}/aie2.py
+build/aie_trace.mlir: ${npu_code}
 	mkdir -p ${@D}
 	python3 $< -t ${trace_size} --anten ${n_antenna} --imgsz ${image_size} > $@
 
@@ -75,10 +91,10 @@ build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/
 
 ##==------- COMPILING C++ HOST CODE -------==##
 
-${targetname}.exe: ${srcdir}/test.cpp
+${targetname}.exe: ${cpp_host}
 	rm -rf _build
 	mkdir -p _build
-	cd _build && ${powershell} cmake -E env CXXFLAGS="-std=c++23 -ggdb" cmake ${srcdir} -D CMAKE_C_COMPILER=gcc-13 -D CMAKE_CXX_COMPILER=g++-13 -DTARGET_NAME=${targetname} 
+	cd _build && ${powershell} cmake -E env CXXFLAGS="-std=c++23 -ggdb" cmake ${srcdir} -D CMAKE_C_COMPILER=gcc-13 -D CMAKE_CXX_COMPILER=g++-13 -DTARGET_NAME=${targetname} -DAPP_VERSION=${app_version}
 	cd _build && ${powershell} cmake --build . --config Release
 ifeq "${powershell}" "powershell.exe"
 	cp _build/${targetname}.exe $@
@@ -105,10 +121,10 @@ trace: ${targetname}.exe build/trace.xclbin build/insts.bin
 	${parse_trace}
 
 run_py: build/final.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
+	${powershell} python3 ${py_host} -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 
 trace_py: build/trace.xclbin
-	${powershell} python3 ${srcdir}/test.py -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${powershell} python3 ${py_host} -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
 	${parse_trace}
 
 ##==-----------------------------==##

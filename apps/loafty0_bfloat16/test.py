@@ -96,7 +96,8 @@ def read_npz_data(path, index, plot):
     # print(file)
     return data
 
-def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, CV, IMG_DIM_SIZE, OUT_SIZE, TRACE_SIZE, NCHANNELS, DATATYPE, verbose):
+def format_input0(freq, vis, blines, N_LMN, CV, IMG_DIM_SIZE, OUT_SIZE, TRACE_SIZE, NCHANNELS, DATATYPE, verbose):
+    IMG_VOL = IMG_DIM_SIZE**2
     # Formatting the frequency to rads
     f = freq[0] # 50MHz
     SL = 299_792_458 # m/s
@@ -130,7 +131,7 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     inputsVis = np.concatenate([np.concatenate(inputsVis_A), np.concatenate(inputsVis_B)]).reshape(2, 2, 4608) # (9216/2) * 2 * 2 (4608 * 2 * 2 = 18432) each to then be distributed
 
     # Formatting lmn
-    inout3 = np.empty((IN2_VOL*N_LMN), dtype=DATATYPE)     # l, m, n
+    inout3 = np.empty((IMG_VOL*N_LMN), dtype=DATATYPE)     # l, m, n
     l, m = np.meshgrid(np.linspace(-1, 1, IMG_DIM_SIZE), np.linspace(1, -1, IMG_DIM_SIZE))
     n = np.sqrt(1 - l**2 - m**2) - 1
     nan_mask = np.isnan(n)
@@ -143,7 +144,7 @@ def format_input0(freq, vis, blines, IN0_VOL, IN1_VOL, IN2_VOL, N_LMN, NINPUTS, 
     for i in range(len(io3x)):
         for j in range(CV):
             inout3[(i*CV + j)::(len(io3x)*CV)] = io3x[i][j::CV]
-    inout3 = inout3.reshape(IN2_VOL//CV, N_LMN, CV)
+    inout3 = inout3.reshape(IMG_VOL//CV, N_LMN, CV)
 
     # Output buffers
     out_zero = np.zeros(OUT_SIZE, dtype=np.uint8)                    # output
@@ -232,10 +233,9 @@ def main(opts):
 
     # Formatting input data
     inputFreq, inputBL, inputVis, inputLMN, out_zero, trace_zero, nan_mask = format_input0(frequency, visibilities, baselines,
-                                                                                   0, 0, INOUT2_VOLUME,
-                                                                                   N_LMN, 0, CV, MATRIX_DIM_SIZE1,
-                                                                                   OUT_SIZE, TRACE_SIZE, NCHANNELS,
-                                                                                   DATATYPE, True)
+                                                                                    N_LMN, CV, MATRIX_DIM_SIZE1,
+                                                                                    OUT_SIZE, TRACE_SIZE, NCHANNELS,
+                                                                                    DATATYPE, False)
 
     # Initialize data buffers
     if DATATYPE == bfloat16:
