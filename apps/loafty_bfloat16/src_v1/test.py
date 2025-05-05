@@ -346,7 +346,7 @@ def main(opts):
             print("Dumping out trace.")
             trace_buffer = bo_trace.read(TRACE_SIZE, 0).view(np.uint32)
 
-            trace_utils.write_out_trace(trace_buffer, str(opts.trace_file))
+            test_utils.write_out_trace(trace_buffer, str(opts.trace_file))
 
         # Writing out unformatted output
         if i == num_iter-1 and opts.verbosity >= 1:

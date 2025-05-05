@@ -18,6 +18,7 @@ lib/**/Makefile
 **/*.exe
 **/build
 **/_build
+tracing/*
 
 
 /platforms/vck190_bare/petalinux/build

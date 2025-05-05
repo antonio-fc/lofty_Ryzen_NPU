@@ -8,6 +8,7 @@
 
 import argparse
 import pyxrt as xrt
+import sys
 
 
 # Add default args to standard parser object
@@ -89,13 +90,13 @@ def parse_args(args):
     return p.parse_args(args)
 
 
-# def write_out_trace(trace_buffer, trace_size, trace_file):
-#     try:
-#         with open(trace_file, "wt") as f:
-#             f.write(trace_buffer)
-#     except Exception as e:
-#         print(e)
-#         sys.exit(1)
+def write_out_trace(trace_buffer, trace_file):
+    try:
+        with open(trace_file, "wt") as f:
+            f.write(trace_buffer)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
 
 
 def init_xrt_load_kernel(opts):

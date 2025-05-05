@@ -19,7 +19,7 @@ app_version = 1
 trace_size = 256000
 n_antenna = 96 # make sure to run 'make clean' after changing this
 image_size = 128 # make sure to run 'make clean' after changing this
-trace_file = tracing/trace.txt
+trace_file = ${srcdir}/tracing/trace.txt
 ifeq ($(app_version), 0)
     cpp_host := ${srcdir}/src_v0/test.cpp
     py_host := ${srcdir}/src_v0/test.py
@@ -206,7 +206,7 @@ endif
 ##==------- PARSING TRACE -------==##
 
 parse_trace:
-	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename ${trace_file} --mlir build/aie_trace.mlir --colshift 1 > tracing/trace.json
+	${powershell} python3 ${srcdir}/utils/parse_trace.py --filename ${trace_file} --mlir build/aie_trace.mlir --colshift 1 > ${srcdir}/tracing/trace.json
 
 ##==-----------------------------==##
 
@@ -216,14 +216,14 @@ run: ${targetname}.exe build/final.xclbin build/insts.bin
 	${powershell} ./$< -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0 --verify true
 
 trace: ${targetname}.exe build/trace.xclbin build/insts.bin 
-	${powershell} ./$< -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 	${parse_trace}
 
 run_py: build/final.xclbin
 	${powershell} python3 ${py_host} -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 
 trace_py: build/trace.xclbin
-	${powershell} python3 ${py_host} -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 1
+	${powershell} python3 ${py_host} -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0
 	${parse_trace}
 
 ##==-----------------------------==##
