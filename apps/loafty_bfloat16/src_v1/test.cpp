@@ -125,10 +125,9 @@ int main(int argc, const char *argv[]) {
     const int CV = 64; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
-    const int INOUT0_VOLUME = MSIZE;
-    const int INOUT1_VOLUME = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
-    const int INOUT2_VOLUME = BSIZE;
-    const int INOUT_FACTOR_VOLUME = INOUT1_VOLUME + INOUT2_VOLUME * N_LMN; // size of the stream for the lmn values and the frequency factor
+    const int FREQ_VOL = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
+    const int LMN_VOLUME = BSIZE * N_LMN;
+    const int INOUT_FACTOR_VOLUME = FREQ_VOL + LMN_VOLUME; // size of the stream for the lmn values and the frequency factor
 
     const int NCORES = 6;
     const int NINPUTS = 5;
@@ -274,17 +273,16 @@ int main(int argc, const char *argv[]) {
         // Generating nan_mask
         auto nan_mask = n | views::transform([](float x) { return x != x; });
         vector<bool> nan_mask_v(nan_mask.begin(), nan_mask.end());
-
         // Format input 0 (frequency factor + lmn)
         DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
         vector<DATATYPE> factor_vec(INOUT_FACTOR_VOLUME);
 
-        vector<DATATYPE> freq_vector(INOUT1_VOLUME, 0); // Frequency factor with padding to add to the lmn data stream
+        vector<DATATYPE> freq_vector(FREQ_VOL); // Frequency factor with padding to add to the lmn data stream
         freq_vector[0] = ff;
 
         vector<vector<DATATYPE>> lmnInputs = {l, m, n};
-        vector<DATATYPE> lmn_vector(INOUT_FACTOR_VOLUME);
-        for(int i=0; i<INOUT2_VOLUME/CV; i++) {
+        vector<DATATYPE> lmn_vector(LMN_VOLUME);
+        for(int i=0; i<BSIZE/CV; i++) {
             for(int j=0; j<CV; j++) {
                 for(int lmn=0; lmn<N_LMN; lmn++) {
                     auto index = i*N_LMN+lmn;
@@ -301,7 +299,6 @@ int main(int argc, const char *argv[]) {
         vector<DATATYPE> main_inputA(FULL_INPUT_VOL);
         vector<DATATYPE> main_inputB(FULL_INPUT_VOL);
         vector<vector<DATATYPE>> mainInputs = {visR, visI, u, v, w};
-        
         for(int v=0; v<NINPUTS; v++) {
             for(int i=0; i<INPUT_VOL; i++) {    
                 main_inputA[i + v*INPUT_VOL] = mainInputs[v][i];
@@ -346,7 +343,6 @@ int main(int argc, const char *argv[]) {
                 /* Warmup iterations do not count towards average runtime. */
                 continue;
             }
-        
             // Copy output results and verify they are correct
             DATATYPE *bufOut;
             if (iter == num_iter - 1) {
