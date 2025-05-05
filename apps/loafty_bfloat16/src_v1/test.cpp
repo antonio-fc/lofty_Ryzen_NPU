@@ -32,6 +32,31 @@ namespace po = boost::program_options;
     using DATATYPE = bfloat16_t;
 #endif
 
+bool isPrime(int n) {
+    if (n <= 1) return false;
+    for (int i = 2; i * i <= n; ++i)
+        if (n % i == 0) return false;
+    return true;
+}
+
+// Function to consume CPU: calculates primes up to a large number
+void cpuIntensiveTask(int limit) {
+    int count = 0;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 2; i <= limit; ++i) {
+        if (isPrime(i)) {
+            ++count;
+        }
+    }
+
+    // auto end = std::chrono::high_resolution_clock::now();
+    // std::chrono::duration<double> elapsed = end - start;
+
+    std::cout << "Found " << count << " prime numbers up to " << limit << "\n";
+    // std::cout << "CPU time: " << elapsed.count() << " seconds\n";
+}
+
 template<typename... Args>
 string dyna_print(std::string_view rt_fmt_str, Args&&... args) {
     return std::vformat(rt_fmt_str, std::make_format_args(args...));
@@ -197,18 +222,15 @@ int main(int argc, const char *argv[]) {
     auto kernel = xrt::kernel(context, kernelName);
 
     // Power measure stuff
-    std::unique_ptr<pmt::PMT> sensor(pmt::Create("powersensor3"));
-    // std::unique_ptr<pmt::PMT> sensor(pmt::Create("nvml"));
-    pmt::State start, end_;
-    start = sensor->Read();
-    auto sum = 0;
-    for(auto i=0; i<1000000000; i++)
-        sum+=1;
-    end_ = sensor->Read();
-    cout<<sensor->joules(start, end_) <<" [J]"<<endl;
-    cout<<sensor->watts(start, end_) <<" [W]"<<endl;
-    cout<<sensor->seconds(start, end_)<<" [S]"<<endl;
-
+    // std::unique_ptr<pmt::PMT> sensor = pmt::Create("likwid");
+    // auto start = sensor->Read();
+    // std::this_thread::sleep_for(
+    //     std::chrono::milliseconds(sensor->GetMeasurementInterval()));  
+    // auto end_ = sensor->Read();
+    // cout<<sensor->joules(start, end_) <<" [J]"<<endl;
+    // cout<<sensor->watts(start, end_) <<" [W]"<<endl;
+    // cout<<sensor->seconds(start, end_)<<" [S]"<<endl;
+    // exit(0);
     // ------------------------------------------------------
     // Initialize input/ output buffer sizes and sync them
     // ------------------------------------------------------
