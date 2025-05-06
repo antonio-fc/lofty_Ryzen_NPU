@@ -15,7 +15,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 64; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
+const int VEC_SIZE = 32; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
 const int REDUC_SIZE = 6; // matching the number of cores per group (A and B)
 const float DIV = 9216.0;
 

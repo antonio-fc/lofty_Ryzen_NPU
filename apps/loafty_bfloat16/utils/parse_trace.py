@@ -4,7 +4,7 @@ import argparse
 import sys
 import re
 
-from aie.utils.trace_events_enum import CoreEvent, MemEvent, PLEvent, MemTileEvent
+from aie.utils.trace_events_enum import CoreEvent, MemEvent, ShimTileEvent, MemTileEvent
 
 # Number of different trace types, currently 4
 # core:    pkt type 0
@@ -669,7 +669,7 @@ def lookup_event_name_by_type(trace_type, code):
     elif trace_type == 1:  # Mem traces
         events_enum = MemEvent
     elif trace_type == 2:  # Shim traces
-        events_enum = PLEvent
+        events_enum = ShimTileEvent
     elif trace_type == 3:  # MemTile traces
         events_enum = MemTileEvent
     if events_enum is not None and code in set(x.value for x in events_enum):

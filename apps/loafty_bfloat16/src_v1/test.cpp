@@ -148,7 +148,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 64; // number of consecutive values in output stream
+    const int CV = 32; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int FREQ_VOL = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
@@ -223,7 +223,7 @@ int main(int argc, const char *argv[]) {
     auto kernel = xrt::kernel(context, kernelName);
 
     // Power measure stuff
-    // std::unique_ptr<pmt::PMT> sensor = pmt::Create("likwid");
+    // std::unique_ptr<pmt::PMT> sensor = pmt::Create("rapl");
     // auto start = sensor->Read();
     // std::this_thread::sleep_for(
     //     std::chrono::milliseconds(sensor->GetMeasurementInterval()));  
@@ -254,10 +254,10 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Getting data from hdf5 file
-    const string fileName = "inputLBA0";
+    const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -267,7 +267,7 @@ int main(int argc, const char *argv[]) {
         // Get visibilities, baselines and frequency
         auto [realVisVector, imagVisVector] = getVisibilitiesVector(filePath.data(), dataSetName); // done
         auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(filePath.data())); // done
-        float frequency = getFrequency("./data/hdf5/inputLBA0.h5", dataSetName); // done
+        float frequency = getFrequency("./data/hdf5/inputLBA1.h5", dataSetName); // done
         cout << "   Frequency: " << frequency << endl;
 
         // Generating lmn

@@ -6,7 +6,7 @@ const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
-const int CV = 64; // consecutive lmn values
+const int CV = 32; // consecutive lmn values
 const int VEC_SIZE = 32;
 
 aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
