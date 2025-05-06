@@ -20,23 +20,33 @@ trace_size = 256000
 n_antenna = 96 # make sure to run 'make clean' after changing this
 image_size = 128 # make sure to run 'make clean' after changing this
 trace_file = ${srcdir}/tracing/trace.txt
-ifeq ($(app_version), 0)
-    cpp_host := ${srcdir}/src_v0/test.cpp
-    py_host := ${srcdir}/src_v0/test.py
-    npu_code := ${srcdir}/src_v0/aie2.py
-	kernels := ${srcdir}/src_v0/kernels
-else ifeq ($(app_version), 1)
-    cpp_host := ${srcdir}/src_v1/test.cpp
-    py_host := ${srcdir}/src_v1/test.py
-    npu_code := ${srcdir}/src_v1/aie2.py
-	kernels := ${srcdir}/src_v1/kernels
-else ifeq ($(app_version), 2)
-    cpp_host := ${srcdir}/src_v2/test.cpp
-    py_host := ${srcdir}/src_v2/test.py
-    npu_code := ${srcdir}/src_v2/aie2.py
-	kernels := ${srcdir}/src_v2/kernels
+
+VALID_VERSIONS := 0 1 2
+ifeq ($(filter $(app_version),$(VALID_VERSIONS)),$(app_version))
+  $(info Loafty Version selected: $(app_version))
 else
-    $(error Unsupported app_version: $(app_version))
+  $(error Loafty Version is invalid: $(app_version))
+endif
+
+## Relevant paths
+src_v := ${srcdir}/src_v$(app_version)
+cpp_host := ${src_v}/test.cpp
+py_host := ${src_v}/test.py
+npu_code := ${src_v}/aie2.py
+kernels := ${src_v}/kernels
+
+## Prerequisites for each version
+ifeq ($(app_version), 0)
+	FINAL_DEPS := build/passthrough.o build/scale.o build/add.o build/kernels.a build/mul.o build/sub.o build/mean.o
+	TRACE_DEPS := build/passthrough.o build/scale.o build/add.o build/kernels.a build/mul.o build/sub.o build/mean.o
+else ifeq ($(app_version), 1)
+	FINAL_DEPS := build/passthrough.o build/mean.o build/kernels.a
+	TRACE_DEPS := build/passthrough.o build/mean.o build/kernels.a
+else ifeq ($(app_version), 2)
+	FINAL_DEPS := build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
+	TRACE_DEPS := build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
+else
+	$(error Loafty Version is invalid: $(app_version))
 endif
 
 ##==------------------------------==##
@@ -147,44 +157,19 @@ build/kernels.a: build/main_kernel.o build/lut_ops.o
 
 ##==------- GENERATING NPU CODE -------==##
 
-##### Version 0 #####
-# build/final.xclbin: build/aie.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/mul.o build/sub.o build/mean.o
-# 	mkdir -p ${@D}
-# 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
-# 		--no-xchesscc --no-xbridge \
-# 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
-
-# build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/mul.o build/sub.o build/mean.o
-# 	mkdir -p ${@D}
-# 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
-# 		--no-xchesscc --no-xbridge \
-# 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
-
-##### Version 1 #####
-build/final.xclbin: build/aie.mlir build/passthrough.o build/mean.o build/kernels.a
+# Rule for final.xclbin
+build/final.xclbin: build/aie.mlir $(FINAL_DEPS)
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
 		--no-xchesscc --no-xbridge \
 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
 
-build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/mean.o build/kernels.a
+# Rule for trace.xclbin
+build/trace.xclbin: build/aie_trace.mlir $(TRACE_DEPS)
 	mkdir -p ${@D}
 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
 		--no-xchesscc --no-xbridge \
 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
-
-##### Version 2 #####
-# build/final.xclbin: build/aie.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
-# 	mkdir -p ${@D}
-# 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
-# 		--no-xchesscc --no-xbridge \
-# 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
-
-# build/trace.xclbin: build/aie_trace.mlir build/passthrough.o build/scale.o build/add.o build/kernels.a build/sub.o build/mean.o
-# 	mkdir -p ${@D}
-# 	cd ${@D} && aiecc.py --aie-generate-xclbin --aie-generate-npu-insts --no-compile-host \
-# 		--no-xchesscc --no-xbridge \
-# 		--xclbin-name=${@F} --npu-insts-name=insts.bin ${<F}
 
 ##==------------------------------------==##
 

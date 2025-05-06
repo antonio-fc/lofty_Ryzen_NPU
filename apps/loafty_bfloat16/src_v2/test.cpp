@@ -20,7 +20,7 @@
 #include "../utils/test_utils.h"
 #include "../utils/hdf5/hdf5_utils.h"
 #include "../utils/cpp_plotting/plot_utils.h"
-#include "../utils/vector_utils.hpp"
+#include "../utils/accuracy_utils.hpp"
 
 #include "pmt.h"
 
@@ -35,62 +35,6 @@ namespace po = boost::program_options;
 template<typename... Args>
 string dyna_print(std::string_view rt_fmt_str, Args&&... args) {
     return std::vformat(rt_fmt_str, std::make_format_args(args...));
-}
-
-void reportAccuracy(vector<float> output, vector<float> ref, vector<bool> nan_mask, const std::string& filename) {
-    auto filtered_output = filter_vector<float>(output, nan_mask);
-    auto filtered_ref = filter_vector<float>(ref, nan_mask);
-    auto max_value = *max_element(begin(filtered_ref), end(filtered_ref));
-    auto min_value = *min_element(begin(filtered_ref), end(filtered_ref));
-    auto range_size = max_value - min_value;
-    auto diff_sum = 0.0;
-    for(auto i=0; i<filtered_ref.size(); i++) {
-        auto diff = abs(filtered_output[i] - filtered_ref[i]);
-        diff_sum+=diff;
-    }
-    auto mean_diff = diff_sum/filtered_ref.size();
-    auto mean_diff_percent = mean_diff*100.0f/range_size;
-    cout << "   Range: [" << min_value << ", " << max_value << "]" << endl;
-    cout << "   Range Size: " << range_size << endl;
-    cout << "   Average Error: " << mean_diff << endl;
-    cout << "   Average Error Percentage: " << mean_diff_percent << endl;
-}
-
-vector<float> image_reference(vector<float> visR, vector<float> visI, vector<float> u, vector<float> v, vector<float> w, float freq, size_t npix_l, size_t npix_m) {
-    const float SL = 299792458; // m/s
-    float factor = -2 * freq * M_PI / SL;
-    vector<float> img(npix_l*npix_m);
-    auto x = linspace(-1.0f, 1.0f, npix_l);
-    auto y = linspace(1.0f, -1.0f, npix_m); 
-    auto [l, m] = meshgrid(x, y);
-    auto n = compute_n(l, m, npix_l, npix_m);
-    for(auto i=0; i<npix_l; i++) {
-        for(auto j=0; j<npix_m; j++) {
-            // Scale baselines with l, m and n
-            auto index = i*npix_m + j;
-            auto scaleU = u * l[index];
-            auto scaleV = v * m[index];
-            auto scaleW = w * n[index];
-            // Add scaled baselines
-            auto blAdd = scaleU + scaleV + scaleW;
-            // Multiply by frequency factor
-            auto scaleFactor = blAdd * factor;
-            // Multiply with visibilties
-            auto cos_v = cos(scaleFactor);
-            auto sin_v = sin(scaleFactor);
-            // Multiply with visibilities
-            auto real = visR * cos_v;
-            auto imag = visI * sin_v;
-            // Subtract real and imag
-            auto vis_mult = real - imag;
-            // Get the mean
-            auto result = mean(vis_mult);
-            // Save result
-            auto index_out = (npix_l - i - 1)*npix_m + npix_m - j - 1;
-            img[index_out] = result;
-        }
-    }
-    return img;
 }
 
 // ----------------------------------------------------------------------------
@@ -111,6 +55,7 @@ int main(int argc, const char *argv[]) {
     int n_warmup_iterations = vm["warmup"].as<int>();
     int trace_size = vm["trace_sz"].as<int>();
     int do_trace = trace_size > 0;
+    auto trace_file = vm["trace_file"].as<std::string>();
     int antennas = vm["anten"].as<int>();
     int image_size = vm["imgsz"].as<int>();
     // ------------------------------------------------------
@@ -233,10 +178,10 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Getting data from hdf5 file
-    const string fileName = "inputLBA0";
+    const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -246,7 +191,7 @@ int main(int argc, const char *argv[]) {
         // Get visibilities, baselines and frequency
         auto [realVisVector, imagVisVector] = getVisibilitiesVector(filePath.data(), dataSetName); // done
         auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(filePath.data())); // done
-        float frequency = getFrequency("./data/hdf5/inputLBA0.h5", dataSetName); // done
+        float frequency = getFrequency("./data/hdf5/inputLBA1.h5", dataSetName); // done
         // auto realVisVector = load1DCSV<float>("utils/npy/csv_files/visR.csv");
         // auto imagVisVector = load1DCSV<float>("utils/npy/csv_files/visI.csv");
         // auto uVector = load1DCSV<float>("utils/npy/csv_files/u.csv");
@@ -310,7 +255,7 @@ int main(int argc, const char *argv[]) {
                 main_inputB[index] = freq;
             }
             for(int i=0; i<INPUT_VOL; i++) {
-                auto index = v*TT_VOL + i;    
+                auto index = v*TT_VOL + FREQ_VOL + i;    
                 main_inputA[index] = mainInputs[v][i];
                 main_inputB[index] = mainInputs[v][i + INPUT_VOL];
             }
@@ -378,6 +323,16 @@ int main(int argc, const char *argv[]) {
                 // cout << "Saved Ref in File: " << outFileNameRef << endl;
                 if (do_verify >= 1)
                     reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");  
+            }
+
+             // Copy trace and output to file
+             if(do_trace && iter==num_iter-1) {
+                char *bufTrace = bo_trace.map<char *>();
+                std::vector<char> trace_vec(TRACE_SIZE/sizeof(char));
+                memcpy(trace_vec.data(), bufTrace, TRACE_SIZE);
+                
+                cout << "   Trace Data Output Size: " << TRACE_SIZE/4 << " into file " << trace_file << endl;
+                test_utils::write_out_trace(bufTrace, TRACE_SIZE, trace_file);
             }
 
             // Accumulate run times
