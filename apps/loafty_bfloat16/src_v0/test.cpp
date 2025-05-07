@@ -55,6 +55,7 @@ int main(int argc, const char *argv[]) {
     int n_warmup_iterations = vm["warmup"].as<int>();
     int trace_size = vm["trace_sz"].as<int>();
     int do_trace = trace_size > 0;
+    auto trace_file = vm["trace_file"].as<std::string>();
     int antennas = vm["anten"].as<int>();
     int image_size = vm["imgsz"].as<int>();
     // ------------------------------------------------------
@@ -173,7 +174,7 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Getting data from hdf5 file
-    const string fileName = "inputLBA0";
+    const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
     for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
@@ -186,7 +187,7 @@ int main(int argc, const char *argv[]) {
         // Get visibilities, baselines and frequency
         auto [realVisVector, imagVisVector] = getVisibilitiesVector(filePath.data(), dataSetName); // done
         auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(filePath.data())); // done
-        float frequency = getFrequency("./data/hdf5/inputLBA0.h5", dataSetName); // done
+        float frequency = getFrequency("./data/hdf5/inputLBA1.h5", dataSetName); // done
         cout << "   Frequency: " << frequency << endl;
 
         // Generating lmn
