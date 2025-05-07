@@ -290,7 +290,10 @@ int main(int argc, const char *argv[]) {
             auto start = chrono::high_resolution_clock::now();
             unsigned int opcode = 3;
             xrt::run run;
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+            if(do_trace)
+                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
+            else
+                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
             run.wait();
             auto stop = chrono::high_resolution_clock::now();
             bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
@@ -324,9 +327,9 @@ int main(int argc, const char *argv[]) {
                 if (do_verify >= 1)
                     reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");  
             }
-
              // Copy trace and output to file
              if(do_trace && iter==num_iter-1) {
+                cout << "heeere" << endl;
                 char *bufTrace = bo_trace.map<char *>();
                 std::vector<char> trace_vec(TRACE_SIZE/sizeof(char));
                 memcpy(trace_vec.data(), bufTrace, TRACE_SIZE);

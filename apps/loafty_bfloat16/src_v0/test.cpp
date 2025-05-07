@@ -298,7 +298,10 @@ int main(int argc, const char *argv[]) {
             auto start = chrono::high_resolution_clock::now();
             unsigned int opcode = 3;
             xrt::run run;
-            run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout3, bo_inout4);
+            if(do_trace)
+                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout3, bo_inout4, bo_trace);
+            else
+                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout3, bo_inout4);
             run.wait();
             auto stop = chrono::high_resolution_clock::now();
             bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
