@@ -255,7 +255,7 @@ int main(int argc, const char *argv[]) {
                 main_inputB[index] = freq;
             }
             for(int i=0; i<INPUT_VOL; i++) {
-                auto index = v*TT_VOL + FREQ_VOL + i;    
+                auto index = v*TT_VOL + i;  // + FREQ_VOL
                 main_inputA[index] = mainInputs[v][i];
                 main_inputB[index] = mainInputs[v][i + INPUT_VOL];
             }

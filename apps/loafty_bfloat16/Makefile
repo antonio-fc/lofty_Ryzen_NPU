@@ -16,7 +16,7 @@ all: build/final.xclbin
 
 targetname = loafty
 app_version = 2
-trace_size = 524288
+trace_size = 536870912 # 524288
 n_antenna = 96 # make sure to run 'make clean' after changing this
 image_size = 128 # make sure to run 'make clean' after changing this
 trace_file = ${srcdir}/tracing/trace.txt
@@ -198,10 +198,10 @@ parse_trace:
 ##==------- RUNNING CODE -------==##
 
 run: ${targetname}.exe build/final.xclbin build/insts.bin
-	${powershell} ./$< -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 10 --warmup 4 --verbosity 0 --verify true
+	${powershell} ./$< -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 2 --warmup 3 --verbosity 0 --verify true
 
 trace: ${targetname}.exe build/trace.xclbin build/insts.bin 
-	${powershell} ./$< -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 5 --warmup 4 --verbosity 0
+	${powershell} ./$< -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 5 --warmup 5 --verbosity 0
 	${parse_trace}
 
 run_py: build/final.xclbin

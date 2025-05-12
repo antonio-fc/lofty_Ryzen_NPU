@@ -92,7 +92,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 32; // number of consecutive values in output stream
+    const int CV = 128; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int FREQ_VOL = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
@@ -189,6 +189,12 @@ int main(int argc, const char *argv[]) {
         bo_trace = xrt::bo(device, TRACE_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
     else
         bo_trace = xrt::bo(device, 1, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
+
+    // xrt::bo bo_traceDummy;
+    // if(do_trace)
+    //     bo_traceDummy = xrt::bo(device, TRACE_SIZE, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
+    // else
+    //     bo_traceDummy = xrt::bo(device, 1, XRT_BO_FLAGS_HOST_ONLY, kernel.group_id(7));
     
     if (verbosity >= 1)
         cout << "Writing data into buffer objects.\n";
@@ -201,7 +207,7 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -291,28 +297,40 @@ int main(int argc, const char *argv[]) {
         float npu_time_total = 0;
         float npu_time_min = 999999999999;
         float npu_time_max = 0;
+        vector<float> times(num_iter);
+        vector<float> timestamps(num_iter);
 
         // ------------------------------------------------------
         // Main run loop
         // ------------------------------------------------------
+        auto start_abs = chrono::high_resolution_clock::now();
         for (unsigned iter = 0; iter < num_iter; iter++) {        
             // Run kernel
             if (verbosity >= 1)
                 cout << "Running Kernel " << iter << ".\n";
             auto start = chrono::high_resolution_clock::now();
+            auto stop = chrono::high_resolution_clock::now();
             unsigned int opcode = 3;
             xrt::run run;
-            if(do_trace)
+            if(do_trace) {
+                start = chrono::high_resolution_clock::now();
                 run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-            else
-                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
-            run.wait();
-            auto stop = chrono::high_resolution_clock::now();
-            bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-            if (iter < n_warmup_iterations) {
-                /* Warmup iterations do not count towards average runtime. */
-                continue;
+                run.wait();
+                stop = chrono::high_resolution_clock::now();
             }
+            else {
+                start = chrono::high_resolution_clock::now();
+                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+                run.wait();
+                stop = chrono::high_resolution_clock::now();
+            }
+            // run.wait();
+            // auto stop = chrono::high_resolution_clock::now();
+            bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+            // if (iter < n_warmup_iterations) {
+            //     /* Warmup iterations do not count towards average runtime. */
+            //     continue;
+            // }
             // Copy output results and verify they are correct
             DATATYPE *bufOut;
             if (iter == num_iter - 1) {
@@ -345,12 +363,14 @@ int main(int argc, const char *argv[]) {
                 std::vector<char> trace_vec(TRACE_SIZE/sizeof(char));
                 memcpy(trace_vec.data(), bufTrace, TRACE_SIZE);
                 
-                cout << "   Trace Data Output Size: " << TRACE_SIZE/4 << " into file " << trace_file << endl;
+                cout << "   Trace Data Output Size: " << TRACE_SIZE/sizeof(char) << " into file " << trace_file << endl;
                 test_utils::write_out_trace(bufTrace, TRACE_SIZE, trace_file);
             }
 
             // Accumulate run times
             float npu_time = chrono::duration_cast<chrono::microseconds>(stop - start).count();
+            times[iter] = npu_time;
+            timestamps[iter] = chrono::duration_cast<chrono::microseconds>(start - start_abs).count();
             npu_time_total += npu_time;
             npu_time_min = (npu_time < npu_time_min) ? npu_time : npu_time_min;
             npu_time_max = (npu_time > npu_time_max) ? npu_time : npu_time_max;
@@ -359,8 +379,12 @@ int main(int argc, const char *argv[]) {
         // ------------------------------------------------------
         // Print verification and timing results
         // ------------------------------------------------------
-        cout << "   Avg NPU time: " << npu_time_total / n_iterations << "us." << endl;    
+        cout << "   Total NPU time: " << npu_time_total << "us." << endl; 
+        cout << "   Avg NPU time: " << npu_time_total / num_iter << "us." << endl;    
         cout << "   Min NPU time: " << npu_time_min << "us." << endl;
         cout << "   Max NPU time: " << npu_time_max << "us." << endl;
+        for(auto i=0; i<num_iter; i++) {
+            cout << "       *Iter" << i << ": " << timestamps[i] << "us, " << times[i] << "us" << endl;
+        }
     }
 }

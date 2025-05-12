@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 # stats for full NPU
-NPU_PEAK_PERF_16CT = 307.2 # GFLOP/s
-NPU_PEAK_PERF_14CT = 268.8 # GFLOP/s
-NPU_PEAK_PERF_13CT = 249.6 # GFLOP/s
+NPU_PEAK_PERF_16CT = 307.2 # GBFOP/s
+NPU_PEAK_PERF_14CT = 268.8 # GBFOP/s
+NPU_PEAK_PERF_13CT = 249.6 # GBFOP/s
 NPU_PEAK_BW = 76.8 # GB/s
 
 # stats for one CT
-CT_PEAK_PERF = 19.2 # GFLOP/s
+CT_PEAK_PERF = 19.2 # GBFOP/s
 CT_PEAK_BW_LOW = 38.4 # GB/s (when neither input is from a nieghbor)
 CT_PEAK_BW_MED = 326.4 # GB/s (when one input is from a neighbor)
 CT_PEAK_BW_HIGH = 614.4 # GB/s (when both inputs are from neighbors)
@@ -20,7 +20,7 @@ CT_PEAK_BW_HIGH = 614.4 # GB/s (when both inputs are from neighbors)
 # metrics for NPU applications
 loaftyLabels = ['loafty0', 'loafty1', 'loafty2']
 loaftySizes = [128, 256, 128]
-loaftyPerf = [[3.6841, 3.6902], [24.986239, 25.285982, 47.8039], [8.9213, 8.9636]] # GFLOP/s
+loaftyPerf = [[3.6841, 3.6902], [24.986239, 25.285982, 47.8039], [8.9213, 8.9636]] # GBFOP/s
 loaftyArithInt = [[12080.3731, 27048.3932], [9737.9951, 21813.262018, 9737.9951], [12084.6272, 27053.7240]] # FLOP/Byte
 loaftyColors = [['r', 'm'], ['g', 'y', 'k'], ['b', 'c']]
 
@@ -37,15 +37,15 @@ def roofline(peakPerf, peakBw, intensity):
 def plot_npu_roofline(START, STOP, N):
     # Getting the roofline
     arithmetic_intensity = np.logspace(START, STOP, num=N, base=2) # FLOP/Byte
-    achievable_perf_16CT = roofline(NPU_PEAK_PERF_16CT, NPU_PEAK_BW, arithmetic_intensity) # GFLOP/s
-    achievable_perf_14CT = roofline(NPU_PEAK_PERF_14CT, NPU_PEAK_BW, arithmetic_intensity) # GFLOP/s
-    achievable_perf_13CT = roofline(NPU_PEAK_PERF_13CT, NPU_PEAK_BW, arithmetic_intensity) # GFLOP/s
+    achievable_perf_16CT = roofline(NPU_PEAK_PERF_16CT, NPU_PEAK_BW, arithmetic_intensity) # GBFOP/s
+    achievable_perf_14CT = roofline(NPU_PEAK_PERF_14CT, NPU_PEAK_BW, arithmetic_intensity) # GBFOP/s
+    achievable_perf_13CT = roofline(NPU_PEAK_PERF_13CT, NPU_PEAK_BW, arithmetic_intensity) # GBFOP/s
     # Plotting the roofline
     _, ax = plt.subplots()
     ax.set_xscale('log', base=2)
     ax.set_yscale('log', base=2)
     ax.set_xlabel('Arithmetic Intensity (FLOP/byte)', fontsize=12)
-    ax.set_ylabel("Achieveable Performance (GFLOP/s)", fontsize=12)
+    ax.set_ylabel("Achieveable Performance (GBFOP/s)", fontsize=12)
     ax.grid(True, which='major')
     ax.plot(arithmetic_intensity, achievable_perf_16CT, linestyle='--', color='b', label="Naive Roofline (16 CTs)")
     ax.plot(arithmetic_intensity, achievable_perf_14CT, linestyle='--', color='r', label="Naive Roofline (14 CTs)")
@@ -70,7 +70,7 @@ def plot_ct_roofline(START, STOP, N):
     ax.set_xscale('log', base=2)
     ax.set_yscale('log', base=2)
     ax.set_xlabel('Arithmetic Intensity (FLOP/byte)', fontsize=12)
-    ax.set_ylabel("Achieveable Performance (GFLOP/s)", fontsize=12)
+    ax.set_ylabel("Achieveable Performance (GBFOP/s)", fontsize=12)
     ax.grid(True, which='major')
     ax.plot(arithmetic_intensity, achievable_perf_low_bw, linestyle='--', color='r', label="Low BW Roofline")
     ax.plot(arithmetic_intensity, achievable_perf_med_bw, linestyle='--', color='tab:gray', label="Medium BW Roofline")
