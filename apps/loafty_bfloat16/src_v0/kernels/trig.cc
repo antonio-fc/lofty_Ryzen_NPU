@@ -6,8 +6,6 @@ const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
-const int CV = 32; // consecutive lmn values
-
 aie::vector<bfloat16, VEC_SIZE> sin_bfloat16(aie::vector<bfloat16, VEC_SIZE> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
         auto bitmap0 = aie::broadcast<uint16, VEC_SIZE>(0x8000);

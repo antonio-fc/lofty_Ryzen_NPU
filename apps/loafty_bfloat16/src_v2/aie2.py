@@ -102,7 +102,7 @@ def loafty(opts):
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256
     MIN_SIZE = 2
-    OUT_SIZE = 32 # need to be at least 2 and even
+    OUT_SIZE = 128 # need to be at least 2 and even
     N_LMN = 3 # 3 for l, m and n
     LMN__MOVE_SIZE = OUT_SIZE*N_LMN
     LMN_SIZE = BSIZE*N_LMN

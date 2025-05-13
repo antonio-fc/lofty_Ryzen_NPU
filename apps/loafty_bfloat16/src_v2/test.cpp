@@ -67,7 +67,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 32; // number of consecutive values in output stream
+    const int CV = 128; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int INOUT0_VOLUME = MSIZE;
