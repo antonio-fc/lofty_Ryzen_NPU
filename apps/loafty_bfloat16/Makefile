@@ -15,7 +15,7 @@ include ${srcdir}/utils/makefile-common
 all: build/final.xclbin
 
 targetname = loafty
-app_version = 0
+app_version = 1
 trace_size = 536870912 # 524288
 n_antenna = 96 # make sure to run 'make clean' after changing this
 image_size = 128 # make sure to run 'make clean' after changing this
@@ -66,43 +66,27 @@ build/aie_trace.mlir: ${npu_code}
 ##== COMPILING NPU KERNELS WITH PEANO ==##
 
 ##### Kernels for version 0 #####
-build/passthrough.o: ${kernels}/passthrough.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/scale.o: ${kernels}/scale.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/add.o: ${kernels}/add.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/trig.o: ${kernels}/trig.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/mul.o: ${kernels}/mul.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/sub.o: ${kernels}/sub.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/mean.o: ${kernels}/mean.cc
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/lut_ops.o: ${kernels}/lut_ops.cpp
-	mkdir -p ${@D}
-	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
-build/kernels.a: build/trig.o build/lut_ops.o
-	ar rvs $@ $+
-
-##### Kernels for version 1 #####
 # build/passthrough.o: ${kernels}/passthrough.cc
+# 	mkdir -p ${@D}
+# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+# build/scale.o: ${kernels}/scale.cc
+# 	mkdir -p ${@D}
+# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+# build/add.o: ${kernels}/add.cc
+# 	mkdir -p ${@D}
+# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+# build/trig.o: ${kernels}/trig.cc
+# 	mkdir -p ${@D}
+# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+# build/mul.o: ${kernels}/mul.cc
+# 	mkdir -p ${@D}
+# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+# build/sub.o: ${kernels}/sub.cc
 # 	mkdir -p ${@D}
 # 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
@@ -110,16 +94,32 @@ build/kernels.a: build/trig.o build/lut_ops.o
 # 	mkdir -p ${@D}
 # 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-# build/main_kernel.o: ${kernels}/main_kernel.cc
-# 	mkdir -p ${@D}
-# 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
-
 # build/lut_ops.o: ${kernels}/lut_ops.cpp
 # 	mkdir -p ${@D}
 # 	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
 
-# build/kernels.a: build/main_kernel.o build/lut_ops.o
+# build/kernels.a: build/trig.o build/lut_ops.o
 # 	ar rvs $@ $+
+
+##### Kernels for version 1 #####
+build/passthrough.o: ${kernels}/passthrough.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/mean.o: ${kernels}/mean.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/main_kernel.o: ${kernels}/main_kernel.cc
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/lut_ops.o: ${kernels}/lut_ops.cpp
+	mkdir -p ${@D}
+	cd ${@D} && ${PEANO_INSTALL_DIR}/bin/clang++ ${PEANOWRAP2_FLAGS} -c $< -o ${@F}
+
+build/kernels.a: build/main_kernel.o build/lut_ops.o
+	ar rvs $@ $+
 
 ##### Kernels for version 2 #####
 # build/passthrough.o: ${kernels}/passthrough.cc
@@ -198,7 +198,7 @@ parse_trace:
 ##==------- RUNNING CODE -------==##
 
 run: ${targetname}.exe build/final.xclbin build/insts.bin
-	${powershell} ./$< -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 2 --warmup 3 --verbosity 0 --verify true
+	${powershell} ./$< -x build/final.xclbin -i build/insts.bin -k MLIR_AIE --anten ${n_antenna} --imgsz ${image_size} --iters 5 --warmup 5 --verbosity 0 --verify true
 
 trace: ${targetname}.exe build/trace.xclbin build/insts.bin 
 	${powershell} ./$< -x build/trace.xclbin -i build/insts.bin -k MLIR_AIE -t ${trace_size} --trace_file ${trace_file} --anten ${n_antenna} --imgsz ${image_size} --iters 5 --warmup 5 --verbosity 0

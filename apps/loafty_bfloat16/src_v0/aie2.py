@@ -124,7 +124,6 @@ def loafty(opts):
 
     ITERS = BSIZE//OUT_SIZE
     
-    NINPUTS = 5 # number of inputs in a single stream
     NCHANNELS = 2
     
     INPUT_SIZE = MSIZE//NCHANNELS # 9216/2 # size of an input per stream

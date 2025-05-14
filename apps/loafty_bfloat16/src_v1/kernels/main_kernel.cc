@@ -6,8 +6,8 @@ const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
-const int CV = 128; // consecutive lmn values
-const int VEC_SIZE = 32;
+const int CV = 64; // consecutive lmn values
+const int VEC_SIZE = 64;
 
 aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
@@ -18,52 +18,10 @@ aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         return aie::bit_xor(resultSin.cast_to<uint16>(), final_sign).cast_to<bfloat16>(); // Negating the result for negative angles
 }
 
-aie::vector<bfloat16, 64> sin_bfloat16(aie::vector<bfloat16, 64> input_vec) {
-    auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
-    auto bitmap0 = aie::broadcast<uint16, 64>(0x8000);
-    auto final_sign = aie::bit_and(input_vec.cast_to<uint16>(), bitmap0); // Obtaining the sign bit, inputs must be uint32 for some reason
-    auto scaled_vec = aie::mul(inputs, FACTOR);
-    auto resultSin0 = getSinbFloat16(scaled_vec.extract<32>(0)); // calling function for cos (calling the lut)
-    auto resultSin1 = getSinbFloat16(scaled_vec.extract<32>(1)); // calling function for cos (calling the lut)
-    auto resultSin = aie::concat(resultSin0, resultSin1);
-    return aie::bit_xor(resultSin.cast_to<uint16>(), final_sign).cast_to<bfloat16>(); // Negating the result for negative angles
-}
-
-aie::vector<bfloat16, 128> sin_bfloat16(aie::vector<bfloat16, 128> input_vec) {
-    auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
-    auto bitmap0 = aie::broadcast<uint16, 128>(0x8000);
-    auto final_sign = aie::bit_and(input_vec.cast_to<uint16>(), bitmap0); // Obtaining the sign bit, inputs must be uint32 for some reason
-    auto scaled_vec = aie::mul(inputs, FACTOR);
-    auto resultSin0 = getSinbFloat16(scaled_vec.extract<32>(0)); // calling function for cos (calling the lut)
-    auto resultSin1 = getSinbFloat16(scaled_vec.extract<32>(1)); // calling function for cos (calling the lut)
-    auto resultSin2 = getSinbFloat16(scaled_vec.extract<32>(2)); // calling function for cos (calling the lut)
-    auto resultSin3 = getSinbFloat16(scaled_vec.extract<32>(3)); // calling function for cos (calling the lut)
-    auto resultSin = aie::concat(aie::concat(resultSin0, resultSin1), aie::concat(resultSin2, resultSin3));
-    return aie::bit_xor(resultSin.cast_to<uint16>(), final_sign).cast_to<bfloat16>(); // Negating the result for negative angles
-}
-
 aie::vector<bfloat16, 32> cos_bfloat16(aie::vector<bfloat16, 32> input_vec) {
     auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
     auto scaled_vec = aie::mul(inputs, FACTOR);
     return getCosbFloat16(scaled_vec); // calling function for cos (calling the lut)
-}
-
-aie::vector<bfloat16, 64> cos_bfloat16(aie::vector<bfloat16, 64> input_vec) {
-    auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
-    auto scaled_vec = aie::mul(inputs, FACTOR);
-    auto resultCos0 = getCosbFloat16(scaled_vec.extract<32>(0));
-    auto resultCos1 = getCosbFloat16(scaled_vec.extract<32>(1));
-    return aie::concat(resultCos0, resultCos1); // calling function for cos (calling the lut)
-}
-
-aie::vector<bfloat16, 128> cos_bfloat16(aie::vector<bfloat16, 128> input_vec) {
-    auto inputs = aie::abs(input_vec); // to remove negative, cause cos(-x) = cos(x)
-    auto scaled_vec = aie::mul(inputs, FACTOR);
-    auto resultCos0 = getCosbFloat16(scaled_vec.extract<32>(0));
-    auto resultCos1 = getCosbFloat16(scaled_vec.extract<32>(1));
-    auto resultCos2 = getCosbFloat16(scaled_vec.extract<32>(2));
-    auto resultCos3 = getCosbFloat16(scaled_vec.extract<32>(3));
-    return aie::concat(aie::concat(resultCos0, resultCos1), aie::concat(resultCos2, resultCos3)); // calling function for cos (calling the lut)
 }
 
 // aie::vector<bfloat16, 64> exp_bfloat16(aie::vector<bfloat16, 32> input_vec) {
@@ -80,7 +38,7 @@ aie::vector<bfloat16, 128> cos_bfloat16(aie::vector<bfloat16, 128> input_vec) {
 
 extern "C" {
 
-void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, bfloat16 *u, bfloat16 *v, bfloat16 *w, bfloat16 *out, uint32_t N) {
+void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visI, bfloat16 *u, bfloat16 *v, bfloat16 *w, bfloat16 *out, uint32_t N) {
     // Output size is CV
     bfloat16 *l = lmn;
     bfloat16 *m = lmn + CV;
@@ -111,21 +69,31 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
             auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
-            // Method1 (works)
-            auto cos = cos_bfloat16(A.to_vector<bfloat16>(0)); // Need to try reduce to one LUT operation
-            auto sin = sin_bfloat16(A.to_vector<bfloat16>(0));
+            // Method1 (works) {VEC_SIZE=32}
+            // auto cos = cos_bfloat16(A.to_vector<bfloat16>(0)); // Need to try reduce to one LUT operation
+            // auto sin = sin_bfloat16(A.to_vector<bfloat16>(0));
+            
+            // Method2 (works) [faster, a bit more error] {VEC_SIZE=64}
+            auto A0 = A.extract<32>(0);
+            auto A1 = A.extract<32>(1);
+            auto cos0 = cos_bfloat16(A0);
+            auto cos1 = cos_bfloat16(A1);
+            auto sin0 = sin_bfloat16(A0);
+            auto sin1 = sin_bfloat16(A1);
+            auto cos = aie::concat(cos0, cos1);
+            auto sin = aie::concat(sin0, sin1);
 
-            // Method2 (???)
+            // Method3 (???)
             // auto exp = exp_bfloat16(A);
             // auto sin = exp.extract<32>(0);
             // auto cos = exp.extract<32>(1);
 
             // Mult with visibilities and subtract
             auto vecR = aie::load_v<VEC_SIZE>(visR + i);
-            auto vecC = aie::load_v<VEC_SIZE>(visC + i);
+            auto vecI = aie::load_v<VEC_SIZE>(visI + i);
             auto R = aie::mul(cos, vecR);
-            auto C = aie::mul(sin, vecC);
-            auto result = aie::sub(R, C);
+            auto I = aie::mul(sin, vecI);
+            auto result = aie::sub(R, I);
 
             // Adding to acc
             acc = aie::add(acc, result);
@@ -137,4 +105,62 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, b
         out[t] = res;
     }
 }
+//// VERSION OMITTING THE TRIG FUNCTIONS///////
+// void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visC, bfloat16 *u, bfloat16 *v, bfloat16 *w, bfloat16 *out, uint32_t N) {
+//     // Output size is CV
+//     bfloat16 *l = lmn;
+//     bfloat16 *m = lmn + CV;
+//     bfloat16 *n = lmn + CV*2;
+//     for(int t = 0; t < CV; t++) // for each pixel/lmn
+//     chess_prepare_for_pipelining chess_loop_range(64, 64) { 
+//         // Check if calculations can be skipped
+//         if ((l[t]*l[t] + m[t]*m[t]) > 1.0) {
+//             continue; // out[t] = n[t]; // hex for NaN
+//         }
+        
+//         // Initialize the accum for the reduction
+//         aie::vector<bfloat16, VEC_SIZE> sum_v = aie::zeros<bfloat16, VEC_SIZE>();
+//         aie::accum<accfloat, VEC_SIZE> acc;
+//         acc.from_vector(sum_v, 0);
+
+//         // Intermediate operations
+//         for (int i = 0; i < N; i += VEC_SIZE) { // 24 times
+//             // Getting baselines vectors
+//             auto vecU = aie::load_v<VEC_SIZE>(u + i);
+//             auto vecV = aie::load_v<VEC_SIZE>(v + i);
+//             auto vecW = aie::load_v<VEC_SIZE>(w + i);
+
+//             // Scale, Add and Scale
+//             auto scaleU = aie::mul(vecU, l[t]);
+//             auto scaleV = aie::mul(vecV, m[t]);
+//             auto scaleW = aie::mul(vecW, n[t]);
+//             auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
+//             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq).to_vector<bfloat16>(0);
+
+//             // Method1 (works)
+//             // auto cos = cos_bfloat16(A.to_vector<bfloat16>(0)); // Need to try reduce to one LUT operation
+//             // auto sin = sin_bfloat16(A.to_vector<bfloat16>(0));
+
+//             // Method2 (???)
+//             // auto exp = exp_bfloat16(A);
+//             // auto sin = exp.extract<32>(0);
+//             // auto cos = exp.extract<32>(1);
+
+//             // Mult with visibilities and subtract
+//             auto vecR = aie::load_v<VEC_SIZE>(visR + i);
+//             auto vecC = aie::load_v<VEC_SIZE>(visC + i);
+//             auto R = aie::mul(A, vecR);
+//             auto C = aie::mul(A, vecC);
+//             auto result = aie::sub(R, C);
+
+//             // Adding to acc
+//             acc = aie::add(acc, result);
+//         }
+
+//         // Final reduction
+//         aie::vector<float, VEC_SIZE> sum = acc.to_vector<float>(0);
+//         bfloat16 res = aie::reduce_add(sum);
+//         out[t] = res;
+//     }
+// }
 }

@@ -15,11 +15,11 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 128; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
+const int VEC_SIZE = 64;
 const float DIV = 9216.0;
 
 extern "C" {
-void mean(bfloat16 *in,  bfloat16 *out, uint32_t N, uint32_t index) { // Input Value Sizes: OUT_SIZE * 6, Output Size
+void mean(bfloat16 *in,  bfloat16 *out, uint32_t N, uint32_t index) {
     // Declare the accumulator
     auto sum_v = aie::zeros<bfloat16, VEC_SIZE>();
     aie::accum<accfloat, VEC_SIZE> acc;

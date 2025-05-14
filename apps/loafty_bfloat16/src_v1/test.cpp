@@ -92,7 +92,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 128; // number of consecutive values in output stream
+    const int CV = 64; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int FREQ_VOL = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
@@ -207,7 +207,7 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();

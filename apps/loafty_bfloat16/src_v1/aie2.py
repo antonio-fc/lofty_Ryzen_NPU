@@ -86,7 +86,7 @@ def loafty(opts):
     MATRIX_DIM_SIZE1 = opts.imgsz # size of lmn matrices side (square matrix), as well as size of image frame
     MSIZE = MATRIX_DIM_SIZE0**2 # 96x96
     BSIZE = MATRIX_DIM_SIZE1**2 # 256*256 
-    OUT_SIZE = 128
+    OUT_SIZE = 64
     N_LMN = 3 # 3 for l, m and n
     FACTOR_MOVE_SIZE = OUT_SIZE * N_LMN
     FACTOR_SIZE = FACTOR_MOVE_SIZE + BSIZE*N_LMN
