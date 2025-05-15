@@ -95,10 +95,10 @@ std::vector<T> filter_vector(const std::vector<T>& data, const std::vector<bool>
         throw std::invalid_argument("Data and filter vectors dont have the same size.");
     }
 
-    std::vector<T> result(data.size());
+    std::vector<T> result;
     for (auto i = 0; i < data.size(); i++) {
         if (!filter[i]) {
-            result[i] = data[i];
+            result.push_back(data[i]);
         }
     }
 

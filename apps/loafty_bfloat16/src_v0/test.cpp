@@ -177,12 +177,13 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=16) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
+        auto subbandIndex = getSubbandIndex(dataSetName);
         cout << endl << "Dataset Name: " << dataSetName << endl;
-        cout << "   Subband: " << getSubbandIndex(dataSetName) << endl;
+        cout << "   Subband: " << subbandIndex << endl;
         
         // Get visibilities, baselines and frequency
         auto [realVisVector, imagVisVector] = getVisibilitiesVector(filePath.data(), dataSetName); // done
@@ -195,6 +196,7 @@ int main(int argc, const char *argv[]) {
         auto y = linspace(1.0f, -1.0f, MATRIX_DIM_SIZE1);
         auto [lVector, mVector] = meshgrid(x, y); // done
         auto nVector = compute_n(lVector, mVector, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1); // done
+        auto nan_mask_v = getNanMask(lVector, mVector, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1);
 
         // FORMATTING THE INPUT
         // Separating per input
@@ -214,8 +216,8 @@ int main(int argc, const char *argv[]) {
         vector<DATATYPE> m = castVector<DATATYPE>(mVector); // m
         vector<DATATYPE> n = castVector<DATATYPE>(nVector); // n
         // Generating nan_mask
-        auto nan_mask = n | views::transform([](float x) { return x != x; });
-        vector<bool> nan_mask_v(nan_mask.begin(), nan_mask.end());
+        // auto nan_mask = n | views::transform([](float x) { return x != x; });
+        // vector<bool> nan_mask_v(nan_mask.begin(), nan_mask.end());
 
         // Format input
         DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
@@ -332,8 +334,11 @@ int main(int argc, const char *argv[]) {
                 // string file_path_ref = format("utils/cpp_plotting/file_plotting/{}", outFileNameRef);
                 // save1DArrayToCSV(castVector<float>(ref), file_path_ref);
                 // cout << "Saved Ref in File: " << outFileNameRef << endl;
-                if (do_verify >= 1)
-                    reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");  
+                if (do_verify >= 1) {
+                    // reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
+                    auto file_path = dyna_print("accuracy/set1/acc0_{}.csv", MATRIX_DIM_SIZE1);
+                    reportAccuracyCSV(castVector<float>(out_vec), ref, nan_mask_v, subbandIndex, frequency, file_path);
+                }
             }
 
             // Copy trace and output to file

@@ -22,3 +22,4 @@ float getFrequency(const char *filePath, const char *datasetName);
 vector<float> linspace(float start, float end, int num);
 pair<vector<float>, vector<float>> meshgrid(const vector<float>& x, const vector<float>& y);
 vector<float> compute_n(const vector<float>& l, const vector<float>& m, size_t rows, size_t cols);
+vector<bool> getNanMask(const vector<float>& l, const vector<float>& m, size_t rows, size_t cols);

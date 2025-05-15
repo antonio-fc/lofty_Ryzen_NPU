@@ -3,24 +3,52 @@
 #include "vector_utils.hpp"
 using namespace std;
 
-int reportAccuracy(vector<float> output, vector<float> ref, vector<bool> nan_mask, const std::string& filename) {
+pair<vector<float>, vector<float>> getDiffVector(vector<float> output, vector<float> ref, vector<bool> nan_mask) {
     auto filtered_output = filter_vector<float>(output, nan_mask);
     auto filtered_ref = filter_vector<float>(ref, nan_mask);
-    auto max_value = *max_element(begin(filtered_ref), end(filtered_ref));
-    auto min_value = *min_element(begin(filtered_ref), end(filtered_ref));
-    auto range_size = max_value - min_value;
-    auto diff_sum = 0.0;
+    vector<float> diff(filtered_ref.size());
+    vector<float> diff_percent(diff.size());
     for(auto i=0; i<filtered_ref.size(); i++) {
-        auto diff = abs(filtered_output[i] - filtered_ref[i]);
-        diff_sum+=diff;
+        diff[i] = abs(filtered_output[i] - filtered_ref[i]);
+        diff_percent[i] = diff[i]*100/filtered_ref[i];
     }
-    auto mean_diff = diff_sum/filtered_ref.size();
-    auto mean_diff_percent = mean_diff*100.0f/range_size;
-    cout << "   Range: [" << min_value << ", " << max_value << "]" << endl;
-    cout << "   Range Size: " << range_size << endl;
-    cout << "   Average Error: " << mean_diff << endl;
-    cout << "   Average Error Percentage: " << mean_diff_percent << endl;
+    return {diff, diff_percent};
+}
+
+int reportAccuracy(vector<float> output, vector<float> ref, vector<bool> nan_mask, const std::string& filename) {
+    auto [diff, diff_percent] = getDiffVector(output, ref, nan_mask);
+    auto max_diff_percent = *max_element(begin(diff_percent), end(diff_percent));
+    auto min_diff_percent = *min_element(begin(diff_percent), end(diff_percent));
+    auto mean_diff_percent = mean(diff_percent);
+    
+    cout << "   Min Error %:" << min_diff_percent << endl;
+    cout << "   Max Error %:" << max_diff_percent << endl;
+    cout << "   Average Error %: " << mean_diff_percent << endl;
     return mean_diff_percent;
+}
+
+int reportAccuracyCSV(vector<float> output, vector<float> ref, vector<bool> nan_mask, int subband_index, float freq, const std::string& filepath) {
+    // Getting accuracy results
+    auto [diff, diff_percent] = getDiffVector(output, ref, nan_mask);
+    auto max_diff_percent = *max_element(begin(diff_percent), end(diff_percent));
+    auto min_diff_percent = *min_element(begin(diff_percent), end(diff_percent));
+    auto mean_diff_percent = mean(diff_percent);
+
+    // Writing out to file
+    std::ofstream file(filepath, std::ios::app);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file.\n";
+        return 1;
+    }
+    // Write data
+    file << subband_index << ";"
+            << freq << ";"
+            << mean_diff_percent << ";"
+            << max_diff_percent << ";"
+            << min_diff_percent << "\n";
+
+    file.close();
+    return 0;
 }
 
 vector<float> image_reference(vector<float> visR, vector<float> visI, vector<float> u, vector<float> v, vector<float> w, float freq, size_t npix_l, size_t npix_m) {

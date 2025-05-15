@@ -334,3 +334,20 @@ vector<float> compute_n(const vector<float>& l, const vector<float>& m, size_t r
 
     return n;
 }
+
+vector<bool> getNanMask(const vector<float>& l, const vector<float>& m, size_t rows, size_t cols) {
+    vector<bool> nan_mask(rows*cols);
+
+    for (auto i = 0; i < rows; ++i) {
+        for (auto j = 0; j < cols; ++j) {
+            auto index = i*cols + j;
+            float val = 1.0f - l[index]*l[index] - m[index]*m[index];
+            if (val >= 0.0f)
+                nan_mask[index] = false;  
+            else
+                nan_mask[index] = true; // nan values
+        }
+    }
+
+    return nan_mask;
+}
