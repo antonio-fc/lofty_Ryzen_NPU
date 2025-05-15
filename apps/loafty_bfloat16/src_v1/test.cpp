@@ -327,10 +327,10 @@ int main(int argc, const char *argv[]) {
             // run.wait();
             // auto stop = chrono::high_resolution_clock::now();
             bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-            // if (iter < n_warmup_iterations) {
-            //     /* Warmup iterations do not count towards average runtime. */
-            //     continue;
-            // }
+            if (iter < n_warmup_iterations) {
+                /* Warmup iterations do not count towards average runtime. */
+                continue;
+            }
             // Copy output results and verify they are correct
             DATATYPE *bufOut;
             if (iter == num_iter - 1) {
@@ -380,11 +380,11 @@ int main(int argc, const char *argv[]) {
         // Print verification and timing results
         // ------------------------------------------------------
         cout << "   Total NPU time: " << npu_time_total << "us." << endl; 
-        cout << "   Avg NPU time: " << npu_time_total / num_iter << "us." << endl;    
+        cout << "   Avg NPU time: " << npu_time_total / n_iterations << "us." << endl;    
         cout << "   Min NPU time: " << npu_time_min << "us." << endl;
         cout << "   Max NPU time: " << npu_time_max << "us." << endl;
-        for(auto i=0; i<num_iter; i++) {
-            cout << "       *Iter" << i << ": " << timestamps[i] << "us, " << times[i] << "us" << endl;
-        }
+        // for(auto i=0; i<num_iter; i++) {
+        //     cout << "       *Iter" << i << ": " << timestamps[i] << "us, " << times[i] << "us" << endl;
+        // }
     }
 }

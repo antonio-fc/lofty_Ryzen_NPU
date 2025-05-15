@@ -241,56 +241,27 @@ def loafty(opts):
 
         # STEP4: CORE DEFINITIONS
 
-        inputFifo = in_u_fifo
-        lmnFifo = in_l_fifo
-        outputFifo = addUfifo
-        @core(scaleUtile, "scale.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = lmnFifo.acquire(ObjectFifoPort.Consume, 1)
-                    for i in range(OUT_SIZE): # 32
-                        for c in range(NCHANNELS): # 2
-                            output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                            kernels['scale'](inputs[c], lmn, output, INPUT_SIZE, i)
-                            outputFifo.release(ObjectFifoPort.Produce, 1)
-                    lmnFifo.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 2)
-
-        inputFifo = in_v_fifo
-        lmnFifo = in_m_fifo
-        outputFifo = addVfifo
-        @core(scaleVtile, "scale.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = lmnFifo.acquire(ObjectFifoPort.Consume, 1)
-                    for i in range(OUT_SIZE): # 32
-                        for c in range(NCHANNELS): # 2
-                            output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                            kernels['scale'](inputs[c], lmn, output, INPUT_SIZE, i)
-                            outputFifo.release(ObjectFifoPort.Produce, 1)
-                    lmnFifo.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 2)
-
-        inputFifo = in_w_fifo
-        lmnFifo = in_n_fifo
-        outputFifo = addWfifo
-        @core(scaleWtile, "scale.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
-                for _ in range_(ITERS): # img_size**2 / 32
-                    lmn = lmnFifo.acquire(ObjectFifoPort.Consume, 1)
-                    for i in range(OUT_SIZE): # 32
-                        for c in range(NCHANNELS): # 2
-                            output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
-                            kernels['scale'](inputs[c], lmn, output, INPUT_SIZE, i)
-                            outputFifo.release(ObjectFifoPort.Produce, 1)
-                    lmnFifo.release(ObjectFifoPort.Consume, 1)
-                inputFifo.release(ObjectFifoPort.Consume, 2)
+        inputFIFOs = [in_u_fifo, in_v_fifo, in_w_fifo]
+        lmnFIFOs = [in_l_fifo, in_m_fifo, in_n_fifo]
+        outputFIFOs = [addUfifo, addVfifo, addWfifo]
+        core_tiles = [scaleUtile, scaleVtile, scaleWtile]
+        for C in range(3): # For each of the scaling baselines by the cosine directions
+            inputFifo = inputFIFOs[C]
+            lmnFifo = lmnFIFOs[C]
+            outputFifo = outputFIFOs[C]
+            @core(core_tiles[C], "scale.o")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
+                    for _ in range_(ITERS): # img_size**2 / 32
+                        lmn = lmnFifo.acquire(ObjectFifoPort.Consume, 1)
+                        for i in range(OUT_SIZE): # 32
+                            for c in range(NCHANNELS): # 2
+                                output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 4608
+                                kernels['scale'](inputs[c], lmn, output, INPUT_SIZE, i)
+                                outputFifo.release(ObjectFifoPort.Produce, 1)
+                        lmnFifo.release(ObjectFifoPort.Consume, 1)
+                    inputFifo.release(ObjectFifoPort.Consume, 2)
 
         ##########################################################################################################################
         inputUFifo = addUfifo
@@ -326,6 +297,7 @@ def loafty(opts):
                         inputWFifo.release(ObjectFifoPort.Consume, 1)
                     
         ##########################################################################################################################
+        
         inputFifo = scaleAddBLfifo
         outputFifo = trigFifo
         @core(scaleFreqTile, "scale.o")
@@ -340,88 +312,69 @@ def loafty(opts):
                         outputFifo.release(ObjectFifoPort.Produce, 1)
                         inputFifo.release(ObjectFifoPort.Consume, 1)
                 of_in_freq.release(ObjectFifoPort.Consume, 1) # 2
+        
         ##########################################################################################################################
-        inputFifo = trigFifo
-        outputFifo = multTrigRfifo
-        @core(cosTile, "kernels.a")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2
-                    for _ in range_(NCHANNELS): # 2
-                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['cos'](inputs, output, INPUT_SIZE)
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                        inputFifo.release(ObjectFifoPort.Consume, 1)
-                    
-        inputFifo = trigFifo
-        outputFifo = multTrigCfifo
-        @core(sinTile, "kernels.a")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2
-                    for _ in range_(NCHANNELS): # 2
-                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['sin'](inputs, output, INPUT_SIZE)
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                        inputFifo.release(ObjectFifoPort.Consume, 1)
-        ##########################################################################################################################
-        inputVisFifo = in_visR_fifo
-        inputFifo = multTrigRfifo
-        outputFifo = reduceRfifo
-        @core(multRtile, "mul.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
-                for _ in range_(BSIZE): # img_size**2
-                    for c in range(NCHANNELS): # 2
-                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['mul'](inputs, inputVis[c], output, INPUT_SIZE)
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                        inputFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 2)
+        
+        inputFIFOs = [trigFifo, trigFifo]
+        outputFIFOs = [multTrigRfifo, multTrigCfifo]
+        ops = ['cos', 'sin']
+        core_tiles = [cosTile, sinTile]
+        for C in range(2): # For each of the tiles that do the trigonometric functions
+            inputFifo = inputFIFOs[C]
+            outputFifo = outputFIFOs[C]
+            op = ops[C]
+            @core(core_tiles[C], "kernels.a")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE): # img_size**2
+                        for _ in range_(NCHANNELS): # 2
+                            inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
+                            output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
+                            kernels[op](inputs, output, INPUT_SIZE)
+                            outputFifo.release(ObjectFifoPort.Produce, 1)
+                            inputFifo.release(ObjectFifoPort.Consume, 1)
 
-        inputVisFifo = in_visC_fifo
-        inputFifo = multTrigCfifo
-        outputFifo = reduceCfifo
-        @core(multCtile, "mul.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
-                for _ in range_(BSIZE): # img_size**2
-                    for c in range(NCHANNELS): # 2
-                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
-                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                        kernels['mul'](inputs, inputVis[c], output, INPUT_SIZE)
-                        outputFifo.release(ObjectFifoPort.Produce, 1)
-                        inputFifo.release(ObjectFifoPort.Consume, 1)
-                inputVisFifo.release(ObjectFifoPort.Consume, 2)
         ##########################################################################################################################
-        inputFifo = reduceRfifo
-        outputFifo = reduc2SubRfifo
-        @core(addRtile, "add.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2
-                    inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608] the two halfs of the real pixel data
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['add'](inputs[0], inputs[1], output, INPUT_SIZE)
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputFifo.release(ObjectFifoPort.Consume, 2)
-
-        inputFifo = reduceCfifo
-        outputFifo = reduc2SubCfifo
-        @core(addCtile, "add.o")
-        def core_body():
-            for _ in range_(ITER_KERNEL):
-                for _ in range_(BSIZE): # img_size**2
-                    inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608] the two halfs of the real pixel data
-                    output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
-                    kernels['add'](inputs[0], inputs[1], output, INPUT_SIZE)
-                    outputFifo.release(ObjectFifoPort.Produce, 1)
-                    inputFifo.release(ObjectFifoPort.Consume, 2)
+        
+        inputVisFIFOs = [in_visR_fifo, in_visC_fifo]
+        inputFIFOs = [multTrigRfifo, multTrigCfifo]
+        outputFIFOs = [reduceRfifo, reduceCfifo]
+        core_tiles = [multRtile, multCtile]
+        for C in range(2): # For the tiles that multply the trigonometric function output with the visibilities
+            inputVisFifo = inputVisFIFOs[C]
+            inputFifo = inputFIFOs[C]
+            outputFifo = outputFIFOs[C]
+            @core(core_tiles[C], "mul.o")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608]
+                    for _ in range_(BSIZE): # img_size**2
+                        for c in range(NCHANNELS): # 2
+                            inputs = inputFifo.acquire(ObjectFifoPort.Consume, 1)
+                            output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
+                            kernels['mul'](inputs, inputVis[c], output, INPUT_SIZE)
+                            outputFifo.release(ObjectFifoPort.Produce, 1)
+                            inputFifo.release(ObjectFifoPort.Consume, 1)
+                    inputVisFifo.release(ObjectFifoPort.Consume, 2)
+        
+        ##########################################################################################################################
+        
+        inputFIFOs = [reduceRfifo, reduceCfifo]
+        outputFIFOs = [reduc2SubRfifo, reduc2SubCfifo]
+        core_tiles = [addRtile, addCtile]
+        for C in range(2):
+            inputFifo = inputFIFOs[C]
+            outputFifo = outputFIFOs[C]
+            @core(core_tiles[C], "add.o")
+            def core_body():
+                for _ in range_(ITER_KERNEL):
+                    for _ in range_(BSIZE): # img_size**2
+                        inputs = inputFifo.acquire(ObjectFifoPort.Consume, 2) # [4608, 4608] the two halfs of the real pixel data
+                        output = outputFifo.acquire(ObjectFifoPort.Produce, 1)
+                        kernels['add'](inputs[0], inputs[1], output, INPUT_SIZE)
+                        outputFifo.release(ObjectFifoPort.Produce, 1)
+                        inputFifo.release(ObjectFifoPort.Consume, 2)
+        
         ##########################################################################################################################
         inputFifo0 = reduc2SubRfifo
         inputFifo1 = reduc2SubCfifo
