@@ -3,7 +3,7 @@
 #include "vector_utils.hpp"
 using namespace std;
 
-pair<vector<float>, vector<float>> getDiffVector(vector<float> output, vector<float> ref, vector<bool> nan_mask) {
+tuple<vector<float>, vector<float>, vector<float>, vector<float>> getDiffVector(vector<float> output, vector<float> ref, vector<bool> nan_mask) {
     auto filtered_output = filter_vector<float>(output, nan_mask);
     auto filtered_ref = filter_vector<float>(ref, nan_mask);
     vector<float> diff(filtered_ref.size());
@@ -12,14 +12,18 @@ pair<vector<float>, vector<float>> getDiffVector(vector<float> output, vector<fl
         diff[i] = abs(filtered_output[i] - filtered_ref[i]);
         diff_percent[i] = diff[i]*100/filtered_ref[i];
     }
-    return {diff, diff_percent};
+    vector<float> metadata = {};
+    return {diff, diff_percent, filtered_output, filtered_ref};
 }
 
 int reportAccuracy(vector<float> output, vector<float> ref, vector<bool> nan_mask, const std::string& filename) {
-    auto [diff, diff_percent] = getDiffVector(output, ref, nan_mask);
+    auto [diff, diff_percent, output_new, ref_new] = getDiffVector(output, ref, nan_mask);
     auto max_diff_percent = *max_element(begin(diff_percent), end(diff_percent));
     auto min_diff_percent = *min_element(begin(diff_percent), end(diff_percent));
     auto mean_diff_percent = mean(diff_percent);
+    auto max_diff = *max_element(begin(diff), end(diff));
+    auto min_diff = *min_element(begin(diff), end(diff));
+    auto mean_diff = mean(diff);
     
     cout << "   Min Error %:" << min_diff_percent << endl;
     cout << "   Max Error %:" << max_diff_percent << endl;
@@ -29,10 +33,21 @@ int reportAccuracy(vector<float> output, vector<float> ref, vector<bool> nan_mas
 
 int reportAccuracyCSV(vector<float> output, vector<float> ref, vector<bool> nan_mask, int subband_index, float freq, const std::string& filepath) {
     // Getting accuracy results
-    auto [diff, diff_percent] = getDiffVector(output, ref, nan_mask);
+    auto [diff, diff_percent, output_new, ref_new] = getDiffVector(output, ref, nan_mask);
+
     auto max_diff_percent = *max_element(begin(diff_percent), end(diff_percent));
     auto min_diff_percent = *min_element(begin(diff_percent), end(diff_percent));
     auto mean_diff_percent = mean(diff_percent);
+
+    auto max_diff = *max_element(begin(diff), end(diff));
+    auto min_diff = *min_element(begin(diff), end(diff));
+    auto mean_diff = mean(diff);
+
+    auto max_out = *max_element(begin(output_new), end(output_new));
+    auto min_out = *min_element(begin(output_new), end(output_new));
+
+    auto max_ref = *max_element(begin(ref_new), end(ref_new));
+    auto min_ref = *min_element(begin(ref_new), end(ref_new));
 
     // Writing out to file
     std::ofstream file(filepath, std::ios::app);
@@ -41,11 +56,11 @@ int reportAccuracyCSV(vector<float> output, vector<float> ref, vector<bool> nan_
         return 1;
     }
     // Write data
-    file << subband_index << ";"
-            << freq << ";"
-            << mean_diff_percent << ";"
-            << max_diff_percent << ";"
-            << min_diff_percent << "\n";
+    file << subband_index << ";" << freq << ";"
+            << mean_diff_percent << ";" << min_diff_percent << ";" << max_diff_percent << ";"
+            << mean_diff << ";" << min_diff << ";" << max_diff << ";"
+            << min_out << ";" << max_out << ";"
+            << min_ref << ";" << max_ref << "\n";
 
     file.close();
     return 0;
