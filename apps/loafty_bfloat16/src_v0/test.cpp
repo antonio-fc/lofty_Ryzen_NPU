@@ -174,7 +174,7 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Getting data from hdf5 file
-    const string fileName = "inputLBA1";
+    const string fileName = "inputLBA2";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
     for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
@@ -226,7 +226,7 @@ int main(int argc, const char *argv[]) {
         DATATYPE *bufInOut3 = bo_inout3.map<DATATYPE *>();
 
         // Format frequency input
-        vector<DATATYPE> freq_vector = {freq, freq};
+        vector<DATATYPE> freq_vector = {ff, ff};
 
         // Format baselines input
         vector<DATATYPE> baselines_vector(BASELINES_VOLUME);

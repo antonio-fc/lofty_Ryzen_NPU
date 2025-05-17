@@ -181,7 +181,7 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -253,11 +253,11 @@ int main(int argc, const char *argv[]) {
         for(int v=0; v<NINPUTS; v++) {
             for(int i=0; i<FREQ_VOL; i++) {
                 auto index = v*TT_VOL + i;
-                main_inputA[index] = freq;
-                main_inputB[index] = freq;
+                main_inputA[index] = ff;
+                main_inputB[index] = ff;
             }
             for(int i=0; i<INPUT_VOL; i++) {
-                auto index = v*TT_VOL + i;  // + FREQ_VOL
+                auto index = v*TT_VOL + FREQ_VOL + i;  // + FREQ_VOL
                 main_inputA[index] = mainInputs[v][i];
                 main_inputB[index] = mainInputs[v][i + INPUT_VOL];
             }
