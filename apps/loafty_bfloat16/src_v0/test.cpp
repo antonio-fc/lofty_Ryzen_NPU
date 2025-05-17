@@ -174,7 +174,7 @@ int main(int argc, const char *argv[]) {
     memcpy(bufInstr, instr_v.data(), instr_v.size() * sizeof(int));
 
     // Getting data from hdf5 file
-    const string fileName = "inputLBA2";
+    const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
     for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {

@@ -259,9 +259,15 @@ Baselines computeBaselines(const Matrix& coordXYZ) { // From https://git.astron.
 }
 
 int getSubbandIndex(string dataSetName) {
-    auto subbandString = dataSetName.substr(dataSetName.length() - 3, dataSetName.length() - 1);
+    string subbandString = dataSetName.substr(dataSetName.length() - 3, 3);
     if(dataSetName[dataSetName.length() - 3] == 'B') {
-        subbandString = dataSetName.substr(dataSetName.length() - 2, dataSetName.length() - 1);
+        subbandString = dataSetName.substr(dataSetName.length() - 2, 2);
+        if(dataSetName[dataSetName.length() - 2] == 'B') {
+            subbandString = dataSetName.substr(dataSetName.length() - 1, 1);
+        }
+    }
+    else if (dataSetName[dataSetName.length() - 3] == 'S') {
+        subbandString = dataSetName.substr(dataSetName.length() - 1, 1);
     }
     return stoi(subbandString);
 }
