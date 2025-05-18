@@ -70,8 +70,8 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visI, b
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
             // Method1 (works) {VEC_SIZE=32}
-            // auto cos = cos_bfloat16(A.to_vector<bfloat16>(0)); // Need to try reduce to one LUT operation
-            // auto sin = sin_bfloat16(A.to_vector<bfloat16>(0));
+            // auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
+            // auto sin = sin_bfloat16(A);
             
             // Method2 (works) [faster, a bit more error] {VEC_SIZE=64}
             auto A0 = A.extract<32>(0);

@@ -21,6 +21,7 @@
 #include "../utils/hdf5/hdf5_utils.h"
 #include "../utils/cpp_plotting/plot_utils.h"
 #include "../utils/accuracy_utils.hpp"
+#include "../utils/power_utils.hpp"
 
 #include "pmt.h"
 

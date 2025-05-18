@@ -51,6 +51,7 @@ add_executable(${currentTarget}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/cpp_plotting/plot_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/vector_utils.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/accuracy_utils.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/power_utils.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src_v${APP_VERSION}/test.cpp
 )
 
