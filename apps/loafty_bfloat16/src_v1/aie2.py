@@ -208,7 +208,7 @@ def loafty(opts):
                 inFIFOs = [obf_in_fifoA, obf_in_fifoB]
                 outFIFOs = [obf_out_fifoA, obf_out_fifoB]
                 for c in range(NDISTGROUP): # Twice for each distribution group, So GroupA (6) + GroupB (6) = 12
-                    @core(cores[c], "kernels.a")
+                    @core(cores[c], "kernels.a", stack_size=0xA00)
                     def core_body():
                         for _ in range_(ITER_KERNEL): # this needs to be at least the number of iterations in the test file
                             freq = of_in_factor.acquire(ObjectFifoPort.Consume, 1)

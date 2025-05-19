@@ -66,7 +66,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visI, b
             auto scaleU = aie::mul(vecU, l[t]);
             auto scaleV = aie::mul(vecV, m[t]);
             auto scaleW = aie::mul(vecW, n[t]);
-            auto baseAdd = aie::add(scaleU, aie::add(scaleV, scaleW));
+            auto baseAdd = aie::mac(aie::add(scaleU, scaleV), vecW, n[t]);
             auto A = aie::mul(baseAdd.to_vector<bfloat16>(0), freq);
 
             // Method1 (works) {VEC_SIZE=32}
