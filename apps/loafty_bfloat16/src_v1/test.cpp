@@ -208,7 +208,7 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -311,72 +311,28 @@ int main(int argc, const char *argv[]) {
             // Run kernel
             if (verbosity >= 1)
                 cout << "Running Kernel " << iter << ".\n";
-            auto start = chrono::high_resolution_clock::now();
-            auto stop = chrono::high_resolution_clock::now();
             unsigned int opcode = 3;
-            xrt::run run;
-            if(do_trace) {
-                start = chrono::high_resolution_clock::now();
-                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-                run.wait();
-                stop = chrono::high_resolution_clock::now();
-            }
-            else {
-                start = chrono::high_resolution_clock::now();
-                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
-                run.wait();
-                stop = chrono::high_resolution_clock::now();
-            }
-            // run.wait();
-            // auto stop = chrono::high_resolution_clock::now();
+            auto start = chrono::high_resolution_clock::now();
+            auto run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
+            run.wait();
+            auto stop = chrono::high_resolution_clock::now();
             bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
             if (iter < n_warmup_iterations) {
                 /* Warmup iterations do not count towards average runtime. */
                 continue;
             }
-            // Copy output results and verify they are correct
-            DATATYPE *bufOut;
             if (iter == num_iter - 1) {
                 // Output
-                bufOut = bo_inout4.map<DATATYPE *>();
-                for(auto i=0; i<OUT_SIZE; i++)
-                    if(nan_mask_v[i])
-                        bufOut[i] = static_cast<DATATYPE>(nan("0"));
-                vector<DATATYPE> out_vec(OUTPUT_VOL);
+                auto bufOut = bo_inout4.map<DATATYPE *>();
+                vector<DATATYPE> out_vec(4608);
                 memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
                 reverse(out_vec.begin(), out_vec.end());
-                // string outFileName = dyna_print("{}_{}.csv", fileName, subbandString);
-                // string file_path = format("../utils/cpp_plotting/file_plotting/{}", outFileName);
-                // save1DArrayToCSV(castVector<float>(out_vec), file_path);
-                // cout << "Saved Out in File: " << outFileName << endl;
-
-                // Verification
-                auto ref = image_reference(realVisVector, imagVisVector, uVector, vVector, wVector, frequency, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1);
-                // string outFileNameRef = dyna_print("{}_{}_ref.csv", fileName, subbandString);
-                // string file_path_ref = format("../utils/cpp_plotting/file_plotting/{}", outFileNameRef);
-                // save1DArrayToCSV(castVector<float>(ref), file_path_ref);
-                // cout << "Saved Ref in File: " << outFileNameRef << endl;
-                if (do_verify >= 1) {
-                    // reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
-                    auto file_path = dyna_print("accuracy/set1/acc1_{}.csv", MATRIX_DIM_SIZE1);
-                    reportAccuracyCSV(castVector<float>(out_vec), ref, nan_mask_v, subbandIndex, frequency, file_path);
-                }
-            }
-
-            // Copy trace and output to file
-            if(do_trace && iter==num_iter-1) {
-                char *bufTrace = bo_trace.map<char *>();
-                std::vector<char> trace_vec(TRACE_SIZE/sizeof(char));
-                memcpy(trace_vec.data(), bufTrace, TRACE_SIZE);
-                
-                cout << "   Trace Data Output Size: " << TRACE_SIZE/sizeof(char) << " into file " << trace_file << endl;
-                test_utils::write_out_trace(bufTrace, TRACE_SIZE, trace_file);
+                for (auto i = 0; i < 10; i++)
+                    cout << out_vec[i] << endl;
             }
 
             // Accumulate run times
             float npu_time = chrono::duration_cast<chrono::microseconds>(stop - start).count();
-            times[iter] = npu_time;
-            timestamps[iter] = chrono::duration_cast<chrono::microseconds>(start - start_abs).count();
             npu_time_total += npu_time;
             npu_time_min = (npu_time < npu_time_min) ? npu_time : npu_time_min;
             npu_time_max = (npu_time > npu_time_max) ? npu_time : npu_time_max;

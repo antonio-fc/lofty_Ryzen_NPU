@@ -300,6 +300,15 @@ int main(int argc, const char *argv[]) {
                 /* Warmup iterations do not count towards average runtime. */
                 continue;
             }
+            if (iter == num_iter - 1) {
+                // Output
+                auto bufOut = bo_inout4.map<DATATYPE *>();
+                vector<DATATYPE> out_vec(4608);
+                memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
+                reverse(out_vec.begin(), out_vec.end());
+                for (auto i = 0; i < 10; i++)
+                    cout << out_vec[i] << endl;
+            }
             // Accumulate run times
             float npu_time = chrono::duration_cast<chrono::microseconds>(stop - start).count();
             npu_time_total += npu_time;

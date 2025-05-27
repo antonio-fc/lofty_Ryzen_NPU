@@ -5,6 +5,7 @@ const bfloat16 LUT_TRUE_SIZE = LUT_SIZE/2.0; // This is for a 512 lut, where hal
 const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2pi]
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
+const int VEC_SIZE = 1024;
 
 aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
@@ -37,43 +38,114 @@ void main_kernel(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N, uint3
             auto input1 = aie::load_v<VEC_SIZE>(in + HALF_SIZE + i);
             auto vis1 = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
 
-            // Scale
-            auto scaleInput0 = aie::mul(input0, freq).to_vector<bfloat16>();
-            auto scaleInput1 = aie::mul(input1, freq).to_vector<bfloat16>();
+            // // Scale
+            // auto scaleInput0 = aie::mul(input0, freq).to_vector<bfloat16>();
+            // auto scaleInput1 = aie::mul(input1, freq).to_vector<bfloat16>();
 
-            // Apply the trig op
-            aie::vector<bfloat16, VEC_SIZE> trig0;
-            aie::vector<bfloat16, VEC_SIZE> trig1;
+            // // Apply the trig op
+            // aie::vector<bfloat16, VEC_SIZE> trig0;
+            // aie::vector<bfloat16, VEC_SIZE> trig1;
 
-            if (trig == 0) { // applying cosine
-                auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
-                auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
-                auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
-                auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
-                trig0 = aie::concat(trig0A, trig0B);
-                trig1 = aie::concat(trig1A, trig1B);
-                // trig0 = cos_bfloat16(scaleInput0);
-                // trig1 = cos_bfloat16(scaleInput1);
-            } else { // applying sine
-                auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
-                auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
-                auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
-                auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
-                trig0 = aie::concat(trig0A, trig0B);
-                trig1 = aie::concat(trig1A, trig1B);
-                // trig0 = sin_bfloat16(scaleInput0);
-                // trig1 = sin_bfloat16(scaleInput1);
-            }
+            // if (trig == 0) { // applying cosine
+            //     // vec => 256
+            //     auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
+            //     auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
+            //     auto trig0C = cos_bfloat16(scaleInput0.extract<32>(2));
+            //     auto trig0D = cos_bfloat16(scaleInput0.extract<32>(3));
+            //     auto trig1E = cos_bfloat16(scaleInput0.extract<32>(4));
+            //     auto trig1F = cos_bfloat16(scaleInput0.extract<32>(5));
+            //     auto trig1G = cos_bfloat16(scaleInput0.extract<32>(6));
+            //     auto trig1H = cos_bfloat16(scaleInput0.extract<32>(7));
+            //     auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
+            //     auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
+            //     auto trig1C = cos_bfloat16(scaleInput1.extract<32>(2));
+            //     auto trig1D = cos_bfloat16(scaleInput1.extract<32>(3));
+            //     auto trig0E = cos_bfloat16(scaleInput1.extract<32>(4));
+            //     auto trig0F = cos_bfloat16(scaleInput1.extract<32>(5));
+            //     auto trig0G = cos_bfloat16(scaleInput1.extract<32>(6));
+            //     auto trig0H = cos_bfloat16(scaleInput1.extract<32>(7));
+            //     trig0 = aie::concat(aie::concat(aie::concat(trig0A, trig0B), aie::concat(trig0C, trig0D)), aie::concat(aie::concat(trig0E, trig0F), aie::concat(trig0G, trig0H)));
+            //     trig1 = aie::concat(aie::concat(aie::concat(trig1A, trig1B), aie::concat(trig1C, trig1D)), aie::concat(aie::concat(trig1E, trig1F), aie::concat(trig1G, trig1H)));
+
+            //     // vec => 128
+            //     // auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
+            //     // auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
+            //     // auto trig0C = cos_bfloat16(scaleInput0.extract<32>(2));
+            //     // auto trig0D = cos_bfloat16(scaleInput0.extract<32>(3));
+            //     // auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
+            //     // auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
+            //     // auto trig1C = cos_bfloat16(scaleInput1.extract<32>(2));
+            //     // auto trig1D = cos_bfloat16(scaleInput1.extract<32>(3));
+            //     // trig0 = aie::concat(aie::concat(trig0A, trig0B), aie::concat(trig0C, trig0D));
+            //     // trig1 = aie::concat(aie::concat(trig1A, trig1B), aie::concat(trig1C, trig1D));
+
+            //     // vec => 64
+            //     // auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
+            //     // auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
+            //     // auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
+            //     // auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
+            //     // trig0 = aie::concat(trig0A, trig0B);
+            //     // trig1 = aie::concat(trig1A, trig1B);
+
+            //     // vec => 32
+            //     // trig0 = cos_bfloat16(scaleInput0);
+            //     // trig1 = cos_bfloat16(scaleInput1);
+            // } else { // applying sine
+            //     // vec => 256
+            //     auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
+            //     auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
+            //     auto trig0C = sin_bfloat16(scaleInput0.extract<32>(2));
+            //     auto trig0D = sin_bfloat16(scaleInput0.extract<32>(3));
+            //     auto trig1E = sin_bfloat16(scaleInput0.extract<32>(4));
+            //     auto trig1F = sin_bfloat16(scaleInput0.extract<32>(5));
+            //     auto trig1G = sin_bfloat16(scaleInput0.extract<32>(6));
+            //     auto trig1H = sin_bfloat16(scaleInput0.extract<32>(7));
+            //     auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
+            //     auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
+            //     auto trig1C = sin_bfloat16(scaleInput1.extract<32>(2));
+            //     auto trig1D = sin_bfloat16(scaleInput1.extract<32>(3));
+            //     auto trig0E = sin_bfloat16(scaleInput1.extract<32>(4));
+            //     auto trig0F = sin_bfloat16(scaleInput1.extract<32>(5));
+            //     auto trig0G = sin_bfloat16(scaleInput1.extract<32>(6));
+            //     auto trig0H = sin_bfloat16(scaleInput1.extract<32>(7));
+            //     trig0 = aie::concat(aie::concat(aie::concat(trig0A, trig0B), aie::concat(trig0C, trig0D)), aie::concat(aie::concat(trig0E, trig0F), aie::concat(trig0G, trig0H)));
+            //     trig1 = aie::concat(aie::concat(aie::concat(trig1A, trig1B), aie::concat(trig1C, trig1D)), aie::concat(aie::concat(trig1E, trig1F), aie::concat(trig1G, trig1H)));
+
+
+            //     // vec => 128
+            //     // auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
+            //     // auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
+            //     // auto trig0C = sin_bfloat16(scaleInput0.extract<32>(2));
+            //     // auto trig0D = sin_bfloat16(scaleInput0.extract<32>(3));
+            //     // auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
+            //     // auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
+            //     // auto trig1C = sin_bfloat16(scaleInput1.extract<32>(2));
+            //     // auto trig1D = sin_bfloat16(scaleInput1.extract<32>(3));
+            //     // trig0 = aie::concat(aie::concat(trig0A, trig0B), aie::concat(trig0C, trig0D));
+            //     // trig1 = aie::concat(aie::concat(trig1A, trig1B), aie::concat(trig1C, trig1D));
+
+            //     // vec => 64
+            //     // auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
+            //     // auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
+            //     // auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
+            //     // auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
+            //     // trig0 = aie::concat(trig0A, trig0B);
+            //     // trig1 = aie::concat(trig1A, trig1B);
+
+            //     // vec => 32
+            //     // trig0 = sin_bfloat16(scaleInput0);
+            //     // trig1 = sin_bfloat16(scaleInput1);
+            // }
 
             // Multiplying by vis
-            auto prod0 = aie::mul(trig0, vis0);
-            auto prod1 = aie::mul(trig1, vis1);
+            // auto prod0 = aie::mul(scaleInput0, vis0);
+            // auto prod1 = aie::mul(scaleInput1, vis1);
 
-            // Adding to acc
-            auto result = aie::add(prod0, prod1);
+            // // Adding to acc
+            // auto result = aie::add(prod0, prod1);
 
             // Writing result to output
-            aie::store_v(out + i, result.to_vector<bfloat16>());
+            aie::store_v(out + i, input0);
         }
     }
 }

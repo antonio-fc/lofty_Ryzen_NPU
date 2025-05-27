@@ -79,14 +79,9 @@ def declaring_tiles(n_cols, n_comp):
     ST = [] # Shim Tiles
     MT = [] # Memory Tiles (currently not used)
     CT = [] # Compute Tiles
-    if n_cols == 5:
-        for i in range(1, 5):
-            ST.append(tile(i, 0))
-    else:
-        for i in range(n_cols):
-            ST.append(tile(i, 0))
     for i in range(n_cols):
         # Making the shim and mem tiles
+        ST.append(tile(i, 0))
         MT.append(tile(i, 1))
         # Making compute tiles
         c = []
@@ -130,8 +125,7 @@ def loafty(opts):
     dtype_k = np.int32
 
     # Device setup
-    device_ = AIEDevice.npu1_4col
-    @device(device_)
+    @device(AIEDevice.npu1_4col)
     def device_body():
         out_ty = np.ndarray[(OUT_SIZE,), dtype]
         lmn_move_ty = np.ndarray[(LMN__MOVE_SIZE,), dtype]
@@ -145,31 +139,26 @@ def loafty(opts):
         kernels = declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype_k)
 
         # Tile declarations
-        if device_ == AIEDevice.npu1:
-            ST, MT, CT = declaring_tiles(5, 4)
-        else:
-            ST, MT, CT = declaring_tiles(4, 4)
-        core_ = CT[0][1]
-        core_off = CT[2][2]
+        ST, MT, CT = declaring_tiles(4, 4)
+        core_ = CT[1][2]
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_lmn = object_fifo("in0", ST[0], core_off, [1, 1], lmn_move_ty)
-        of_in_mainA = object_fifo("in1", ST[1], core_, [1, 1], input_ty)
-        of_in_mainB = object_fifo("in2", ST[2], core_, [1, 1], dist_ty)        
+        of_in_lmn = object_fifo("in0", ST[1], core_, 2, lmn_move_ty)
+        of_in_mainA = object_fifo("in1", ST[0], core_, 2, dist_ty)       
 
-        of_out = object_fifo("out", core_, ST[3], [1, 1], join_ty)
+        of_out = object_fifo("out", core_, ST[2], 2, input_ty)
         # Benched core definition
-        kernel_bin = "kernels.a"
-        @core(core_, kernel_bin, stack_size=0xA00)
+        kernel_bin = "scale.o"
+        @core(core_, kernel_bin)
         def core_body():
             for _ in range_(ITER_KERNEL):
-                input1 = of_in_mainA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
-                input2 = of_in_mainB.acquire(ObjectFifoPort.Consume, 1)
+                inputs = of_in_mainA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                lmn = of_in_lmn.acquire(ObjectFifoPort.Consume, 1)
                 output = of_out.acquire(ObjectFifoPort.Produce, 1) # 4608
                 for _ in range_(ITERS):
-                    kernels['main'](input1, input2, output, INPUT_SIZE, 0)
+                    kernels['scale'](inputs, lmn, output, INPUT_SIZE, OUT_SIZE, 0, 0)
                 of_out.release(ObjectFifoPort.Produce, 1)
-                of_in_mainB.release(ObjectFifoPort.Consume, 1)
+                of_in_lmn.release(ObjectFifoPort.Consume, 1)
                 of_in_mainA.release(ObjectFifoPort.Consume, 1)
 
                     
@@ -178,8 +167,8 @@ def loafty(opts):
         def sequence(lmn, mainA, mainB, output):
             npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=1, mem=lmn, sizes=[1, 1, 1, LMN_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_mainA, bd_id=2, mem=mainA, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainA
-            npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, JOIN_SIZE]) # output (size = BSIZE)
+            # npu_dma_memcpy_nd(metadata=of_in_mainB, bd_id=3, mem=mainB, sizes=[1, 1, 1, FULL_INPUT_SIZE]) # input: mainB
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, INPUT_SIZE]) # output (size = BSIZE)
             # We know of_out will complete after of_in and of_in_lmn, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 

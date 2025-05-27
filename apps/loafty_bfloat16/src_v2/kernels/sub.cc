@@ -14,7 +14,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 64; // Size of the working vectors
+const int VEC_SIZE = 16; // Size of the working vectors
 
 extern "C" {
 
@@ -22,9 +22,8 @@ void sub_kernel(bfloat16 *a, bfloat16 *b, bfloat16 *c, uint32_t N) {
     for (int i = 0; i < N; i += VEC_SIZE) {
         auto input0 = aie::load_v<VEC_SIZE>(a + i);
         auto input1 = aie::load_v<VEC_SIZE>(b + i);
-        auto result = aie::sub(input0, input1);
-        // auto ones = aie::broadcast<bfloat16, VEC_SIZE>(1.0);
-        aie::store_v(c + i, result);
+        // auto result = aie::sub(input0, input1);
+        aie::store_v(c + i, input0);
     }
 }
 

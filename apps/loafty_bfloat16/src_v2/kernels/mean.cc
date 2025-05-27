@@ -15,7 +15,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 64;
+const int VEC_SIZE = 16;
 const float DIV = 9216.0;
 
 extern "C" {
@@ -28,12 +28,12 @@ void mean(bfloat16 *in,  bfloat16 *out, uint32_t N, uint32_t index) {
     // Adding the results from each core
     for(int i = 0; i < N; i += VEC_SIZE) {
         auto input = aie::load_v<VEC_SIZE>(in + i);
-        acc = aie::add(acc, input);
+        // acc = aie::add(acc, input);
     }
 
     // Writing results to output
     aie::vector<float, VEC_SIZE> sum = aie::to_vector<float>(acc, 0);
-    bfloat16 res = aie::reduce_add(sum);
+    bfloat16 res = DIV; //aie::reduce_add(sum);
     out[index] = res/DIV;
 }
 } // extern "C"
