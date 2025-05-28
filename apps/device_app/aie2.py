@@ -40,58 +40,18 @@ def create_argparser():
     )
     return p
 
-def declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype):
-    # kernel for passthrough (scalar)
-    name0 = "passthrough"
-    kernel0 = external_func("passthrough",
-        inputs=[dist_ty, dist_ty, dtype],
-    )
-    name1 = "scale"
-    kernel1 = external_func("baseline_scale",
-        inputs=[dist_ty, lmn_move_ty, input_ty, dtype, dtype, dtype, dtype],
-    )
-    name2 = "add"
-    kernel2 = external_func("add_kernel",
-        inputs=[input_ty, input_ty, input_ty, dtype],
-    )
-    name3 = "main"
-    kernel3 = external_func("main_kernel",
-        inputs=[input_ty, dist_ty, join_ty, dtype, dtype],
-    )
-    name4 = "sub"
-    kernel4 = external_func("sub_kernel",
-        inputs=[input_ty, input_ty, input_ty, dtype],
-    )
-    name5 = "mean"
-    kernel5 = external_func("mean",
-        inputs=[input_ty, out_ty, dtype, dtype],
-    )
-    return {
-        name0: kernel0,
-        name1: kernel1,
-        name2: kernel2,
-        name3: kernel3,
-        name4: kernel4,
-        name5: kernel5,
-    }
-
 def declaring_tiles(n_cols, n_comp):
     ST = [] # Shim Tiles
     MT = [] # Memory Tiles (currently not used)
     CT = [] # Compute Tiles
-    if n_cols == 5:
-        for i in range(1, 5):
-            ST.append(tile(i, 0))
-    else:
-        for i in range(n_cols):
-            ST.append(tile(i, 0))
-    for i in range(n_cols):
-        # Making the shim and mem tiles
-        MT.append(tile(i, 1))
-        # Making compute tiles
+    # Pupulating the tile sets
+    for col in range(n_cols):
+        if n_cols < 5 or col > 0:
+            ST.append(tile(col, 0))
+        MT.append(tile(col, 1))
         c = []
         for j in range(n_comp):
-            c.append(tile(i, j+2))
+            c.append(tile(col, j+2))
         CT.append(c)
     return (ST, MT, CT)
 
@@ -141,14 +101,18 @@ def loafty(opts):
         join_ty = np.ndarray[(JOIN_SIZE,), dtype]
 
         # AIE Core Function declarations
-
-        kernels = declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype_k)
+        kernel = external_func("add_kernel", inputs=[input_ty, input_ty, input_ty, dtype_k])
 
         # Tile declarations
-        if device_ == AIEDevice.npu1:
-            ST, MT, CT = declaring_tiles(5, 4)
-        else:
-            ST, MT, CT = declaring_tiles(4, 4)
+        N_COMP_TILES = 4
+        ST, MT, CT = (
+            declaring_tiles(5, N_COMP_TILES) if device_ == AIEDevice.npu1 else
+            declaring_tiles(4, N_COMP_TILES) if device_ == AIEDevice.npu1_4col else
+            declaring_tiles(3, N_COMP_TILES) if device_ == AIEDevice.npu1_3col else
+            declaring_tiles(2, N_COMP_TILES) if device_ == AIEDevice.npu1_2col else
+            declaring_tiles(1, N_COMP_TILES) if device_ == AIEDevice.npu1_1col else
+            declaring_tiles(0, 0)
+        )
         core_ = CT[0][1]
         core_off = CT[2][2]
         # AIE-array data movement with object fifos
@@ -163,11 +127,11 @@ def loafty(opts):
         @core(core_, kernel_bin)
         def core_body():
             for _ in range_(ITER_KERNEL):
-                input1 = of_in_mainA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                input1 = of_in_mainA.acquire(ObjectFifoPort.Consume, 1)
                 input2 = of_in_mainB.acquire(ObjectFifoPort.Consume, 1)
-                output = of_out.acquire(ObjectFifoPort.Produce, 1) # 4608
+                output = of_out.acquire(ObjectFifoPort.Produce, 1)
                 for _ in range_(ITERS):
-                    kernels['add'](input1, input2, output, 16384)
+                    kernel(input1, input2, output, 16384)
                 of_out.release(ObjectFifoPort.Produce, 1)
                 of_in_mainB.release(ObjectFifoPort.Consume, 1)
                 of_in_mainA.release(ObjectFifoPort.Consume, 1)

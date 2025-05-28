@@ -23,9 +23,8 @@ void add_kernel(bfloat16 *a, bfloat16 *b, bfloat16 *c, uint32_t N) {
     aie::accum<accfloat, VEC_SIZE> acc;
     acc.from_vector(sum_v, 0);
     auto input0 = aie::broadcast<bfloat16, VEC_SIZE>(1.00001f);
-    auto input1 = aie::broadcast<bfloat16, VEC_SIZE>(1.00001f);
     for (int i = 0; i < N; i += 1) {
-        acc = aie::mac(acc, input0, input1);
+        acc = aie::add(acc, input0);
     }
     aie::store_v(c, acc.to_vector<bfloat16>(0));
 }
