@@ -12,6 +12,12 @@ double calculatePower(double energy_before, double energy_after, double duration
     return ((energy_after - energy_before) / 1e6) / duration;
 }
 
+tuple<std::string, std::string> getPowerZoneNames() {
+    std::string pkg = "/sys/class/powercap/intel-rapl:0/name";
+    std::string core = "/sys/class/powercap/intel-rapl:0/intel-rapl:0:0/name";
+    return {pkg, core};
+}
+
 tuple<std::chrono::_V2::system_clock::time_point, double, double> measure() {
     std::string pkg = "/sys/class/powercap/intel-rapl:0/energy_uj";
     std::string core = "/sys/class/powercap/intel-rapl:0/intel-rapl:0:0/energy_uj";

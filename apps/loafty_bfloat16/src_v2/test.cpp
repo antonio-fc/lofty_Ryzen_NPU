@@ -145,17 +145,17 @@ int main(int argc, const char *argv[]) {
     auto kernel = xrt::kernel(context, kernelName);
 
     // Power measure stuff
-    std::unique_ptr<pmt::PMT> sensor(pmt::Create("powersensor3"));
+    // std::unique_ptr<pmt::PMT> sensor(pmt::Create("powersensor3"));
     // std::unique_ptr<pmt::PMT> sensor(pmt::Create("nvml"));
-    pmt::State start, end_;
-    start = sensor->Read();
-    auto sum = 0;
-    for(auto i=0; i<1000000000; i++)
-        sum+=1;
-    end_ = sensor->Read();
-    cout<<sensor->joules(start, end_) <<" [J]"<<endl;
-    cout<<sensor->watts(start, end_) <<" [W]"<<endl;
-    cout<<sensor->seconds(start, end_)<<" [S]"<<endl;
+    // pmt::State start, end_;
+    // start = sensor->Read();
+    // auto sum = 0;
+    // for(auto i=0; i<1000000000; i++)
+    //     sum+=1;
+    // end_ = sensor->Read();
+    // cout<<sensor->joules(start, end_) <<" [J]"<<endl;
+    // cout<<sensor->watts(start, end_) <<" [W]"<<endl;
+    // cout<<sensor->seconds(start, end_)<<" [S]"<<endl;
 
     // ------------------------------------------------------
     // Initialize input/ output buffer sizes and sync them
@@ -182,7 +182,7 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -282,6 +282,8 @@ int main(int argc, const char *argv[]) {
         float npu_time_total = 0;
         float npu_time_min = 999999999999;
         float npu_time_max = 0;
+        double total_cpu_power = 0.0;
+        double total_core_power = 0.0;
 
         // ------------------------------------------------------
         // Main run loop
@@ -290,7 +292,8 @@ int main(int argc, const char *argv[]) {
             // Run kernel
             if (verbosity >= 1)
                 cout << "Running Kernel " << iter << ".\n";
-            auto start = chrono::high_resolution_clock::now();
+            // auto start = chrono::high_resolution_clock::now();
+            auto [start_time, energy_before_pkg, energy_before_core] = measure();
             unsigned int opcode = 3;
             xrt::run run;
             if(do_trace)
@@ -298,7 +301,8 @@ int main(int argc, const char *argv[]) {
             else
                 run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
             run.wait();
-            auto stop = chrono::high_resolution_clock::now();
+            // auto stop = chrono::high_resolution_clock::now();
+            auto [stop_time, energy_after_pkg, energy_after_core] = measure();
             bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
             if (iter < n_warmup_iterations) {
                 /* Warmup iterations do not count towards average runtime. */
@@ -343,9 +347,17 @@ int main(int argc, const char *argv[]) {
                 cout << "   Trace Data Output Size: " << TRACE_SIZE/4 << " into file " << trace_file << endl;
                 test_utils::write_out_trace(bufTrace, TRACE_SIZE, trace_file);
             }
+            // Get CPU power
+            if(true) {
+                double time = chrono::duration_cast<chrono::nanoseconds>(stop_time - start_time).count();
+                double cpu_power = calculatePower(energy_before_pkg, energy_after_pkg, time)*1000000000.0;
+                double core_power = calculatePower(energy_before_core, energy_after_core, time)*1000000000.0;
+                total_cpu_power += cpu_power;
+                total_core_power += core_power;
+            }
 
             // Accumulate run times
-            float npu_time = chrono::duration_cast<chrono::microseconds>(stop - start).count();
+            float npu_time = chrono::duration_cast<chrono::microseconds>(stop_time - start_time).count();
             npu_time_total += npu_time;
             npu_time_min = (npu_time < npu_time_min) ? npu_time : npu_time_min;
             npu_time_max = (npu_time > npu_time_max) ? npu_time : npu_time_max;
@@ -354,8 +366,11 @@ int main(int argc, const char *argv[]) {
         // ------------------------------------------------------
         // Print verification and timing results
         // ------------------------------------------------------
+        cout << "   Total NPU time: " << npu_time_total << "us." << endl;
         cout << "   Avg NPU time: " << npu_time_total / n_iterations << "us." << endl;    
         cout << "   Min NPU time: " << npu_time_min << "us." << endl;
         cout << "   Max NPU time: " << npu_time_max << "us." << endl;
+        cout << "   Average Power of CPU: " << total_cpu_power/n_iterations << "W" << endl;
+        cout << "   Average Power of Core: " << total_core_power/n_iterations << "W" << endl;
     }
 }
