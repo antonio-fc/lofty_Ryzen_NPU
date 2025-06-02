@@ -15,7 +15,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 64; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
+const int VEC_SIZE = 1024; // Size of the working vectors and OUT_SIZE (only works as it is becasue of that)
 const float DIV = 9216.0;
 
 extern "C" {

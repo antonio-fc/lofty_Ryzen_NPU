@@ -169,21 +169,23 @@ def loafty(opts):
         core_off = CT[2][2]
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_lmn = object_fifo("in0", ST[0], core_, [1, 1], out_ty)
+        of_in_lmn = object_fifo("in0", ST[0], core_off, [1, 1], lmn_move_ty)
         of_inA = object_fifo("in1", ST[1], core_, [1, 1], input_ty)
-        of_inB = object_fifo("in2", ST[2], core_off, [1, 1], input_ty)        
+        of_inB = object_fifo("in2", ST[2], core_, [1, 1], input_ty)        
 
-        of_out = object_fifo("out", core_, ST[3], [1, 1], input_ty)
+        of_out = object_fifo("out", core_, ST[3], [1, 1], out_ty)
         # Benched core definition
-        kernel_bin = "kernels.a"
+        kernel_bin = "mean.o"
         @core(core_, kernel_bin)
         def core_body():
             for _ in range_(ITER_KERNEL):
                 input1 = of_inA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                # input2 = of_inB.acquire(ObjectFifoPort.Consume, 1)
                 output = of_out.acquire(ObjectFifoPort.Produce, 1) # 4608
                 for _ in range_(ITERS):
-                    kernels['sin'](input1, output, INPUT_SIZE)
+                    kernels['mean'](input1, output, INPUT_SIZE, 0)
                 of_out.release(ObjectFifoPort.Produce, 1)
+                # of_inB.release(ObjectFifoPort.Consume, 1)
                 of_inA.release(ObjectFifoPort.Consume, 1)
 
                     
@@ -194,7 +196,7 @@ def loafty(opts):
             npu_dma_memcpy_nd(metadata=of_inA, bd_id=2, mem=baselines, sizes=[1, 1, 1, FULL_BL_SIZE])
             npu_dma_memcpy_nd(metadata=of_inB, bd_id=3, mem=vis, sizes=[1, 1, 1, FULL_VIS_SIZE])
             npu_dma_memcpy_nd(metadata=of_in_lmn, bd_id=4, mem=lmn, sizes=[1, 1, 1, LMN_SIZE])
-            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, INPUT_SIZE]) # output (size = BSIZE)
+            npu_dma_memcpy_nd(metadata=of_out, bd_id=0, mem=output, sizes=[1, 1, 1, OUT_SIZE]) # output (size = BSIZE)
             # We know of_out will complete after of_in and of_in_lmn, so it is sufficient to just wait for of_out
             dma_wait(of_out)
 

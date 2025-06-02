@@ -175,15 +175,17 @@ def loafty(opts):
 
         of_out = object_fifo("out", core_, ST[3], [1, 1], input_ty)
         # Benched core definition
-        kernel_bin = "kernels.a"
+        kernel_bin = "scale.o"
         @core(core_, kernel_bin)
         def core_body():
             for _ in range_(ITER_KERNEL):
                 input1 = of_inA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                factor = of_in_lmn.acquire(ObjectFifoPort.Consume, 1)
                 output = of_out.acquire(ObjectFifoPort.Produce, 1) # 4608
                 for _ in range_(ITERS):
-                    kernels['sin'](input1, output, INPUT_SIZE)
+                    kernels['scale'](input1, factor, output, INPUT_SIZE, 0)
                 of_out.release(ObjectFifoPort.Produce, 1)
+                of_in_lmn.release(ObjectFifoPort.Consume, 1)
                 of_inA.release(ObjectFifoPort.Consume, 1)
 
                     

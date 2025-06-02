@@ -15,7 +15,7 @@
 
 #include "aie_api/aie.hpp"
 
-const int VEC_SIZE = 64; // Size of the working vectors
+const int VEC_SIZE = 1024; // Size of the working vectors
 
 extern "C" {
 
@@ -24,8 +24,8 @@ void scale(bfloat16 *in, bfloat16 *lmn, bfloat16 *out, uint32_t N, uint32_t lmnI
     bfloat16 lmn_value = lmn[lmnIndex];
     for (int i = 0; i < N; i += VEC_SIZE) {
         auto input = aie::load_v<VEC_SIZE>(in + i);
-        auto result = aie::mul(input, lmn_value).to_vector<bfloat16>();
-        aie::store_v(out + i, result);
+        // auto result = aie::mul(input, lmn_value).to_vector<bfloat16>();
+        aie::store_v(out + i, input);
     }
 }
 

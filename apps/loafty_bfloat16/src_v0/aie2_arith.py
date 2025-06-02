@@ -169,21 +169,23 @@ def loafty(opts):
         core_off = CT[2][2]
         # AIE-array data movement with object fifos
         # Inputs
-        of_in_lmn = object_fifo("in0", ST[0], core_, [1, 1], out_ty)
+        of_in_lmn = object_fifo("in0", ST[0], core_off, [1, 1], lmn_move_ty)
         of_inA = object_fifo("in1", ST[1], core_, [1, 1], input_ty)
-        of_inB = object_fifo("in2", ST[2], core_off, [1, 1], input_ty)        
+        of_inB = object_fifo("in2", ST[2], core_, [1, 1], input_ty)        
 
         of_out = object_fifo("out", core_, ST[3], [1, 1], input_ty)
         # Benched core definition
-        kernel_bin = "kernels.a"
+        kernel_bin = "mul.o"
         @core(core_, kernel_bin)
         def core_body():
             for _ in range_(ITER_KERNEL):
                 input1 = of_inA.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
+                input2 = of_inB.acquire(ObjectFifoPort.Consume, 1)
                 output = of_out.acquire(ObjectFifoPort.Produce, 1) # 4608
                 for _ in range_(ITERS):
-                    kernels['sin'](input1, output, INPUT_SIZE)
+                    kernels['mul'](input1, input2, output, INPUT_SIZE)
                 of_out.release(ObjectFifoPort.Produce, 1)
+                of_inB.release(ObjectFifoPort.Consume, 1)
                 of_inA.release(ObjectFifoPort.Consume, 1)
 
                     
