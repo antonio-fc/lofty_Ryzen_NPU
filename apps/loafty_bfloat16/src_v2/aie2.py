@@ -54,16 +54,20 @@ def declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype
     kernel2 = external_func("add_kernel",
         inputs=[input_ty, input_ty, input_ty, dtype],
     )
-    name3 = "main"
-    kernel3 = external_func("main_kernel",
-        inputs=[input_ty, dist_ty, join_ty, dtype, dtype],
+    name3 = "main_cos"
+    kernel3 = external_func("main_kernel_cos",
+        inputs=[input_ty, dist_ty, join_ty, dtype],
     )
-    name4 = "sub"
-    kernel4 = external_func("sub_kernel",
+    name4 = "main_sin"
+    kernel4 = external_func("main_kernel_sin",
+        inputs=[input_ty, dist_ty, join_ty, dtype],
+    )
+    name5 = "sub"
+    kernel5 = external_func("sub_kernel",
         inputs=[input_ty, input_ty, input_ty, dtype],
     )
-    name5 = "mean"
-    kernel5 = external_func("mean",
+    name6 = "mean"
+    kernel6 = external_func("mean",
         inputs=[input_ty, out_ty, dtype, dtype],
     )
     return {
@@ -73,6 +77,7 @@ def declaring_kernel_func(dist_ty, input_ty, join_ty, lmn_move_ty, out_ty, dtype
         name3: kernel3,
         name4: kernel4,
         name5: kernel5,
+        name6: kernel6,
     }
 
 def declaring_tiles(n_cols, n_comp):
@@ -277,14 +282,14 @@ def loafty(opts):
             inputVisFifo = main_in_fifos[c][0]
             inputAddFifo = add2mainFIFOs[c]
             outputFifo = real_join_fifos[c]
-            @core(rc_tiles[c][0], "kernels.a")
+            @core(rc_tiles[c][0], "kernels.a", stack_size=0xA00)
             def core_body():
                 for _ in range_(ITER_KERNEL):
                     inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
                     for _ in range_(BSIZE):
                         inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
                         output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 2304
-                        kernels['main'](inputAdd, inputVis, output, INPUT_SIZE, 0)
+                        kernels['main_cos'](inputAdd, inputVis, output, INPUT_SIZE)
                         outputFifo.release(ObjectFifoPort.Produce, 1)
                         inputAddFifo.release(ObjectFifoPort.Consume, 1)
                     inputVisFifo.release(ObjectFifoPort.Consume, 1)
@@ -292,14 +297,14 @@ def loafty(opts):
             inputVisFifo = main_in_fifos[c][1]
             inputAddFifo = add2mainFIFOs[c]
             outputFifo = imag_join_fifos[c]
-            @core(rc_tiles[c][1], "kernels.a")
+            @core(rc_tiles[c][1], "kernels.a", stack_size=0xA00)
             def core_body():
                 for _ in range_(ITER_KERNEL):
                     inputVis = inputVisFifo.acquire(ObjectFifoPort.Consume, 1) # 2 + 4608 = 4610
                     for _ in range_(BSIZE):
                         inputAdd = inputAddFifo.acquire(ObjectFifoPort.Consume, 1) # 4608
                         output = outputFifo.acquire(ObjectFifoPort.Produce, 1) # 2304
-                        kernels['main'](inputAdd, inputVis, output, INPUT_SIZE, 1)
+                        kernels['main_sin'](inputAdd, inputVis, output, INPUT_SIZE)
                         outputFifo.release(ObjectFifoPort.Produce, 1)
                         inputAddFifo.release(ObjectFifoPort.Consume, 1)
                     inputVisFifo.release(ObjectFifoPort.Consume, 1)

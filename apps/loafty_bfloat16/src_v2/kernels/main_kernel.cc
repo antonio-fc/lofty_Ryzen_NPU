@@ -5,6 +5,7 @@ const bfloat16 LUT_TRUE_SIZE = LUT_SIZE/2.0; // This is for a 512 lut, where hal
 const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2pi]
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
+const int VEC_SIZE = 128;
 
 aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
         auto inputs = aie::abs(input_vec); // to remove negative, cause sin(-x) = -sin(x), need to save vector with signs to negate at the end
@@ -23,7 +24,7 @@ aie::vector<bfloat16, 32> cos_bfloat16(aie::vector<bfloat16, 32> input_vec) {
 
 extern "C" {
 
-void main_kernel(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N, uint32_t trig) { // N = 4608
+void main_kernel_cos(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N) { // N = 4608
     uint32_t FREQ_SIZE = 2; // How many indeces of visIn is used by the frequency value
     uint32_t HALF_SIZE = N/2; // new size when folding the output for further joining of the data streams
     bfloat16 *visInput = visIn + FREQ_SIZE;
@@ -32,55 +33,149 @@ void main_kernel(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N, uint3
         // Intermediate operations
         for (int i = 0; i < HALF_SIZE; i += VEC_SIZE) {
             // Getting baselines vectors
-            auto input0 = aie::load_v<VEC_SIZE>(in + i);
-            auto vis0 = aie::load_v<VEC_SIZE>(visInput + i);
-            auto input1 = aie::load_v<VEC_SIZE>(in + HALF_SIZE + i);
-            auto vis1 = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
+            auto inputA = aie::load_v<VEC_SIZE>(in + i);
+            auto visA = aie::load_v<VEC_SIZE>(visInput + i);
+            auto inputB = aie::load_v<VEC_SIZE>(in + HALF_SIZE + i);
+            auto visB = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
 
             // Scale
-            auto scaleInput0 = aie::mul(input0, freq).to_vector<bfloat16>();
-            auto scaleInput1 = aie::mul(input1, freq).to_vector<bfloat16>();
+            auto scaleInputA = aie::mul(inputA, freq).to_vector<bfloat16>();
+            auto scaleInputB = aie::mul(inputB, freq).to_vector<bfloat16>();
 
-            // Apply the trig op
-            aie::vector<bfloat16, VEC_SIZE> trig0;
-            aie::vector<bfloat16, VEC_SIZE> trig1;
+            // Getting cosine
+            // v32
+            // auto trigA = cos_bfloat16(scaleInputA);
+            // auto trigB = cos_bfloat16(scaleInputA);
 
-            if (trig == 0) { // applying cosine
-                auto trig0A = cos_bfloat16(scaleInput0.extract<32>(0));
-                auto trig0B = cos_bfloat16(scaleInput0.extract<32>(1));
-                auto trig1A = cos_bfloat16(scaleInput1.extract<32>(0));
-                auto trig1B = cos_bfloat16(scaleInput1.extract<32>(1));
-                trig0 = aie::concat(trig0A, trig0B);
-                trig1 = aie::concat(trig1A, trig1B);
-                // trig0 = cos_bfloat16(scaleInput0);
-                // trig1 = cos_bfloat16(scaleInput1);
-            } else { // applying sine
-                auto trig0A = sin_bfloat16(scaleInput0.extract<32>(0));
-                auto trig0B = sin_bfloat16(scaleInput0.extract<32>(1));
-                auto trig1A = sin_bfloat16(scaleInput1.extract<32>(0));
-                auto trig1B = sin_bfloat16(scaleInput1.extract<32>(1));
-                trig0 = aie::concat(trig0A, trig0B);
-                trig1 = aie::concat(trig1A, trig1B);
-                // trig0 = sin_bfloat16(scaleInput0);
-                // trig1 = sin_bfloat16(scaleInput1);
-            }
+            // v64
+            // auto trigA0 = cos_bfloat16(scaleInputA.extract<32>(0));
+            // auto trigA1 = cos_bfloat16(scaleInputA.extract<32>(1));
+            // auto trigB0 = cos_bfloat16(scaleInputB.extract<32>(0));
+            // auto trigB1 = cos_bfloat16(scaleInputB.extract<32>(1));
+            // auto trigA = aie::concat(trigA0, trigA1);
+            // auto trigB = aie::concat(trigB0, trigB1);
+
+            // v128
+            auto trigA0 = cos_bfloat16(scaleInputA.extract<32>(0));
+            auto trigA1 = cos_bfloat16(scaleInputA.extract<32>(1));
+            auto trigA2 = cos_bfloat16(scaleInputA.extract<32>(2));
+            auto trigA3 = cos_bfloat16(scaleInputA.extract<32>(3));
+            auto trigB0 = cos_bfloat16(scaleInputB.extract<32>(0));
+            auto trigB1 = cos_bfloat16(scaleInputB.extract<32>(1));
+            auto trigB2 = cos_bfloat16(scaleInputB.extract<32>(2));
+            auto trigB3 = cos_bfloat16(scaleInputB.extract<32>(3));
+            auto trigA = aie::concat(aie::concat(trigA0, trigA1), aie::concat(trigA2, trigA3));
+            auto trigB = aie::concat(aie::concat(trigB0, trigB1), aie::concat(trigB2, trigB3));
+
+            // v256
+            // auto trigA0 = cos_bfloat16(scaleInputA.extract<32>(0));
+            // auto trigA1 = cos_bfloat16(scaleInputA.extract<32>(1));
+            // auto trigA2 = cos_bfloat16(scaleInputA.extract<32>(2));
+            // auto trigA3 = cos_bfloat16(scaleInputA.extract<32>(3));
+            // auto trigA4 = cos_bfloat16(scaleInputA.extract<32>(4));
+            // auto trigA5 = cos_bfloat16(scaleInputA.extract<32>(5));
+            // auto trigA6 = cos_bfloat16(scaleInputA.extract<32>(6));
+            // auto trigA7 = cos_bfloat16(scaleInputA.extract<32>(7));
+            // auto trigB0 = cos_bfloat16(scaleInputB.extract<32>(0));
+            // auto trigB1 = cos_bfloat16(scaleInputB.extract<32>(1));
+            // auto trigB2 = cos_bfloat16(scaleInputB.extract<32>(2));
+            // auto trigB3 = cos_bfloat16(scaleInputB.extract<32>(3));
+            // auto trigB4 = cos_bfloat16(scaleInputB.extract<32>(4));
+            // auto trigB5 = cos_bfloat16(scaleInputB.extract<32>(5));
+            // auto trigB6 = cos_bfloat16(scaleInputB.extract<32>(6));
+            // auto trigB7 = cos_bfloat16(scaleInputB.extract<32>(7));
+            // auto trigA = aie::concat(aie::concat(aie::concat(trigA0, trigA1), aie::concat(trigA2, trigA3)), aie::concat(aie::concat(trigA4, trigA5), aie::concat(trigA6, trigA7)));
+            // auto trigB = aie::concat(aie::concat(aie::concat(trigB0, trigB1), aie::concat(trigB2, trigB3)), aie::concat(aie::concat(trigB4, trigB5), aie::concat(trigB6, trigB7)));
+            
 
             // Multiplying by vis
-            auto prod0 = aie::mul(trig0, vis0);
-            auto prod1 = aie::mul(trig1, vis1);
+            auto prodA = aie::mul(trigA, visA);
+            auto prodB = aie::mul(trigB, visB);
 
             // Adding to acc
-            auto result = aie::add(prod0, prod1);
+            auto result = aie::add(prodA, prodB);
 
             // Writing result to output
             aie::store_v(out + i, result.to_vector<bfloat16>());
         }
     }
 }
-// void sin_float_1024(bfloat16 *a_in, bfloat16 *c_out) {
-//     sin_bfloat16<1024>(a_in, c_out);
-// }
-// void cos_float_1024(bfloat16 *a_in, bfloat16 *c_out) {
-//     cos_bfloat16<1024>(a_in, c_out);
-// }
+
+void main_kernel_sin(bfloat16 *in, bfloat16 *visIn, bfloat16 *out, uint32_t N) { // N = 4608
+    uint32_t FREQ_SIZE = 2; // How many indeces of visIn is used by the frequency value
+    uint32_t HALF_SIZE = N/2; // new size when folding the output for further joining of the data streams
+    bfloat16 *visInput = visIn + FREQ_SIZE;
+    bfloat16 freq = visIn[0];
+    chess_prepare_for_pipelining chess_loop_range(64, 64) {
+        // Intermediate operations
+        for (int i = 0; i < HALF_SIZE; i += VEC_SIZE) {
+            // Getting baselines vectors
+            auto inputA = aie::load_v<VEC_SIZE>(in + i);
+            auto visA = aie::load_v<VEC_SIZE>(visInput + i);
+            auto inputB = aie::load_v<VEC_SIZE>(in + HALF_SIZE + i);
+            auto visB = aie::load_v<VEC_SIZE>(visInput + HALF_SIZE + i);
+
+            // Scale
+            auto scaleInputA = aie::mul(inputA, freq).to_vector<bfloat16>();
+            auto scaleInputB = aie::mul(inputB, freq).to_vector<bfloat16>();
+
+            // Getting sine
+            // v32
+            // auto trigA = sin_bfloat16(scaleInputA);
+            // auto trigB = sin_bfloat16(scaleInputA);
+
+            // v64
+            // auto trigA0 = sin_bfloat16(scaleInputA.extract<32>(0));
+            // auto trigA1 = sin_bfloat16(scaleInputA.extract<32>(1));
+            // auto trigB0 = sin_bfloat16(scaleInputB.extract<32>(0));
+            // auto trigB1 = sin_bfloat16(scaleInputB.extract<32>(1));
+            // auto trigA = aie::concat(trigA0, trigA1);
+            // auto trigB = aie::concat(trigB0, trigB1);
+
+            // v128
+            auto trigA0 = sin_bfloat16(scaleInputA.extract<32>(0));
+            auto trigA1 = sin_bfloat16(scaleInputA.extract<32>(1));
+            auto trigA2 = sin_bfloat16(scaleInputA.extract<32>(2));
+            auto trigA3 = sin_bfloat16(scaleInputA.extract<32>(3));
+            auto trigB0 = sin_bfloat16(scaleInputB.extract<32>(0));
+            auto trigB1 = sin_bfloat16(scaleInputB.extract<32>(1));
+            auto trigB2 = sin_bfloat16(scaleInputB.extract<32>(2));
+            auto trigB3 = sin_bfloat16(scaleInputB.extract<32>(3));
+            auto trigA = aie::concat(aie::concat(trigA0, trigA1), aie::concat(trigA2, trigA3));
+            auto trigB = aie::concat(aie::concat(trigB0, trigB1), aie::concat(trigB2, trigB3));
+
+            // v256
+            // auto trigA0 = sin_bfloat16(scaleInputA.extract<32>(0));
+            // auto trigA1 = sin_bfloat16(scaleInputA.extract<32>(1));
+            // auto trigA2 = sin_bfloat16(scaleInputA.extract<32>(2));
+            // auto trigA3 = sin_bfloat16(scaleInputA.extract<32>(3));
+            // auto trigA4 = sin_bfloat16(scaleInputA.extract<32>(4));
+            // auto trigA5 = sin_bfloat16(scaleInputA.extract<32>(5));
+            // auto trigA6 = sin_bfloat16(scaleInputA.extract<32>(6));
+            // auto trigA7 = sin_bfloat16(scaleInputA.extract<32>(7));
+            // auto trigB0 = sin_bfloat16(scaleInputB.extract<32>(0));
+            // auto trigB1 = sin_bfloat16(scaleInputB.extract<32>(1));
+            // auto trigB2 = sin_bfloat16(scaleInputB.extract<32>(2));
+            // auto trigB3 = sin_bfloat16(scaleInputB.extract<32>(3));
+            // auto trigB4 = sin_bfloat16(scaleInputB.extract<32>(4));
+            // auto trigB5 = sin_bfloat16(scaleInputB.extract<32>(5));
+            // auto trigB6 = sin_bfloat16(scaleInputB.extract<32>(6));
+            // auto trigB7 = sin_bfloat16(scaleInputB.extract<32>(7));
+            // auto trigA = aie::concat(aie::concat(aie::concat(trigA0, trigA1), aie::concat(trigA2, trigA3)), aie::concat(aie::concat(trigA4, trigA5), aie::concat(trigA6, trigA7)));
+            // auto trigB = aie::concat(aie::concat(aie::concat(trigB0, trigB1), aie::concat(trigB2, trigB3)), aie::concat(aie::concat(trigB4, trigB5), aie::concat(trigB6, trigB7)));
+            
+
+            // Multiplying by vis
+            auto prodA = aie::mul(trigA, visA);
+            auto prodB = aie::mul(trigB, visB);
+
+            // Adding to acc
+            auto result = aie::add(prodA, prodB);
+
+            // Writing result to output
+            aie::store_v(out + i, result.to_vector<bfloat16>());
+        }
+    }
+}
+
 }

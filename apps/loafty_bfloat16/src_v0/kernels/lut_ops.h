@@ -8,14 +8,13 @@
 using lut_type = aie::lut<4, bfloat16, bfloat16>;
 const int LUT_SIZE = 1024;
 const int step_i = 0; // Optional lower bits that will be ignored for indexing the lut
-const int VEC_SIZE = 32;
 
 alignas(aie::vector_decl_align) extern bfloat16 sin_ilut_ab[LUT_SIZE];
 alignas(aie::vector_decl_align) extern bfloat16 sin_ilut_cd[LUT_SIZE];
 alignas(aie::vector_decl_align) extern bfloat16 cos_ilut_ab[LUT_SIZE];
 alignas(aie::vector_decl_align) extern bfloat16 cos_ilut_cd[LUT_SIZE];
 
-aie::vector<int16, VEC_SIZE> v32bfloat16_to_v32uint(aie::vector<bfloat16, VEC_SIZE> input) {
+aie::vector<int16, 32> v32bfloat16_to_v32uint(aie::vector<bfloat16, 32> input) {
     aie::vector<int32, 16> index0 = bfloat16_to_int(input.extract<16>(0), 0);
     aie::vector<int16, 16> index0f = aie::filter_even(index0.cast_to<int16>());
     aie::vector<int32, 16> index1 = bfloat16_to_int(input.extract<16>(1), 0);
@@ -24,7 +23,7 @@ aie::vector<int16, VEC_SIZE> v32bfloat16_to_v32uint(aie::vector<bfloat16, VEC_SI
     return index;
 }
 
-__attribute__((always_inline))  aie::vector<bfloat16, VEC_SIZE> getSinbFloat16(aie::vector<bfloat16, VEC_SIZE> x) {
+__attribute__((always_inline))  aie::vector<bfloat16, 32> getSinbFloat16(aie::vector<bfloat16, 32> x) {
     bfloat16 __aie_dm_resource_a *ilut_ab = (bfloat16 __aie_dm_resource_a *)sin_ilut_ab;
     bfloat16 __aie_dm_resource_b *ilut_cd = (bfloat16 __aie_dm_resource_b *)sin_ilut_cd;
     
@@ -38,7 +37,7 @@ __attribute__((always_inline))  aie::vector<bfloat16, VEC_SIZE> getSinbFloat16(a
     return sin_result;
 }
 
-__attribute__((always_inline))  aie::vector<bfloat16, VEC_SIZE> getCosbFloat16(aie::vector<bfloat16, VEC_SIZE> x) {
+__attribute__((always_inline))  aie::vector<bfloat16, 32> getCosbFloat16(aie::vector<bfloat16, 32> x) {
     bfloat16 __aie_dm_resource_a *ilut_ab = (bfloat16 __aie_dm_resource_a *)cos_ilut_ab;
     bfloat16 __aie_dm_resource_b *ilut_cd = (bfloat16 __aie_dm_resource_b *)cos_ilut_cd;
     

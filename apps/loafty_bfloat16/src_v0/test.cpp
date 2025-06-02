@@ -341,7 +341,7 @@ int main(int argc, const char *argv[]) {
                 // save1DArrayToCSV(castVector<float>(ref), file_path_ref);
                 // cout << "Saved Ref in File: " << outFileNameRef << endl;
                 if (do_verify >= 1) {
-                    // reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
+                    reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
                     auto file_path = dyna_print("accuracy/set1/acc0_{}.csv", MATRIX_DIM_SIZE1);
                     reportAccuracyCSV(castVector<float>(out_vec), ref, nan_mask_v, subbandIndex, frequency, file_path);
                 }

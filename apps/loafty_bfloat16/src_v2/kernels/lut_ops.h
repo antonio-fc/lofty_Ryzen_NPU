@@ -8,7 +8,6 @@
 using lut_type = aie::lut<4, bfloat16, bfloat16>;
 const int LUT_SIZE = 1024;
 const int step_i = 0; // Optional lower bits that will be ignored for indexing the lut
-const int VEC_SIZE = 64;
 
 alignas(aie::vector_decl_align) extern bfloat16 sin_ilut_ab[LUT_SIZE];
 alignas(aie::vector_decl_align) extern bfloat16 sin_ilut_cd[LUT_SIZE];

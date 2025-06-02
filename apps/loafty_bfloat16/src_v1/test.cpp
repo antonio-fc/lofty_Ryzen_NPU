@@ -93,7 +93,7 @@ int main(int argc, const char *argv[]) {
     const int MSIZE = pow(MATRIX_DIM_SIZE0, 2);
     const int BSIZE = pow(MATRIX_DIM_SIZE1, 2);
 
-    const int CV = 64; // number of consecutive values in output stream
+    const int CV = 128; // number of consecutive values in output stream
     const int N_LMN = 3; // one for each l, m and n, just to avoid "magic numbers in code"
 
     const int FREQ_VOL = CV * N_LMN; // padding the scalar of the frequency factor to be in the same stream as lmn values
@@ -354,7 +354,7 @@ int main(int argc, const char *argv[]) {
                 // save1DArrayToCSV(castVector<float>(ref), file_path_ref);
                 // cout << "Saved Ref in File: " << outFileNameRef << endl;
                 if (do_verify >= 1) {
-                    // reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
+                    reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
                     auto file_path = dyna_print("accuracy/set1/acc1_{}.csv", MATRIX_DIM_SIZE1);
                     reportAccuracyCSV(castVector<float>(out_vec), ref, nan_mask_v, subbandIndex, frequency, file_path);
                 }

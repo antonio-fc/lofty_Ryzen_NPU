@@ -6,7 +6,7 @@ const bfloat16 INPUT_MAX = M_PI * 2; // for accepted input values in range [0, 2
 const bfloat16 FACTOR = LUT_TRUE_SIZE/INPUT_MAX;   // index = x * LUT_TRUE_SIZE / INPUT_MAX (depends on type of lut)
 const bfloat16 NANCONST = std::numeric_limits<bfloat16>::quiet_NaN();
 
-const int CV = 64; // consecutive lmn values
+const int CV = 128; // consecutive lmn values
 const int VEC_SIZE = 64;
 
 aie::vector<bfloat16, 32> sin_bfloat16(aie::vector<bfloat16, 32> input_vec) {
@@ -73,7 +73,7 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visI, b
             // auto cos = cos_bfloat16(A); // Need to try reduce to one LUT operation
             // auto sin = sin_bfloat16(A);
             
-            // Method2 (works) [faster, a bit more error] {VEC_SIZE=64}
+            // Method2 (works) [faster] {VEC_SIZE=64}
             auto A0 = A.extract<32>(0);
             auto A1 = A.extract<32>(1);
             auto cos0 = cos_bfloat16(A0);
@@ -83,7 +83,24 @@ void main_kernel(bfloat16 freq, bfloat16 *lmn, bfloat16 *visR, bfloat16 *visI, b
             auto cos = aie::concat(cos0, cos1);
             auto sin = aie::concat(sin0, sin1);
 
-            // Method3 (???)
+            // Method3 (works) [slower than method2] {VEC_SIZE=128}
+            // auto A0 = A.extract<32>(0);
+            // auto A1 = A.extract<32>(1);
+            // auto A2 = A.extract<32>(2);
+            // auto A3 = A.extract<32>(3);
+            // auto cos0 = cos_bfloat16(A0);
+            // auto cos1 = cos_bfloat16(A1);
+            // auto cos2 = cos_bfloat16(A2);
+            // auto cos3 = cos_bfloat16(A3);
+            // auto sin0 = sin_bfloat16(A0);
+            // auto sin1 = sin_bfloat16(A1);
+            // auto sin2 = sin_bfloat16(A2);
+            // auto sin3 = sin_bfloat16(A3);
+            
+            // auto cos = aie::concat(aie::concat(cos0, cos1), aie::concat(cos2, cos3));
+            // auto sin = aie::concat(aie::concat(sin0, sin1), aie::concat(sin2, sin3));
+
+            // Method4 (???)
             // auto exp = exp_bfloat16(A);
             // auto sin = exp.extract<32>(0);
             // auto cos = exp.extract<32>(1);
