@@ -38,6 +38,96 @@ string dyna_print(std::string_view rt_fmt_str, Args&&... args) {
     return std::vformat(rt_fmt_str, std::make_format_args(args...));
 }
 
+void writeVectorToCSV(const std::string& filename,
+                      const std::vector<float>& vec,
+                      const std::string& header = "Values") {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << " for writing.\n";
+        return;
+    }
+
+    // Optional header
+    file << header << "\n";
+
+    // Write each value in a new row
+    for (float value : vec) {
+        file << value << "\n";
+    }
+
+    file.close();
+}
+
+void writeVectorsToCSV(const std::string& filename,
+                       const std::vector<float>& v1,
+                       const std::vector<float>& v2,
+                       const std::vector<float>& v3) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << " for writing.\n";
+        return;
+    }
+
+    // Write CSV header
+    file << "Vector1,Vector2,Vector3\n";
+
+    // Determine the maximum size
+    size_t maxSize = std::max({v1.size(), v2.size(), v3.size()});
+
+    // Write each row
+    for (size_t i = 0; i < maxSize; ++i) {
+        file << (i < v1.size() ? std::to_string(v1[i]) : "")
+             << "," << (i < v2.size() ? std::to_string(v2[i]) : "")
+             << "," << (i < v3.size() ? std::to_string(v3[i]) : "")
+             << "\n";
+    }
+
+    file.close();
+}
+
+void writeColumnsToCSV(const std::string& filename,
+                       const std::vector<std::vector<float>>& columns) {
+    if (columns.empty()) {
+        std::cerr << "Error: No data to write.\n";
+        return;
+    }
+
+    size_t numColumns = columns.size();
+    size_t numRows = columns[0].size();
+
+    // Check all columns have the same size
+    for (const auto& col : columns) {
+        if (col.size() != numRows) {
+            std::cerr << "Error: All vectors must have the same length.\n";
+            return;
+        }
+    }
+
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open file " << filename << " for writing.\n";
+        return;
+    }
+
+    // Optional: write a header (Column1, Column2, ...)
+    for (size_t i = 0; i < numColumns; ++i) {
+        file << "Column" << (i + 1);
+        if (i < numColumns - 1) file << ",";
+    }
+    file << "\n";
+
+    // Write row by row
+    for (size_t row = 0; row < numRows; ++row) {
+        for (size_t col = 0; col < numColumns; ++col) {
+            file << columns[col][row];
+            if (col < numColumns - 1) file << ",";
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
 // ----------------------------------------------------------------------------
 // Main
 // ----------------------------------------------------------------------------
@@ -182,7 +272,12 @@ int main(int argc, const char *argv[]) {
     const string fileName = "inputLBA1";
     const string filePath = format("./data/hdf5/{}.h5", fileName);
     auto datasetNames = getDatasetNames(filePath.data()); // size = 512
-    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=512) {
+    auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(filePath.data())); // done
+    std::vector<std::vector<float>> visibiltiesReal;
+    std::vector<std::vector<float>> visibiltiesImag;
+    std::vector<float> frequencies;
+    // writeVectorsToCSV("inputs/baselines.csv", uVector, vVector, wVector);
+    for(auto dsidx=0; dsidx<datasetNames.size(); dsidx+=1) {
         // GETTING INPUT DATA
         auto dataSetNameString = datasetNames[dsidx];
         auto dataSetName = (const char*) dataSetNameString.data();
@@ -192,185 +287,13 @@ int main(int argc, const char *argv[]) {
         
         // Get visibilities, baselines and frequency
         auto [realVisVector, imagVisVector] = getVisibilitiesVector(filePath.data(), dataSetName); // done
-        auto [uVector, vVector, wVector] = computeBaselines(getXYZCoordinates(filePath.data())); // done
+        visibiltiesReal.push_back(realVisVector);
+        visibiltiesImag.push_back(imagVisVector);
         float frequency = getFrequency("./data/hdf5/inputLBA1.h5", dataSetName); // done
-        // auto realVisVector = load1DCSV<float>("utils/npy/csv_files/visR.csv");
-        // auto imagVisVector = load1DCSV<float>("utils/npy/csv_files/visI.csv");
-        // auto uVector = load1DCSV<float>("utils/npy/csv_files/u.csv");
-        // auto vVector = load1DCSV<float>("utils/npy/csv_files/v.csv");
-        // auto wVector = load1DCSV<float>("utils/npy/csv_files/w.csv");
-        // float frequency = load1DCSV<float>("utils/npy/csv_files/frequency.csv")[0];
-        cout << "   Frequency: " << frequency << endl;
-
-        // Generating lmn
-        auto x = linspace(-1.0f, 1.0f, MATRIX_DIM_SIZE1);
-        auto y = linspace(1.0f, -1.0f, MATRIX_DIM_SIZE1);
-        auto [lVector, mVector] = meshgrid(x, y); // done
-        auto nVector = compute_n(lVector, mVector, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1); // done
-        auto nan_mask_v = getNanMask(lVector, mVector, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1);
-
-        // FORMATTING THE INPUT
-        // Separating per input
-        DATATYPE freq = (DATATYPE) frequency;
-        DATATYPE SpeedOfLight = 299792458; // m/s
-        DATATYPE factor = static_cast<DATATYPE>(-2 * M_PI / SpeedOfLight);
-        DATATYPE ff = freq * factor; // frequency factor
-        
-        vector<DATATYPE> visR = castVector<DATATYPE>(realVisVector); // real component of visibilities
-        vector<DATATYPE> visI = castVector<DATATYPE>(imagVisVector); // imaginary component of visibilities
-        
-        vector<DATATYPE> u = castVector<DATATYPE>(uVector); // baselines, u
-        vector<DATATYPE> v = castVector<DATATYPE>(vVector); // baselines, v
-        vector<DATATYPE> w = castVector<DATATYPE>(wVector); // baselines, w
-
-        vector<DATATYPE> l = castVector<DATATYPE>(lVector); // l
-        vector<DATATYPE> m = castVector<DATATYPE>(mVector); // m
-        vector<DATATYPE> n = castVector<DATATYPE>(nVector); // n
-        // Generating nan_mask
-        // auto nan_mask = n | views::transform([](float x) { return x != x; });
-        // vector<bool> nan_mask_v(nan_mask.begin(), nan_mask.end());
-
-        // Format input 0 (frequency factor + lmn)
-        DATATYPE *bufInOut0 = bo_inout0.map<DATATYPE *>();
-
-        vector<vector<DATATYPE>> lmnInputs = {l, m, n};
-        vector<DATATYPE> lmn_vector(INOUT_LMN_VOLUME);
-        for(int i=0; i<INOUT2_VOLUME/CV; i++) {
-            for(int j=0; j<CV; j++) {
-                for(int lmn=0; lmn<N_LMN; lmn++) {
-                    auto index = i*N_LMN+lmn;
-                    lmn_vector[index*CV + j] = lmnInputs[lmn][i*CV + j];
-                }
-            }
-        }
-        
-        // Format inputs 1 and 2 (Main inputs A and B)
-        DATATYPE *bufInOut1 = bo_inout1.map<DATATYPE *>();
-        DATATYPE *bufInOut2 = bo_inout2.map<DATATYPE *>();
-        vector<DATATYPE> main_inputA(FULL_INPUT_VOL);
-        vector<DATATYPE> main_inputB(FULL_INPUT_VOL);
-        vector<vector<DATATYPE>> mainInputs = {visR, visI, u, v, w};
-        auto TT_VOL = INPUT_VOL+FREQ_VOL;
-        for(int v=0; v<NINPUTS; v++) {
-            for(int i=0; i<FREQ_VOL; i++) {
-                auto index = v*TT_VOL + i;
-                main_inputA[index] = ff;
-                main_inputB[index] = ff;
-            }
-            for(int i=0; i<INPUT_VOL; i++) {
-                auto index = v*TT_VOL + FREQ_VOL + i;  // + FREQ_VOL
-                main_inputA[index] = mainInputs[v][i];
-                main_inputB[index] = mainInputs[v][i + INPUT_VOL];
-            }
-        }
-
-        // Initialize data buffers
-        memcpy(bufInOut0, lmn_vector.data(), INOUT_LMN_SIZE);
-        memcpy(bufInOut1, main_inputA.data(), FULL_INPUT_SIZE);
-        memcpy(bufInOut2, main_inputB.data(), FULL_INPUT_SIZE);
-        
-        // Sync buffers to update input buffer values
-        bo_instr.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-        bo_inout0.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-        bo_inout1.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-        bo_inout2.sync(XCL_BO_SYNC_BO_TO_DEVICE);
-
-        // ------------------------------------------------------
-        // Initialize run configs
-        // ------------------------------------------------------
-        unsigned num_iter = n_iterations + n_warmup_iterations;
-        float npu_time_total = 0;
-        float npu_time_min = 999999999999;
-        float npu_time_max = 0;
-        double total_cpu_power = 0.0;
-        double total_core_power = 0.0;
-
-        // ------------------------------------------------------
-        // Main run loop
-        // ------------------------------------------------------
-        for (unsigned iter = 0; iter < num_iter; iter++) {        
-            // Run kernel
-            if (verbosity >= 1)
-                cout << "Running Kernel " << iter << ".\n";
-            // auto start = chrono::high_resolution_clock::now();
-            auto [start_time, energy_before_pkg, energy_before_core] = measure();
-            unsigned int opcode = 3;
-            xrt::run run;
-            if(do_trace)
-                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4, bo_trace);
-            else
-                run = kernel(opcode, bo_instr, instr_v.size(), bo_inout0, bo_inout1, bo_inout2, bo_inout4);
-            run.wait();
-            // auto stop = chrono::high_resolution_clock::now();
-            auto [stop_time, energy_after_pkg, energy_after_core] = measure();
-            bo_inout4.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
-            if (iter < n_warmup_iterations) {
-                /* Warmup iterations do not count towards average runtime. */
-                continue;
-            }
-        
-            // Copy output results and verify they are correct
-            DATATYPE *bufOut;
-            if (iter == num_iter - 1) {
-                // Output
-                bufOut = bo_inout4.map<DATATYPE *>();
-                for(auto i=0; i<OUT_SIZE; i++)
-                    if(nan_mask_v[i])
-                        bufOut[i] = static_cast<DATATYPE>(nan("0"));
-                vector<DATATYPE> out_vec(OUTPUT_VOL);
-                memcpy(out_vec.data(), bufOut, (out_vec.size() * sizeof(DATATYPE)));
-                reverse(out_vec.begin(), out_vec.end());
-                // string outFileName = dyna_print("{}_{}B.csv", fileName, getSubbandIndex(dataSetName));
-                // string file_path = format("utils/cpp_plotting/jjj/{}", outFileName);
-                // save1DArrayToCSV(castVector<float>(out_vec), file_path);
-                // cout << "   Saved Out in File: " << outFileName << endl;
-
-                // Verification
-                auto ref = image_reference(realVisVector, imagVisVector, uVector, vVector, wVector, frequency, MATRIX_DIM_SIZE1, MATRIX_DIM_SIZE1);
-                // string outFileNameRef = dyna_print("{}_{}_ref.csv", fileName, subbandString);
-                // string file_path_ref = format("utils/cpp_plotting/file_plotting/{}", outFileNameRef);
-                // save1DArrayToCSV(castVector<float>(ref), file_path_ref);
-                // cout << "Saved Ref in File: " << outFileNameRef << endl;
-                if (do_verify >= 1) {
-                    reportAccuracy(castVector<float>(out_vec), ref, nan_mask_v, "");
-                    auto file_path = dyna_print("accuracy/set1/acc2_{}.csv", MATRIX_DIM_SIZE1);
-                    reportAccuracyCSV(castVector<float>(out_vec), ref, nan_mask_v, subbandIndex, frequency, file_path);
-                }
-            }
-             // Copy trace and output to file
-             if(do_trace && iter==num_iter-1) {
-                cout << "heeere" << endl;
-                char *bufTrace = bo_trace.map<char *>();
-                std::vector<char> trace_vec(TRACE_SIZE/sizeof(char));
-                memcpy(trace_vec.data(), bufTrace, TRACE_SIZE);
-                
-                cout << "   Trace Data Output Size: " << TRACE_SIZE/4 << " into file " << trace_file << endl;
-                test_utils::write_out_trace(bufTrace, TRACE_SIZE, trace_file);
-            }
-            // Get CPU power
-            if(true) {
-                double time = chrono::duration_cast<chrono::nanoseconds>(stop_time - start_time).count();
-                double cpu_power = calculatePower(energy_before_pkg, energy_after_pkg, time)*1000000000.0;
-                double core_power = calculatePower(energy_before_core, energy_after_core, time)*1000000000.0;
-                total_cpu_power += cpu_power;
-                total_core_power += core_power;
-            }
-
-            // Accumulate run times
-            float npu_time = chrono::duration_cast<chrono::microseconds>(stop_time - start_time).count();
-            npu_time_total += npu_time;
-            npu_time_min = (npu_time < npu_time_min) ? npu_time : npu_time_min;
-            npu_time_max = (npu_time > npu_time_max) ? npu_time : npu_time_max;
-        }
-
-        // ------------------------------------------------------
-        // Print verification and timing results
-        // ------------------------------------------------------
-        cout << "   Total NPU time: " << npu_time_total << "us." << endl;
-        cout << "   Avg NPU time: " << npu_time_total / n_iterations << "us." << endl;    
-        cout << "   Min NPU time: " << npu_time_min << "us." << endl;
-        cout << "   Max NPU time: " << npu_time_max << "us." << endl;
-        cout << "   Average Power of CPU: " << total_cpu_power/n_iterations << "W" << endl;
-        cout << "   Average Power of Core: " << total_core_power/n_iterations << "W" << endl;
+        frequencies.push_back(frequency);
     }
+    writeVectorToCSV("inputs/frequencies.csv", frequencies);
+    writeColumnsToCSV("inputs/visibilitiesReal.csv", visibiltiesReal);
+    writeColumnsToCSV("inputs/visibilitiesImag.csv", visibiltiesImag);
+    
 }
