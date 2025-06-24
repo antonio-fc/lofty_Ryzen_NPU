@@ -1,0 +1,5 @@
+torch
+torchviz
+ipykernel
+torchvision
+torchview

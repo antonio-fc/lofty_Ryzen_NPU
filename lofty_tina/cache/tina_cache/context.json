@@ -1,0 +1,918 @@
+{
+ "config": {
+  "passes": [
+   {
+    "name": "init",
+    "plugin": "vaip-pass_init"
+   },
+   {
+    "name": "vaiml",
+    "plugin": "vaip-pass_vaiml",
+    "passVaimlParam": {
+     "subPass": [
+      {
+       "name": "fuse_DPU",
+       "plugin": "vaip-pass_level1_dpu",
+       "passDpuParam": {
+        "subPass": [
+         {
+          "name": "convert_ending_blacklist_ops_to_unknown_op",
+          "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op"
+         },
+         {
+          "name": "dynamic_input_batch",
+          "plugin": "vaip-pass_dynamic_input_batch"
+         },
+         {
+          "name": "create_const_op",
+          "plugin": "vaip-pass_create_const_op"
+         },
+         {
+          "name": "convert_split_to_xir",
+          "plugin": "vaip-pass_convert_split_to_xir_op"
+         },
+         {
+          "name": "to_xir",
+          "plugin": "vaip-pass_to_xir_ops"
+         },
+         {
+          "name": "convert_pad",
+          "plugin": "vaip-pass_convert_pad",
+          "enableGc": true
+         },
+         {
+          "name": "convert_in_to_gn",
+          "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+          "enableGc": true
+         },
+         {
+          "name": "remove_extra_q_dq",
+          "plugin": "vaip-pass_remove_extra_q_dq"
+         },
+         {
+          "name": "merge_add_into_conv_bias",
+          "plugin": "vaip-pass_merge_add_into_conv_bias"
+         },
+         {
+          "name": "merge_fix",
+          "plugin": "vaip-pass_merge_fix",
+          "enableGc": true
+         },
+         {
+          "name": "layoutransform",
+          "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+         },
+         {
+          "name": "gc_after_layout_transform",
+          "plugin": "vaip-pass_remove_isolated_node"
+         },
+         {
+          "name": "fuse_transpose",
+          "plugin": "vaip-pass_fuse_transpose",
+          "enableGc": true
+         },
+         {
+          "name": "gc_after_fuse_transpose",
+          "plugin": "vaip-pass_remove_isolated_node"
+         },
+         {
+          "name": "remove_identity",
+          "plugin": "vaip-pass_remove_identity",
+          "logVerbosity": 1
+         },
+         {
+          "name": "add_fix_after_const",
+          "plugin": "vaip-pass_const_add_fix"
+         },
+         {
+          "name": "remove_reshape_fix",
+          "plugin": "vaip-pass_py_ext",
+          "disabled": true,
+          "pyExt": {
+           "moduleName": "voe.passes.remove_reshape_fix",
+           "methodName": "rules"
+          }
+         },
+         {
+          "name": "const_fold_batchnorm_to_scale",
+          "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+         },
+         {
+          "name": "const_fold_transpose",
+          "plugin": "vaip-pass_const_fold_transpose"
+         },
+         {
+          "name": "merge_pad",
+          "plugin": "vaip-pass_merge_pad"
+         },
+         {
+          "name": "merge_hard_sigmoid",
+          "plugin": "vaip-pass_merge_hard_sigmoid"
+         },
+         {
+          "name": "merge_mul",
+          "plugin": "vaip-pass_merge_mul",
+          "enableGc": true
+         },
+         {
+          "name": "merge_consecutive_fix",
+          "plugin": "vaip-pass_merge_consecutive_fix",
+          "enableLog": true,
+          "logVerbosity": 1,
+          "disabled": true
+         },
+         {
+          "name": "convert_softmax_to_hard_softmax",
+          "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+          "disabled": true
+         },
+         {
+          "name": "merge_fix_fix_transpose",
+          "plugin": "vaip-pass_merge_fix_fix_transpose",
+          "enableGc": true,
+          "disabled": true
+         },
+         {
+          "name": "final_gc",
+          "plugin": "vaip-pass_remove_isolated_node"
+         }
+        ],
+        "xcompilerAttrs": {
+         "opt_level": {
+          "uintValue": 0
+         },
+         "debug_mode": {
+          "stringValue": "performance"
+         },
+         "disable_std_quant": {
+          "boolValue": false
+         },
+         "dump_subgraph_ops": {
+          "boolValue": false
+         },
+         "enable_fast_pm": {
+          "boolValue": true
+         },
+         "profile": {
+          "uintValue": 0
+         },
+         "dpu_subgraph_num": {
+          "uintValue": 32
+         }
+        },
+        "minimumNumOfConv": 2,
+        "xclbin": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\xclbins\\phoenix\\1x4.xclbin",
+        "debug": false
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "cacheDir": "C:\\Users\\mruiz\\npucloud_userdata\\antonio-fortanet-capetillo-tudelft\\ryzenaisw\\cache",
+  "cacheKey": "tina_cache",
+  "version": {
+   "versionInfos": [
+    {
+     "packageName": "vaip",
+     "commit": "21a19bc7c475b1b4425adf61a5a354d18d71de03",
+     "version": "vaip.1.0.0"
+    },
+    {
+     "packageName": "target_factory",
+     "commit": "eb02abd5540f2917fde2d36f4e7cd6beb67b026c",
+     "version": "target-factory.3.5.0"
+    },
+    {
+     "packageName": "vart",
+     "commit": "2eb194d81b8b027b4ad435a9925f45519ed88a7e",
+     "version": "vart"
+    },
+    {
+     "packageName": "xcompiler",
+     "commit": "cac870047906a98dbded73838bf285c09e5e6d53",
+     "version": "xcompiler.3.5.0"
+    },
+    {
+     "packageName": "onnxrutnime",
+     "commit": "5c1b7ccbff7e5141c1da7a9d963d660e5741c319",
+     "version": "onnxruntime.1.20.1"
+    },
+    {
+     "packageName": "xir",
+     "commit": "67ef0dad98acdbd8750d0df34031394b349d305d",
+     "version": "xir.3.5.0"
+    },
+    {
+     "packageName": "xrt",
+     "commit": "f62307ddadf65b54acbed420a9f0edc415fefafc",
+     "version": "xrt.2.19.0"
+    },
+    {
+     "packageName": "graph_engine",
+     "commit": "d7385f8afa5f6eb7d5d4452749b0e07bce67b75b",
+     "version": "graph_engine"
+    }
+   ]
+  },
+  "onnxPath": "N/A",
+  "sessionOptions": {
+   "config_file": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\vaip_config.json",
+   "xclbin": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\xclbins\\phoenix\\1x4.xclbin"
+  },
+  "targets": [
+   {
+    "name": "RyzenAI_vision_config_1",
+    "pass": [
+     "init",
+     "vaiml"
+    ]
+   },
+   {
+    "name": "RyzenAI_shell_config_1",
+    "pass": [
+     "init",
+     "fuse_DPU",
+     "vaip_pass_dd_merge_qop",
+     "vaip_pass_dd_merge_dqop",
+     "vaip_pass_dd_merge_qop_onnx",
+     "vaip_pass_dd_merge_dqop_onnx"
+    ],
+    "xclbin": "AMD_AIE2P_2x4x1_Overlay.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "profile": {
+       "uintValue": 0
+      },
+      "enable_mergesync": {
+       "boolValue": true
+      },
+      "enable_weights_prefetch": {
+       "boolValue": true
+      },
+      "opt_level": {
+       "uintValue": 3
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "enable_cost_model_tiling": {
+       "boolValue": true
+      }
+     }
+    },
+    "shareHwContext": true,
+    "graphEngineQosPriority": 640
+   },
+   {
+    "name": "RyzenAI_vision_config_2",
+    "pass": [
+     "init",
+     "fuse_DPU"
+    ],
+    "xclbin": "1x4.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "dump_subgraph_ops": {
+       "boolValue": false
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 16
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "opt_level": {
+       "uintValue": 0
+      },
+      "disable_std_quant": {
+       "boolValue": false
+      },
+      "profile": {
+       "uintValue": 0
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_vision_config_3",
+    "pass": [
+     "init",
+     "fuse_DPU"
+    ],
+    "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "opt_level": {
+       "uintValue": 65536
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_vision_config_3_mha",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA"
+    ],
+    "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "advanced_opt": {
+       "boolValue": true
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_transformer_config_2",
+    "pass": [
+     "init",
+     "fuse_dynamic_dispatch"
+    ],
+    "xclbin": "4x2_psf_model_a8w8_qdq.xclbin"
+   },
+   {
+    "name": "RyzenAI_xcompiler_and_dd_config",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA",
+     "fuse_dynamic_dispatch"
+    ],
+    "xclbin": "2x4x2_pss_pst_model_mha_qdq.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "advanced_opt": {
+       "boolValue": true
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "opt_level": {
+       "uintValue": 65536
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_transformer_cxx_pss_pst",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA",
+     "fuse_dynamic_dispatch_pss_pst"
+    ],
+    "xclbin": "2x4x2_pss_pst_4x2_psq_model_qdq.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "advanced_opt": {
+       "boolValue": true
+      }
+     }
+    },
+    "shareHwContext": true
+   },
+   {
+    "name": "VAIML-x2.0-a3",
+    "pass": [
+     "init",
+     "fuse_DPU_VAIML-x2.0"
+    ]
+   },
+   {
+    "name": "VAIML-x2.0-Procyon",
+    "pass": [
+     "init",
+     "fuse_DPU_VAIML-x2.0"
+    ],
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "enable_qdq_force_xint": {
+       "boolValue": true
+      },
+      "enable_mergesync": {
+       "boolValue": true
+      }
+     }
+    }
+   }
+  ],
+  "target": "RyzenAI_vision_config_1",
+  "onnxMd5A": "7934b839c04bb37aaa49d0de67300670",
+  "onnxMd5B": "8bbbfdef99beee1edb3529bfa18fd745",
+  "mepTable": [
+   {
+    "modelName": "a3",
+    "md5sumOnDisk": "73ecb2594935fb9bd02707930610f29e",
+    "md5sumInMemory": "f59151f8b67a7b8f1a8bcc7798558c33",
+    "target": "VAIML-x2.0-a3",
+    "md5sumInMemoryWithIo": "39b422f40bcb60bbd20be835097256c2"
+   },
+   {
+    "modelName": "DeepLabV3",
+    "md5sumOnDisk": "10a644c6da6b1121f807794506b7e5cc",
+    "md5sumInMemory": "849608d568bbc54380833c9446299989",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "99f39afbf868542fb575023123c98001"
+   },
+   {
+    "modelName": "inceptionv4",
+    "md5sumOnDisk": "42c48a7086ba34889699862d98844e62",
+    "md5sumInMemory": "591d2dc2a27f04111e1b14fbf4222d51",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "3d6d80d6c60811089ced3bf6abb42cdc"
+   },
+   {
+    "modelName": "MobileNet_V3",
+    "md5sumOnDisk": "5bbc61c013f20b6563c62523100fa2ee",
+    "md5sumInMemory": "0bcec05d638535092032784dcca2cce3",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "1506de83ac617b0903613ca420061e84"
+   },
+   {
+    "modelName": "ResNet50",
+    "md5sumOnDisk": "c22b773b35f2ce62932578cc5eec867b",
+    "md5sumInMemory": "b307088b2bf693c51d8ea399247d8139",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "1bea49f637b8f9f0ec80bc44c6d841bb"
+   },
+   {
+    "modelName": "YoloV3",
+    "md5sumOnDisk": "2657be600da90313ca9d32c03bd11835",
+    "md5sumInMemory": "7646f3796c4d98cfa53650482148734a",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "14b71beebb0c98f291bdda3e7843cb1a"
+   }
+  ],
+  "enableCacheFileIoInMem": true
+ },
+ "events": [
+  {
+   "name": "before_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "3976",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "887275520",
+     "currentMemoryInBytes": "75563008"
+    }
+   },
+   "dur": "28370"
+  },
+  {
+   "id": "before_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "3976",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "34e2c000",
+      "current_memory": "346a0000"
+     }
+    }
+   }
+  },
+  {
+   "id": "before_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "32346",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38eb0000"
+     }
+    }
+   }
+  },
+  {
+   "name": "check_cache_hit",
+   "ph": "X",
+   "ts": "32384",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1030422528",
+     "currentMemoryInBytes": "4096"
+    }
+   },
+   "dur": "100"
+  },
+  {
+   "id": "check_cache_hit_mem_usage_1",
+   "ph": "v",
+   "ts": "32384",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38eb7000"
+     }
+    }
+   }
+  },
+  {
+   "id": "check_cache_hit_mem_usage_2",
+   "ph": "v",
+   "ts": "32484",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38eb8000"
+     }
+    }
+   }
+  },
+  {
+   "name": "0-init@vaip-pass_init",
+   "ph": "X",
+   "ts": "32515",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1030422528",
+     "currentMemoryInBytes": "8192"
+    }
+   },
+   "dur": "6"
+  },
+  {
+   "id": "0-init@vaip-pass_init_mem_usage_1",
+   "ph": "v",
+   "ts": "32515",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38ec1000"
+     }
+    }
+   }
+  },
+  {
+   "id": "0-init@vaip-pass_init_mem_usage_2",
+   "ph": "v",
+   "ts": "32522",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38ec3000"
+     }
+    }
+   }
+  },
+  {
+   "name": "2-fuse_DPU@vaip-pass_level1_dpu",
+   "ph": "X",
+   "ts": "32533",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1030422528",
+     "currentMemoryInBytes": "16384"
+    }
+   },
+   "dur": "24333"
+  },
+  {
+   "id": "2-fuse_DPU@vaip-pass_level1_dpu_mem_usage_1",
+   "ph": "v",
+   "ts": "32533",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38ec4000"
+     }
+    }
+   }
+  },
+  {
+   "id": "2-fuse_DPU@vaip-pass_level1_dpu_mem_usage_2",
+   "ph": "v",
+   "ts": "56867",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38ec8000"
+     }
+    }
+   }
+  },
+  {
+   "name": "1-vaiml@vaip-pass_vaiml",
+   "ph": "X",
+   "ts": "32527",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1030422528",
+     "currentMemoryInBytes": "20480"
+    }
+   },
+   "dur": "24370"
+  },
+  {
+   "id": "1-vaiml@vaip-pass_vaiml_mem_usage_1",
+   "ph": "v",
+   "ts": "32527",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38ec3000"
+     }
+    }
+   }
+  },
+  {
+   "id": "1-vaiml@vaip-pass_vaiml_mem_usage_2",
+   "ph": "v",
+   "ts": "56897",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38ec8000"
+     }
+    }
+   }
+  },
+  {
+   "name": "update_cache",
+   "ph": "X",
+   "ts": "32489",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1030422528",
+     "currentMemoryInBytes": "69632"
+    }
+   },
+   "dur": "24591"
+  },
+  {
+   "id": "update_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "32489",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "3d6b0000",
+      "current_memory": "38eb8000"
+     }
+    }
+   }
+  },
+  {
+   "id": "update_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "57081",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38ec9000"
+     }
+    }
+   }
+  },
+  {
+   "name": "read_cache",
+   "ph": "X",
+   "ts": "58915",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1106018304",
+     "currentMemoryInBytes": "270336"
+    }
+   },
+   "dur": "2234"
+  },
+  {
+   "id": "read_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "58915",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38edf000"
+     }
+    }
+   }
+  },
+  {
+   "id": "read_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "61149",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38f21000"
+     }
+    }
+   }
+  },
+  {
+   "name": "after_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "61161",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1106018304",
+     "currentMemoryInBytes": "-75468800"
+    }
+   },
+   "dur": "6948"
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "61161",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "38f21000"
+     }
+    }
+   }
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "68109",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "34728000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "3974",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "887275520",
+     "currentMemoryInBytes": "557056"
+    }
+   },
+   "dur": "64150"
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "3974",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "34e2c000",
+      "current_memory": "346a0000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "68125",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "34728000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_3",
+   "ph": "X",
+   "ts": "3193",
+   "pid": "15240",
+   "tid": "7924",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "887275520",
+     "currentMemoryInBytes": "557056"
+    }
+   },
+   "dur": "65086"
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_1",
+   "ph": "v",
+   "ts": "3193",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "34e2c000",
+      "current_memory": "346a0000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_2",
+   "ph": "v",
+   "ts": "68279",
+   "pid": "15240",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "41ec8000",
+      "current_memory": "34728000"
+     }
+    }
+   }
+  }
+ ],
+ "cpuUsage": [
+  {
+   "avgCpuUtil": 5.06329107,
+   "memPeakWorkingSetSize": 1054.78125
+  }
+ ],
+ "cacheFiles": [
+  "context.json"
+ ]
+}

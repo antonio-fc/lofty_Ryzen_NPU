@@ -1,0 +1,3233 @@
+{
+ "metaDef": [
+  {
+   "id": "subgraph_(/Constant_output_0_DequantizeLinear_Output_vaip_24)",
+   "inputs": [
+    "input_QuantizeLinear_Output"
+   ],
+   "outputs": [
+    "output_QuantizeLinear_Output"
+   ],
+   "nodes": [
+    "output_QuantizeLinear_Output",
+    "output_QuantizeLinear_Input",
+    "/relu_3/Relu_output_0_DequantizeLinear_Output",
+    "/relu_3/Relu_output_0_QuantizeLinear_Output",
+    "/relu_3/Relu_output_0",
+    "/conv4/Conv_output_0",
+    "/relu_2/Relu_output_0_DequantizeLinear_Output",
+    "/relu_2/Relu_output_0_QuantizeLinear_Output",
+    "/relu_2/Relu_output_0",
+    "/conv3/Conv_output_0",
+    "/relu_1/Relu_output_0_DequantizeLinear_Output",
+    "/relu_1/Relu_output_0_QuantizeLinear_Output",
+    "/relu_1/Relu_output_0",
+    "/conv2/Conv_output_0",
+    "/relu/Relu_output_0_DequantizeLinear_Output",
+    "/relu/Relu_output_0_QuantizeLinear_Output",
+    "/relu/Relu_output_0",
+    "/conv1/Conv_output_0",
+    "input_DequantizeLinear_Output",
+    "conv1.weight_DequantizeLinear_Output",
+    "conv1.bias_DequantizeLinear_Output",
+    "conv2.weight_DequantizeLinear_Output",
+    "conv2.bias_DequantizeLinear_Output",
+    "conv3.weight_DequantizeLinear_Output",
+    "conv3.bias_DequantizeLinear_Output",
+    "conv4.weight_DequantizeLinear_Output",
+    "conv4.bias_DequantizeLinear_Output",
+    "/Constant_output_0_DequantizeLinear_Output"
+   ],
+   "constantInitializers": [
+    "/Constant_output_0_quantized",
+    "/Constant_output_0_zero_point",
+    "/relu/Relu_output_0_scale",
+    "/relu/Relu_output_0_zero_point",
+    "/relu_1/Relu_output_0_scale",
+    "/relu_1/Relu_output_0_zero_point",
+    "/relu_2/Relu_output_0_zero_point",
+    "/relu_3/Relu_output_0_scale",
+    "/relu_3/Relu_output_0_zero_point",
+    "conv1.bias_quantized",
+    "conv1.bias_zero_point",
+    "conv1.weight_quantized",
+    "conv1.weight_scale",
+    "conv1.weight_zero_point",
+    "conv2.bias_quantized",
+    "conv2.bias_zero_point",
+    "conv2.weight_quantized",
+    "conv2.weight_zero_point",
+    "conv3.bias_quantized",
+    "conv3.bias_scale",
+    "conv3.bias_zero_point",
+    "conv3.weight_quantized",
+    "conv3.weight_zero_point",
+    "conv4.bias_quantized",
+    "conv4.bias_zero_point",
+    "conv4.weight_quantized",
+    "conv4.weight_scale",
+    "conv4.weight_zero_point",
+    "input_scale",
+    "input_zero_point",
+    "output_zero_point"
+   ],
+   "device": "DPU",
+   "dpuParam": {
+    "compiledXmodel": "compiled.0x8000205000c9d3d.xmodel",
+    "subgraphName": "subgraph_(/Constant_output_0_DequantizeLinear_Output_vaip_24)",
+    "inputSchedule": [
+     {
+      "fromTbParam": {
+       "tbType": "ONNX_INPUT",
+       "tensorName": "input_QuantizeLinear_Output"
+      },
+      "toTbParam": {
+       "tbType": "XIR_INPUT",
+       "tensorName": "(input_DequantizeLinear_Output)"
+      }
+     }
+    ],
+    "outputSchedule": [
+     {
+      "fromTbParam": {
+       "tbType": "XIR_OUTPUT",
+       "tensorName": "(output)_inserted_fix_1"
+      },
+      "toTbParam": {
+       "tbType": "ONNX_OUTPUT",
+       "tensorName": "output_QuantizeLinear_Output",
+       "onnxShape": [
+        "-1",
+        "256",
+        "224",
+        "224"
+       ]
+      }
+     }
+    ],
+    "xclbin": "C:\\Users\\mruiz\\npucloud_userdata\\antonio-fortanet-capetillo-tudelft\\ryzenaisw\\cache\\hello_cache\\1x4.xclbin"
+   }
+  }
+ ],
+ "config": {
+  "passes": [
+   {
+    "name": "init",
+    "plugin": "vaip-pass_init"
+   },
+   {
+    "name": "vaiml",
+    "plugin": "vaip-pass_vaiml",
+    "passVaimlParam": {
+     "subPass": [
+      {
+       "name": "fuse_DPU",
+       "plugin": "vaip-pass_level1_dpu",
+       "passDpuParam": {
+        "subPass": [
+         {
+          "name": "convert_ending_blacklist_ops_to_unknown_op",
+          "plugin": "vaip-pass_convert_ending_blacklist_ops_to_unknown_op"
+         },
+         {
+          "name": "dynamic_input_batch",
+          "plugin": "vaip-pass_dynamic_input_batch"
+         },
+         {
+          "name": "create_const_op",
+          "plugin": "vaip-pass_create_const_op"
+         },
+         {
+          "name": "convert_split_to_xir",
+          "plugin": "vaip-pass_convert_split_to_xir_op"
+         },
+         {
+          "name": "to_xir",
+          "plugin": "vaip-pass_to_xir_ops"
+         },
+         {
+          "name": "convert_pad",
+          "plugin": "vaip-pass_convert_pad",
+          "enableGc": true
+         },
+         {
+          "name": "convert_in_to_gn",
+          "plugin": "vaip-pass_convert_instancenorm_to_groupnorm",
+          "enableGc": true
+         },
+         {
+          "name": "remove_extra_q_dq",
+          "plugin": "vaip-pass_remove_extra_q_dq"
+         },
+         {
+          "name": "merge_add_into_conv_bias",
+          "plugin": "vaip-pass_merge_add_into_conv_bias"
+         },
+         {
+          "name": "merge_fix",
+          "plugin": "vaip-pass_merge_fix",
+          "enableGc": true
+         },
+         {
+          "name": "layoutransform",
+          "plugin": "vaip-pass_layout_transform_via_adding_transpose"
+         },
+         {
+          "name": "gc_after_layout_transform",
+          "plugin": "vaip-pass_remove_isolated_node"
+         },
+         {
+          "name": "fuse_transpose",
+          "plugin": "vaip-pass_fuse_transpose",
+          "enableGc": true
+         },
+         {
+          "name": "gc_after_fuse_transpose",
+          "plugin": "vaip-pass_remove_isolated_node"
+         },
+         {
+          "name": "remove_identity",
+          "plugin": "vaip-pass_remove_identity",
+          "logVerbosity": 1
+         },
+         {
+          "name": "add_fix_after_const",
+          "plugin": "vaip-pass_const_add_fix"
+         },
+         {
+          "name": "remove_reshape_fix",
+          "plugin": "vaip-pass_py_ext",
+          "disabled": true,
+          "pyExt": {
+           "moduleName": "voe.passes.remove_reshape_fix",
+           "methodName": "rules"
+          }
+         },
+         {
+          "name": "const_fold_batchnorm_to_scale",
+          "plugin": "vaip-pass_const_fold_batchnorm_to_scale"
+         },
+         {
+          "name": "const_fold_transpose",
+          "plugin": "vaip-pass_const_fold_transpose"
+         },
+         {
+          "name": "merge_pad",
+          "plugin": "vaip-pass_merge_pad"
+         },
+         {
+          "name": "merge_hard_sigmoid",
+          "plugin": "vaip-pass_merge_hard_sigmoid"
+         },
+         {
+          "name": "merge_mul",
+          "plugin": "vaip-pass_merge_mul",
+          "enableGc": true
+         },
+         {
+          "name": "merge_consecutive_fix",
+          "plugin": "vaip-pass_merge_consecutive_fix",
+          "enableLog": true,
+          "logVerbosity": 1,
+          "disabled": true
+         },
+         {
+          "name": "convert_softmax_to_hard_softmax",
+          "plugin": "vaip-pass_convert_softmax_to_hard_softmax",
+          "disabled": true
+         },
+         {
+          "name": "merge_fix_fix_transpose",
+          "plugin": "vaip-pass_merge_fix_fix_transpose",
+          "enableGc": true,
+          "disabled": true
+         },
+         {
+          "name": "final_gc",
+          "plugin": "vaip-pass_remove_isolated_node"
+         }
+        ],
+        "xcompilerAttrs": {
+         "profile": {
+          "uintValue": 0
+         },
+         "dump_subgraph_ops": {
+          "boolValue": false
+         },
+         "disable_std_quant": {
+          "boolValue": false
+         },
+         "dpu_subgraph_num": {
+          "uintValue": 32
+         },
+         "opt_level": {
+          "uintValue": 0
+         },
+         "debug_mode": {
+          "stringValue": "performance"
+         },
+         "enable_fast_pm": {
+          "boolValue": true
+         }
+        },
+        "minimumNumOfConv": 2,
+        "xclbin": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\xclbins\\phoenix\\1x4.xclbin",
+        "debug": false
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "cacheDir": "C:\\Users\\mruiz\\npucloud_userdata\\antonio-fortanet-capetillo-tudelft\\ryzenaisw\\cache",
+  "cacheKey": "hello_cache",
+  "version": {
+   "versionInfos": [
+    {
+     "packageName": "vaip",
+     "commit": "21a19bc7c475b1b4425adf61a5a354d18d71de03",
+     "version": "vaip.1.0.0"
+    },
+    {
+     "packageName": "target_factory",
+     "commit": "eb02abd5540f2917fde2d36f4e7cd6beb67b026c",
+     "version": "target-factory.3.5.0"
+    },
+    {
+     "packageName": "vart",
+     "commit": "2eb194d81b8b027b4ad435a9925f45519ed88a7e",
+     "version": "vart"
+    },
+    {
+     "packageName": "xcompiler",
+     "commit": "cac870047906a98dbded73838bf285c09e5e6d53",
+     "version": "xcompiler.3.5.0"
+    },
+    {
+     "packageName": "onnxrutnime",
+     "commit": "5c1b7ccbff7e5141c1da7a9d963d660e5741c319",
+     "version": "onnxruntime.1.20.1"
+    },
+    {
+     "packageName": "xir",
+     "commit": "67ef0dad98acdbd8750d0df34031394b349d305d",
+     "version": "xir.3.5.0"
+    },
+    {
+     "packageName": "xrt",
+     "commit": "f62307ddadf65b54acbed420a9f0edc415fefafc",
+     "version": "xrt.2.19.0"
+    },
+    {
+     "packageName": "graph_engine",
+     "commit": "d7385f8afa5f6eb7d5d4452749b0e07bce67b75b",
+     "version": "graph_engine"
+    }
+   ]
+  },
+  "onnxPath": "N/A",
+  "sessionOptions": {
+   "config_file": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\vaip_config.json",
+   "xclbin": "C:\\Program Files\\RyzenAI\\1.4.1\\voe-4.0-win_amd64\\xclbins\\phoenix\\1x4.xclbin"
+  },
+  "targets": [
+   {
+    "name": "RyzenAI_vision_config_1",
+    "pass": [
+     "init",
+     "vaiml"
+    ]
+   },
+   {
+    "name": "RyzenAI_shell_config_1",
+    "pass": [
+     "init",
+     "fuse_DPU",
+     "vaip_pass_dd_merge_qop",
+     "vaip_pass_dd_merge_dqop",
+     "vaip_pass_dd_merge_qop_onnx",
+     "vaip_pass_dd_merge_dqop_onnx"
+    ],
+    "xclbin": "AMD_AIE2P_2x4x1_Overlay.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "opt_level": {
+       "uintValue": 3
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "profile": {
+       "uintValue": 0
+      },
+      "enable_cost_model_tiling": {
+       "boolValue": true
+      },
+      "enable_mergesync": {
+       "boolValue": true
+      },
+      "enable_weights_prefetch": {
+       "boolValue": true
+      }
+     }
+    },
+    "shareHwContext": true,
+    "graphEngineQosPriority": 640
+   },
+   {
+    "name": "RyzenAI_vision_config_2",
+    "pass": [
+     "init",
+     "fuse_DPU"
+    ],
+    "xclbin": "1x4.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "profile": {
+       "uintValue": 0
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 16
+      },
+      "dump_subgraph_ops": {
+       "boolValue": false
+      },
+      "disable_std_quant": {
+       "boolValue": false
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "opt_level": {
+       "uintValue": 0
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_vision_config_3",
+    "pass": [
+     "init",
+     "fuse_DPU"
+    ],
+    "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_vision_config_3_mha",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA"
+    ],
+    "xclbin": "AMD_AIE2P_4x4_Overlay_CFG2.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "advanced_opt": {
+       "boolValue": true
+      },
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_transformer_config_2",
+    "pass": [
+     "init",
+     "fuse_dynamic_dispatch"
+    ],
+    "xclbin": "4x2_psf_model_a8w8_qdq.xclbin"
+   },
+   {
+    "name": "RyzenAI_xcompiler_and_dd_config",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA",
+     "fuse_dynamic_dispatch"
+    ],
+    "xclbin": "2x4x2_pss_pst_model_mha_qdq.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "advanced_opt": {
+       "boolValue": true
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      },
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "debug_mode": {
+       "stringValue": "performance"
+      }
+     }
+    }
+   },
+   {
+    "name": "RyzenAI_transformer_cxx_pss_pst",
+    "pass": [
+     "init",
+     "fuse_DPU_MHA",
+     "fuse_dynamic_dispatch_pss_pst"
+    ],
+    "xclbin": "2x4x2_pss_pst_4x2_psq_model_qdq.xclbin",
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "debug_mode": {
+       "stringValue": "performance"
+      },
+      "enable_fast_pm": {
+       "boolValue": true
+      },
+      "opt_level": {
+       "uintValue": 65536
+      },
+      "advanced_opt": {
+       "boolValue": true
+      },
+      "dpu_subgraph_num": {
+       "uintValue": 1000
+      }
+     }
+    },
+    "shareHwContext": true
+   },
+   {
+    "name": "VAIML-x2.0-a3",
+    "pass": [
+     "init",
+     "fuse_DPU_VAIML-x2.0"
+    ]
+   },
+   {
+    "name": "VAIML-x2.0-Procyon",
+    "pass": [
+     "init",
+     "fuse_DPU_VAIML-x2.0"
+    ],
+    "targetOpts": {
+     "xcompilerAttrs": {
+      "enable_mergesync": {
+       "boolValue": true
+      },
+      "enable_qdq_force_xint": {
+       "boolValue": true
+      }
+     }
+    }
+   }
+  ],
+  "target": "RyzenAI_vision_config_1",
+  "onnxMd5A": "134af88e7b8113352b8993646fde6a67",
+  "onnxMd5B": "b650a6436c35820339c101f557d13572",
+  "mepTable": [
+   {
+    "modelName": "a3",
+    "md5sumOnDisk": "73ecb2594935fb9bd02707930610f29e",
+    "md5sumInMemory": "f59151f8b67a7b8f1a8bcc7798558c33",
+    "target": "VAIML-x2.0-a3",
+    "md5sumInMemoryWithIo": "39b422f40bcb60bbd20be835097256c2"
+   },
+   {
+    "modelName": "DeepLabV3",
+    "md5sumOnDisk": "10a644c6da6b1121f807794506b7e5cc",
+    "md5sumInMemory": "849608d568bbc54380833c9446299989",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "99f39afbf868542fb575023123c98001"
+   },
+   {
+    "modelName": "inceptionv4",
+    "md5sumOnDisk": "42c48a7086ba34889699862d98844e62",
+    "md5sumInMemory": "591d2dc2a27f04111e1b14fbf4222d51",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "3d6d80d6c60811089ced3bf6abb42cdc"
+   },
+   {
+    "modelName": "MobileNet_V3",
+    "md5sumOnDisk": "5bbc61c013f20b6563c62523100fa2ee",
+    "md5sumInMemory": "0bcec05d638535092032784dcca2cce3",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "1506de83ac617b0903613ca420061e84"
+   },
+   {
+    "modelName": "ResNet50",
+    "md5sumOnDisk": "c22b773b35f2ce62932578cc5eec867b",
+    "md5sumInMemory": "b307088b2bf693c51d8ea399247d8139",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "1bea49f637b8f9f0ec80bc44c6d841bb"
+   },
+   {
+    "modelName": "YoloV3",
+    "md5sumOnDisk": "2657be600da90313ca9d32c03bd11835",
+    "md5sumInMemory": "7646f3796c4d98cfa53650482148734a",
+    "target": "VAIML-x2.0-Procyon",
+    "md5sumInMemoryWithIo": "14b71beebb0c98f291bdda3e7843cb1a"
+   }
+  ],
+  "enableCacheFileIoInMem": true
+ },
+ "originNodes": {
+  "/relu_1/Relu_output_0_DequantizeLinear_Output_vaip_16": {
+   "name": "/relu_1/Relu_output_0_DequantizeLinear_Output_vaip_16",
+   "opType": "transpose",
+   "originNode": "/relu_1/Relu_output_0_DequantizeLinear_Output",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/conv1/Conv_output_0_vaip_3": {
+   "name": "/conv1/Conv_output_0_vaip_3",
+   "opType": "transpose",
+   "originNode": "/conv1/Conv_output_0",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "(output)_inserted_fix_1": {
+   "name": "(output)_inserted_fix_1",
+   "opType": "identity",
+   "originNode": "output"
+  },
+  "/relu_1/Relu_output_0_DequantizeLinear_Output_vaip_7": {
+   "name": "/relu_1/Relu_output_0_DequantizeLinear_Output_vaip_7",
+   "opType": "transpose",
+   "originNode": "/relu_1/Relu_output_0_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv2.weight_DequantizeLinear_Output_vaip_5": {
+   "name": "conv2.weight_DequantizeLinear_Output_vaip_5",
+   "opType": "transpose",
+   "originNode": "conv2.weight_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv3.bias_DequantizeLinear_Output_vaip_30": {
+   "name": "conv3.bias_DequantizeLinear_Output_vaip_30",
+   "opType": "fix",
+   "originNode": "conv3.bias_DequantizeLinear_Output",
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "11"
+    }
+   }
+  },
+  "/relu_2/Relu_output_0_DequantizeLinear_Output_vaip_10": {
+   "name": "/relu_2/Relu_output_0_DequantizeLinear_Output_vaip_10",
+   "opType": "transpose",
+   "originNode": "/relu_2/Relu_output_0_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/relu_2/Relu_output_0_vaip_17": {
+   "name": "/relu_2/Relu_output_0_vaip_17",
+   "opType": "transpose",
+   "originNode": "/relu_2/Relu_output_0",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/conv3/Conv_output_0_vaip_9": {
+   "name": "/conv3/Conv_output_0_vaip_9",
+   "opType": "transpose",
+   "originNode": "/conv3/Conv_output_0",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv2.bias_DequantizeLinear_Output_vaip_28": {
+   "name": "conv2.bias_DequantizeLinear_Output_vaip_28",
+   "opType": "fix",
+   "originNode": "conv2.bias_DequantizeLinear_Output",
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "11"
+    }
+   }
+  },
+  "(input_DequantizeLinear_Output)": {
+   "name": "(input_DequantizeLinear_Output)",
+   "opType": "identity",
+   "originNode": "input_DequantizeLinear_Output"
+  },
+  "conv4.weight_DequantizeLinear_Output_vaip_31": {
+   "name": "conv4.weight_DequantizeLinear_Output_vaip_31",
+   "opType": "fix",
+   "next": {
+    "name": "conv4.weight_DequantizeLinear_Output_vaip_11",
+    "opType": "transpose",
+    "originNode": "conv4.weight_DequantizeLinear_Output",
+    "pass": "layoutransform",
+    "attribute": {
+     "transposeAttr": {
+      "order": [
+       "0",
+       "2",
+       "3",
+       "1"
+      ]
+     }
+    }
+   },
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "12"
+    }
+   }
+  },
+  "conv3.weight_DequantizeLinear_Output_vaip_29": {
+   "name": "conv3.weight_DequantizeLinear_Output_vaip_29",
+   "opType": "fix",
+   "next": {
+    "name": "conv3.weight_DequantizeLinear_Output_vaip_8",
+    "opType": "transpose",
+    "originNode": "conv3.weight_DequantizeLinear_Output",
+    "pass": "layoutransform",
+    "attribute": {
+     "transposeAttr": {
+      "order": [
+       "0",
+       "2",
+       "3",
+       "1"
+      ]
+     }
+    }
+   },
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "11"
+    }
+   }
+  },
+  "conv1.weight_DequantizeLinear_Output_vaip_25": {
+   "name": "conv1.weight_DequantizeLinear_Output_vaip_25",
+   "opType": "fix",
+   "next": {
+    "name": "conv1.weight_DequantizeLinear_Output_vaip_2",
+    "opType": "transpose",
+    "originNode": "conv1.weight_DequantizeLinear_Output",
+    "pass": "layoutransform",
+    "attribute": {
+     "transposeAttr": {
+      "order": [
+       "0",
+       "2",
+       "3",
+       "1"
+      ]
+     }
+    }
+   },
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "9"
+    }
+   }
+  },
+  "input_DequantizeLinear_Output": {
+   "name": "input_DequantizeLinear_Output",
+   "opType": "identity",
+   "originNode": "input_DequantizeLinear_Output"
+  },
+  "input_QuantizeLinear_Output": {
+   "name": "input_QuantizeLinear_Output",
+   "opType": "identity",
+   "originNode": "input_QuantizeLinear_Output"
+  },
+  "/relu_2/Relu_output_0_DequantizeLinear_Output_vaip_18": {
+   "name": "/relu_2/Relu_output_0_DequantizeLinear_Output_vaip_18",
+   "opType": "transpose",
+   "originNode": "/relu_2/Relu_output_0_DequantizeLinear_Output",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/conv4/Conv_output_0_vaip_12": {
+   "name": "/conv4/Conv_output_0_vaip_12",
+   "opType": "transpose",
+   "originNode": "/conv4/Conv_output_0",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/Constant_output_0_DequantizeLinear_Output_vaip_21": {
+   "name": "/Constant_output_0_DequantizeLinear_Output_vaip_21",
+   "opType": "const",
+   "originNode": "/Constant_output_0_DequantizeLinear_Output",
+   "pass": "fuse_transpose"
+  },
+  "/relu/Relu_output_0_vaip_13": {
+   "name": "/relu/Relu_output_0_vaip_13",
+   "opType": "transpose",
+   "originNode": "/relu/Relu_output_0",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/relu/Relu_output_0_DequantizeLinear_Output_vaip_14": {
+   "name": "/relu/Relu_output_0_DequantizeLinear_Output_vaip_14",
+   "opType": "transpose",
+   "originNode": "/relu/Relu_output_0_DequantizeLinear_Output",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv3.weight_DequantizeLinear_Output_vaip_8": {
+   "name": "conv3.weight_DequantizeLinear_Output_vaip_8",
+   "opType": "transpose",
+   "originNode": "conv3.weight_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv4.weight_DequantizeLinear_Output_vaip_11": {
+   "name": "conv4.weight_DequantizeLinear_Output_vaip_11",
+   "opType": "transpose",
+   "originNode": "conv4.weight_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "output": {
+   "name": "output",
+   "opType": "identity",
+   "originNode": "output"
+  },
+  "conv2.weight_DequantizeLinear_Output_vaip_27": {
+   "name": "conv2.weight_DequantizeLinear_Output_vaip_27",
+   "opType": "fix",
+   "next": {
+    "name": "conv2.weight_DequantizeLinear_Output_vaip_5",
+    "opType": "transpose",
+    "originNode": "conv2.weight_DequantizeLinear_Output",
+    "pass": "layoutransform",
+    "attribute": {
+     "transposeAttr": {
+      "order": [
+       "0",
+       "2",
+       "3",
+       "1"
+      ]
+     }
+    }
+   },
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "11"
+    }
+   }
+  },
+  "output_vaip_23": {
+   "name": "output_vaip_23",
+   "opType": "transpose",
+   "originNode": "output",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/relu/Relu_output_0_DequantizeLinear_Output_vaip_4": {
+   "name": "/relu/Relu_output_0_DequantizeLinear_Output_vaip_4",
+   "opType": "transpose",
+   "originNode": "/relu/Relu_output_0_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/conv2/Conv_output_0_vaip_6": {
+   "name": "/conv2/Conv_output_0_vaip_6",
+   "opType": "transpose",
+   "originNode": "/conv2/Conv_output_0",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "/relu_3/Relu_output_0_vaip_19": {
+   "name": "/relu_3/Relu_output_0_vaip_19",
+   "opType": "transpose",
+   "originNode": "/relu_3/Relu_output_0",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv1.bias_DequantizeLinear_Output_vaip_26": {
+   "name": "conv1.bias_DequantizeLinear_Output_vaip_26",
+   "opType": "fix",
+   "originNode": "conv1.bias_DequantizeLinear_Output",
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "9"
+    }
+   }
+  },
+  "/relu_1/Relu_output_0_vaip_15": {
+   "name": "/relu_1/Relu_output_0_vaip_15",
+   "opType": "transpose",
+   "originNode": "/relu_1/Relu_output_0",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "input_DequantizeLinear_Output_vaip_1": {
+   "name": "input_DequantizeLinear_Output_vaip_1",
+   "opType": "transpose",
+   "originNode": "input_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv1.weight_DequantizeLinear_Output_vaip_2": {
+   "name": "conv1.weight_DequantizeLinear_Output_vaip_2",
+   "opType": "transpose",
+   "originNode": "conv1.weight_DequantizeLinear_Output",
+   "pass": "layoutransform",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "conv4.bias_DequantizeLinear_Output_vaip_32": {
+   "name": "conv4.bias_DequantizeLinear_Output_vaip_32",
+   "opType": "fix",
+   "originNode": "conv4.bias_DequantizeLinear_Output",
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "12"
+    }
+   }
+  },
+  "/Constant_output_0_DequantizeLinear_Output_vaip_24": {
+   "name": "/Constant_output_0_DequantizeLinear_Output_vaip_24",
+   "opType": "fix",
+   "next": {
+    "name": "/Constant_output_0_DequantizeLinear_Output_vaip_21",
+    "opType": "const",
+    "originNode": "/Constant_output_0_DequantizeLinear_Output",
+    "pass": "fuse_transpose"
+   },
+   "pass": "add_fix_after_const",
+   "attribute": {
+    "fixAttr": {
+     "fixPoint": "6"
+    }
+   }
+  },
+  "/relu_3/Relu_output_0_DequantizeLinear_Output_vaip_20": {
+   "name": "/relu_3/Relu_output_0_DequantizeLinear_Output_vaip_20",
+   "opType": "transpose",
+   "originNode": "/relu_3/Relu_output_0_DequantizeLinear_Output",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  },
+  "output_QuantizeLinear_Input_vaip_22": {
+   "name": "output_QuantizeLinear_Input_vaip_22",
+   "opType": "transpose",
+   "originNode": "output_QuantizeLinear_Input",
+   "pass": "fuse_transpose",
+   "attribute": {
+    "transposeAttr": {
+     "order": [
+      "0",
+      "2",
+      "3",
+      "1"
+     ]
+    }
+   }
+  }
+ },
+ "constDataInfo": {
+  "conv2.weight_quantized": {
+   "offset": "917",
+   "size": "18432",
+   "shape": [
+    "64",
+    "32",
+    "3",
+    "3"
+   ],
+   "type": 3
+  },
+  "conv4.weight_scale": {
+   "offset": "93275",
+   "size": "4",
+   "type": 1
+  },
+  "conv2.bias_zero_point": {
+   "offset": "19349",
+   "size": "1",
+   "type": 3
+  },
+  "conv2.bias_DequantizeLinear_Output_vaip_28": {
+   "offset": "465766",
+   "size": "256",
+   "shape": [
+    "64"
+   ],
+   "type": 1
+  },
+  "conv3.weight_DequantizeLinear_Output": {
+   "offset": "466022",
+   "size": "294912",
+   "shape": [
+    "128",
+    "64",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv3.bias_quantized": {
+   "offset": "93147",
+   "size": "128",
+   "shape": [
+    "128"
+   ],
+   "type": 3
+  },
+  "conv1.weight_DequantizeLinear_Output_vaip_25": {
+   "offset": "3490410",
+   "size": "3456",
+   "shape": [
+    "32",
+    "3",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv2.bias_quantized": {
+   "offset": "19350",
+   "size": "64",
+   "shape": [
+    "64"
+   ],
+   "type": 3
+  },
+  "conv2.bias_DequantizeLinear_Output": {
+   "offset": "465766",
+   "size": "256",
+   "shape": [
+    "64"
+   ],
+   "type": 1
+  },
+  "/relu_1/Relu_output_0_scale": {
+   "offset": "19414",
+   "size": "4",
+   "type": 1
+  },
+  "/Constant_output_0_zero_point": {
+   "offset": "388452",
+   "size": "1",
+   "type": 3
+  },
+  "conv1.bias_quantized": {
+   "size": "32",
+   "shape": [
+    "32"
+   ],
+   "type": 3
+  },
+  "conv4.bias_zero_point": {
+   "offset": "42",
+   "size": "1",
+   "type": 3
+  },
+  "conv2.weight_zero_point": {
+   "offset": "916",
+   "size": "1",
+   "type": 3
+  },
+  "conv1.weight_scale": {
+   "offset": "43",
+   "size": "4",
+   "type": 1
+  },
+  "conv3.bias_DequantizeLinear_Output": {
+   "offset": "760934",
+   "size": "512",
+   "shape": [
+    "128"
+   ],
+   "type": 1
+  },
+  "/Constant_output_0_DequantizeLinear_Output_vaip_21": {
+   "offset": "3493866",
+   "size": "4",
+   "shape": [
+    "1",
+    "1",
+    "1",
+    "1"
+   ],
+   "type": 1
+  },
+  "conv3.bias_DequantizeLinear_Output_vaip_30": {
+   "offset": "760934",
+   "size": "512",
+   "shape": [
+    "128"
+   ],
+   "type": 1
+  },
+  "conv4.weight_DequantizeLinear_Output_vaip_31": {
+   "offset": "1942122",
+   "size": "1179648",
+   "shape": [
+    "256",
+    "3",
+    "3",
+    "128"
+   ],
+   "type": 1
+  },
+  "/relu_3/Relu_output_0_scale": {
+   "offset": "388448",
+   "size": "4",
+   "type": 1
+  },
+  "conv3.weight_quantized": {
+   "offset": "19419",
+   "size": "73728",
+   "shape": [
+    "128",
+    "64",
+    "3",
+    "3"
+   ],
+   "type": 3
+  },
+  "/Constant_output_0_DequantizeLinear_Output": {
+   "offset": "1942118",
+   "size": "4",
+   "type": 1
+  },
+  "/Constant_output_0_quantized": {
+   "offset": "388453",
+   "size": "1",
+   "type": 3
+  },
+  "/relu/Relu_output_0_scale": {
+   "offset": "912",
+   "size": "4",
+   "type": 1
+  },
+  "conv2.weight_DequantizeLinear_Output_vaip_27": {
+   "offset": "3416682",
+   "size": "73728",
+   "shape": [
+    "64",
+    "3",
+    "3",
+    "32"
+   ],
+   "type": 1
+  },
+  "input_scale": {
+   "offset": "34",
+   "size": "4",
+   "type": 1
+  },
+  "conv1.weight_DequantizeLinear_Output_vaip_2": {
+   "offset": "3490410",
+   "size": "3456",
+   "shape": [
+    "32",
+    "3",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv3.bias_zero_point": {
+   "offset": "32",
+   "size": "1",
+   "type": 3
+  },
+  "conv4.bias_quantized": {
+   "offset": "388192",
+   "size": "256",
+   "shape": [
+    "256"
+   ],
+   "type": 3
+  },
+  "conv4.weight_DequantizeLinear_Output_vaip_11": {
+   "offset": "1942122",
+   "size": "1179648",
+   "shape": [
+    "256",
+    "3",
+    "3",
+    "128"
+   ],
+   "type": 1
+  },
+  "conv3.bias_scale": {
+   "offset": "38",
+   "size": "4",
+   "type": 1
+  },
+  "conv1.bias_DequantizeLinear_Output_vaip_26": {
+   "offset": "391910",
+   "size": "128",
+   "shape": [
+    "32"
+   ],
+   "type": 1
+  },
+  "conv2.weight_DequantizeLinear_Output_vaip_5": {
+   "offset": "3416682",
+   "size": "73728",
+   "shape": [
+    "64",
+    "3",
+    "3",
+    "32"
+   ],
+   "type": 1
+  },
+  "conv4.bias_DequantizeLinear_Output": {
+   "offset": "1941094",
+   "size": "1024",
+   "shape": [
+    "256"
+   ],
+   "type": 1
+  },
+  "conv3.weight_zero_point": {
+   "offset": "19418",
+   "size": "1",
+   "type": 3
+  },
+  "conv4.bias_DequantizeLinear_Output_vaip_32": {
+   "offset": "1941094",
+   "size": "1024",
+   "shape": [
+    "256"
+   ],
+   "type": 1
+  },
+  "conv1.weight_quantized": {
+   "offset": "47",
+   "size": "864",
+   "shape": [
+    "32",
+    "3",
+    "3",
+    "3"
+   ],
+   "type": 3
+  },
+  "conv3.weight_DequantizeLinear_Output_vaip_29": {
+   "offset": "3121770",
+   "size": "294912",
+   "shape": [
+    "128",
+    "3",
+    "3",
+    "64"
+   ],
+   "type": 1
+  },
+  "conv1.bias_DequantizeLinear_Output": {
+   "offset": "391910",
+   "size": "128",
+   "shape": [
+    "32"
+   ],
+   "type": 1
+  },
+  "conv4.weight_quantized": {
+   "offset": "93280",
+   "size": "294912",
+   "shape": [
+    "256",
+    "128",
+    "3",
+    "3"
+   ],
+   "type": 3
+  },
+  "conv2.weight_DequantizeLinear_Output": {
+   "offset": "392038",
+   "size": "73728",
+   "shape": [
+    "64",
+    "32",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv1.weight_DequantizeLinear_Output": {
+   "offset": "388454",
+   "size": "3456",
+   "shape": [
+    "32",
+    "3",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv4.weight_DequantizeLinear_Output": {
+   "offset": "761446",
+   "size": "1179648",
+   "shape": [
+    "256",
+    "128",
+    "3",
+    "3"
+   ],
+   "type": 1
+  },
+  "conv4.weight_zero_point": {
+   "offset": "93279",
+   "size": "1",
+   "type": 3
+  },
+  "conv3.weight_DequantizeLinear_Output_vaip_8": {
+   "offset": "3121770",
+   "size": "294912",
+   "shape": [
+    "128",
+    "3",
+    "3",
+    "64"
+   ],
+   "type": 1
+  },
+  "/Constant_output_0_DequantizeLinear_Output_vaip_24": {
+   "offset": "3493866",
+   "size": "4",
+   "shape": [
+    "1",
+    "1",
+    "1",
+    "1"
+   ],
+   "type": 1
+  },
+  "conv1.weight_zero_point": {
+   "offset": "33",
+   "size": "1",
+   "type": 3
+  },
+  "conv1.bias_zero_point": {
+   "offset": "911",
+   "size": "1",
+   "type": 3
+  }
+ },
+ "fixInfo": {
+  "conv3.weight_DequantizeLinear_Output": 11,
+  "conv4.weight_DequantizeLinear_Output": 12,
+  "conv2.weight_DequantizeLinear_Output": 11,
+  "conv3.bias_DequantizeLinear_Output": 11,
+  "conv3.weight_DequantizeLinear_Output_vaip_8": 11,
+  "conv1.weight_DequantizeLinear_Output": 9,
+  "conv1.weight_DequantizeLinear_Output_vaip_2": 9,
+  "/Constant_output_0_DequantizeLinear_Output_vaip_21": 6,
+  "conv2.bias_DequantizeLinear_Output": 11,
+  "conv4.weight_DequantizeLinear_Output_vaip_11": 12,
+  "conv2.weight_DequantizeLinear_Output_vaip_5": 11,
+  "/Constant_output_0_DequantizeLinear_Output": 6,
+  "conv4.bias_DequantizeLinear_Output": 12,
+  "conv1.bias_DequantizeLinear_Output": 9
+ },
+ "deviceSubgraphCount": {
+  "IPU": 1
+ },
+ "events": [
+  {
+   "name": "before_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "20676",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "1085440"
+    }
+   },
+   "dur": "1030"
+  },
+  {
+   "id": "before_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "20676",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ebb4000"
+     }
+    }
+   }
+  },
+  {
+   "id": "before_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "21707",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecbd000"
+     }
+    }
+   }
+  },
+  {
+   "name": "check_cache_hit",
+   "ph": "X",
+   "ts": "21731",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "4096"
+    }
+   },
+   "dur": "38"
+  },
+  {
+   "id": "check_cache_hit_mem_usage_1",
+   "ph": "v",
+   "ts": "21731",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecc4000"
+     }
+    }
+   }
+  },
+  {
+   "id": "check_cache_hit_mem_usage_2",
+   "ph": "v",
+   "ts": "21769",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecc5000"
+     }
+    }
+   }
+  },
+  {
+   "name": "0-init@vaip-pass_init",
+   "ph": "X",
+   "ts": "23373",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "8192"
+    }
+   },
+   "dur": "298"
+  },
+  {
+   "id": "0-init@vaip-pass_init_mem_usage_1",
+   "ph": "v",
+   "ts": "23373",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecce000"
+     }
+    }
+   }
+  },
+  {
+   "id": "0-init@vaip-pass_init_mem_usage_2",
+   "ph": "v",
+   "ts": "23671",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecd0000"
+     }
+    }
+   }
+  },
+  {
+   "name": "3-convert_ending_blacklist_ops_to_unknown_op@vaip-pass_convert_ending_blacklist_ops_to_unknown_op",
+   "ph": "X",
+   "ts": "28154",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "12"
+  },
+  {
+   "id": "3-convert_ending_blacklist_ops_to_unknown_op@vaip-pass_convert_ending_blacklist_ops_to_unknown_op_mem_usage_1",
+   "ph": "v",
+   "ts": "28154",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ed9d000"
+     }
+    }
+   }
+  },
+  {
+   "id": "3-convert_ending_blacklist_ops_to_unknown_op@vaip-pass_convert_ending_blacklist_ops_to_unknown_op_mem_usage_2",
+   "ph": "v",
+   "ts": "28166",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ed9d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "4-dynamic_input_batch@vaip-pass_dynamic_input_batch",
+   "ph": "X",
+   "ts": "28179",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "232"
+  },
+  {
+   "id": "4-dynamic_input_batch@vaip-pass_dynamic_input_batch_mem_usage_1",
+   "ph": "v",
+   "ts": "28179",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ed9d000"
+     }
+    }
+   }
+  },
+  {
+   "id": "4-dynamic_input_batch@vaip-pass_dynamic_input_batch_mem_usage_2",
+   "ph": "v",
+   "ts": "28411",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ed9d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "5-create_const_op@vaip-pass_create_const_op",
+   "ph": "X",
+   "ts": "28416",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "3960832"
+    }
+   },
+   "dur": "8877"
+  },
+  {
+   "id": "5-create_const_op@vaip-pass_create_const_op_mem_usage_1",
+   "ph": "v",
+   "ts": "28416",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ed9d000"
+     }
+    }
+   }
+  },
+  {
+   "id": "5-create_const_op@vaip-pass_create_const_op_mem_usage_2",
+   "ph": "v",
+   "ts": "37294",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f164000"
+     }
+    }
+   }
+  },
+  {
+   "name": "6-convert_split_to_xir@vaip-pass_convert_split_to_xir_op",
+   "ph": "X",
+   "ts": "37312",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "36864"
+    }
+   },
+   "dur": "1816"
+  },
+  {
+   "id": "6-convert_split_to_xir@vaip-pass_convert_split_to_xir_op_mem_usage_1",
+   "ph": "v",
+   "ts": "37312",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f164000"
+     }
+    }
+   }
+  },
+  {
+   "id": "6-convert_split_to_xir@vaip-pass_convert_split_to_xir_op_mem_usage_2",
+   "ph": "v",
+   "ts": "39128",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f16d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "7-to_xir@vaip-pass_to_xir_ops",
+   "ph": "X",
+   "ts": "39137",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "90112"
+    }
+   },
+   "dur": "2472"
+  },
+  {
+   "id": "7-to_xir@vaip-pass_to_xir_ops_mem_usage_1",
+   "ph": "v",
+   "ts": "39137",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f16d000"
+     }
+    }
+   }
+  },
+  {
+   "id": "7-to_xir@vaip-pass_to_xir_ops_mem_usage_2",
+   "ph": "v",
+   "ts": "41610",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f183000"
+     }
+    }
+   }
+  },
+  {
+   "name": "8-convert_pad@vaip-pass_convert_pad",
+   "ph": "X",
+   "ts": "41621",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "4096"
+    }
+   },
+   "dur": "358"
+  },
+  {
+   "id": "8-convert_pad@vaip-pass_convert_pad_mem_usage_1",
+   "ph": "v",
+   "ts": "41621",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f183000"
+     }
+    }
+   }
+  },
+  {
+   "id": "8-convert_pad@vaip-pass_convert_pad_mem_usage_2",
+   "ph": "v",
+   "ts": "41980",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f184000"
+     }
+    }
+   }
+  },
+  {
+   "name": "9-convert_in_to_gn@vaip-pass_convert_instancenorm_to_groupnorm",
+   "ph": "X",
+   "ts": "41984",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "8192"
+    }
+   },
+   "dur": "52"
+  },
+  {
+   "id": "9-convert_in_to_gn@vaip-pass_convert_instancenorm_to_groupnorm_mem_usage_1",
+   "ph": "v",
+   "ts": "41984",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f184000"
+     }
+    }
+   }
+  },
+  {
+   "id": "9-convert_in_to_gn@vaip-pass_convert_instancenorm_to_groupnorm_mem_usage_2",
+   "ph": "v",
+   "ts": "42037",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f186000"
+     }
+    }
+   }
+  },
+  {
+   "name": "10-remove_extra_q_dq@vaip-pass_remove_extra_q_dq",
+   "ph": "X",
+   "ts": "42041",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "12288"
+    }
+   },
+   "dur": "40"
+  },
+  {
+   "id": "10-remove_extra_q_dq@vaip-pass_remove_extra_q_dq_mem_usage_1",
+   "ph": "v",
+   "ts": "42041",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f186000"
+     }
+    }
+   }
+  },
+  {
+   "id": "10-remove_extra_q_dq@vaip-pass_remove_extra_q_dq_mem_usage_2",
+   "ph": "v",
+   "ts": "42081",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "name": "11-merge_add_into_conv_bias@vaip-pass_merge_add_into_conv_bias",
+   "ph": "X",
+   "ts": "42086",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "132"
+  },
+  {
+   "id": "11-merge_add_into_conv_bias@vaip-pass_merge_add_into_conv_bias_mem_usage_1",
+   "ph": "v",
+   "ts": "42086",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "id": "11-merge_add_into_conv_bias@vaip-pass_merge_add_into_conv_bias_mem_usage_2",
+   "ph": "v",
+   "ts": "42218",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "name": "12-merge_fix@vaip-pass_merge_fix",
+   "ph": "X",
+   "ts": "42223",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "768"
+  },
+  {
+   "id": "12-merge_fix@vaip-pass_merge_fix_mem_usage_1",
+   "ph": "v",
+   "ts": "42223",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "id": "12-merge_fix@vaip-pass_merge_fix_mem_usage_2",
+   "ph": "v",
+   "ts": "42991",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "name": "13-layoutransform@vaip-pass_layout_transform_via_adding_transpose",
+   "ph": "X",
+   "ts": "42997",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "20480"
+    }
+   },
+   "dur": "2340"
+  },
+  {
+   "id": "13-layoutransform@vaip-pass_layout_transform_via_adding_transpose_mem_usage_1",
+   "ph": "v",
+   "ts": "42997",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f189000"
+     }
+    }
+   }
+  },
+  {
+   "id": "13-layoutransform@vaip-pass_layout_transform_via_adding_transpose_mem_usage_2",
+   "ph": "v",
+   "ts": "45337",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f18e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "14-gc_after_layout_transform@vaip-pass_remove_isolated_node",
+   "ph": "X",
+   "ts": "45348",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "16"
+  },
+  {
+   "id": "14-gc_after_layout_transform@vaip-pass_remove_isolated_node_mem_usage_1",
+   "ph": "v",
+   "ts": "45348",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f18e000"
+     }
+    }
+   }
+  },
+  {
+   "id": "14-gc_after_layout_transform@vaip-pass_remove_isolated_node_mem_usage_2",
+   "ph": "v",
+   "ts": "45364",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f18e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "15-fuse_transpose@vaip-pass_fuse_transpose",
+   "ph": "X",
+   "ts": "45368",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "1716224"
+    }
+   },
+   "dur": "9069"
+  },
+  {
+   "id": "15-fuse_transpose@vaip-pass_fuse_transpose_mem_usage_1",
+   "ph": "v",
+   "ts": "45368",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f18e000"
+     }
+    }
+   }
+  },
+  {
+   "id": "15-fuse_transpose@vaip-pass_fuse_transpose_mem_usage_2",
+   "ph": "v",
+   "ts": "54438",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f331000"
+     }
+    }
+   }
+  },
+  {
+   "name": "16-gc_after_fuse_transpose@vaip-pass_remove_isolated_node",
+   "ph": "X",
+   "ts": "54450",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "13"
+  },
+  {
+   "id": "16-gc_after_fuse_transpose@vaip-pass_remove_isolated_node_mem_usage_1",
+   "ph": "v",
+   "ts": "54450",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f331000"
+     }
+    }
+   }
+  },
+  {
+   "id": "16-gc_after_fuse_transpose@vaip-pass_remove_isolated_node_mem_usage_2",
+   "ph": "v",
+   "ts": "54463",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f331000"
+     }
+    }
+   }
+  },
+  {
+   "name": "17-remove_identity@vaip-pass_remove_identity",
+   "ph": "X",
+   "ts": "54468",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "4096"
+    }
+   },
+   "dur": "388"
+  },
+  {
+   "id": "17-remove_identity@vaip-pass_remove_identity_mem_usage_1",
+   "ph": "v",
+   "ts": "54468",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f331000"
+     }
+    }
+   }
+  },
+  {
+   "id": "17-remove_identity@vaip-pass_remove_identity_mem_usage_2",
+   "ph": "v",
+   "ts": "54856",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "name": "18-add_fix_after_const@vaip-pass_const_add_fix",
+   "ph": "X",
+   "ts": "54862",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "628"
+  },
+  {
+   "id": "18-add_fix_after_const@vaip-pass_const_add_fix_mem_usage_1",
+   "ph": "v",
+   "ts": "54862",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "id": "18-add_fix_after_const@vaip-pass_const_add_fix_mem_usage_2",
+   "ph": "v",
+   "ts": "55491",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "name": "19-const_fold_batchnorm_to_scale@vaip-pass_const_fold_batchnorm_to_scale",
+   "ph": "X",
+   "ts": "55497",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "30"
+  },
+  {
+   "id": "19-const_fold_batchnorm_to_scale@vaip-pass_const_fold_batchnorm_to_scale_mem_usage_1",
+   "ph": "v",
+   "ts": "55497",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "id": "19-const_fold_batchnorm_to_scale@vaip-pass_const_fold_batchnorm_to_scale_mem_usage_2",
+   "ph": "v",
+   "ts": "55527",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "name": "20-const_fold_transpose@vaip-pass_const_fold_transpose",
+   "ph": "X",
+   "ts": "55531",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "8192"
+    }
+   },
+   "dur": "31"
+  },
+  {
+   "id": "20-const_fold_transpose@vaip-pass_const_fold_transpose_mem_usage_1",
+   "ph": "v",
+   "ts": "55531",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f332000"
+     }
+    }
+   }
+  },
+  {
+   "id": "20-const_fold_transpose@vaip-pass_const_fold_transpose_mem_usage_2",
+   "ph": "v",
+   "ts": "55562",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f334000"
+     }
+    }
+   }
+  },
+  {
+   "name": "21-merge_pad@vaip-pass_merge_pad",
+   "ph": "X",
+   "ts": "55566",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "4096"
+    }
+   },
+   "dur": "25"
+  },
+  {
+   "id": "21-merge_pad@vaip-pass_merge_pad_mem_usage_1",
+   "ph": "v",
+   "ts": "55566",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f334000"
+     }
+    }
+   }
+  },
+  {
+   "id": "21-merge_pad@vaip-pass_merge_pad_mem_usage_2",
+   "ph": "v",
+   "ts": "55591",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f335000"
+     }
+    }
+   }
+  },
+  {
+   "name": "22-merge_hard_sigmoid@vaip-pass_merge_hard_sigmoid",
+   "ph": "X",
+   "ts": "55596",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "25"
+  },
+  {
+   "id": "22-merge_hard_sigmoid@vaip-pass_merge_hard_sigmoid_mem_usage_1",
+   "ph": "v",
+   "ts": "55596",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f335000"
+     }
+    }
+   }
+  },
+  {
+   "id": "22-merge_hard_sigmoid@vaip-pass_merge_hard_sigmoid_mem_usage_2",
+   "ph": "v",
+   "ts": "55621",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f335000"
+     }
+    }
+   }
+  },
+  {
+   "name": "23-merge_mul@vaip-pass_merge_mul",
+   "ph": "X",
+   "ts": "55626",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "8192"
+    }
+   },
+   "dur": "372"
+  },
+  {
+   "id": "23-merge_mul@vaip-pass_merge_mul_mem_usage_1",
+   "ph": "v",
+   "ts": "55626",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f335000"
+     }
+    }
+   }
+  },
+  {
+   "id": "23-merge_mul@vaip-pass_merge_mul_mem_usage_2",
+   "ph": "v",
+   "ts": "55998",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f337000"
+     }
+    }
+   }
+  },
+  {
+   "name": "24-final_gc@vaip-pass_remove_isolated_node",
+   "ph": "X",
+   "ts": "56003",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128"
+    }
+   },
+   "dur": "13"
+  },
+  {
+   "id": "24-final_gc@vaip-pass_remove_isolated_node_mem_usage_1",
+   "ph": "v",
+   "ts": "56003",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f337000"
+     }
+    }
+   }
+  },
+  {
+   "id": "24-final_gc@vaip-pass_remove_isolated_node_mem_usage_2",
+   "ph": "v",
+   "ts": "56017",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2f337000"
+     }
+    }
+   }
+  },
+  {
+   "name": "2-fuse_DPU@vaip-pass_level1_dpu",
+   "ph": "X",
+   "ts": "23689",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "53882880"
+    }
+   },
+   "dur": "4137448"
+  },
+  {
+   "id": "2-fuse_DPU@vaip-pass_level1_dpu_mem_usage_1",
+   "ph": "v",
+   "ts": "23689",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecd1000"
+     }
+    }
+   }
+  },
+  {
+   "id": "2-fuse_DPU@vaip-pass_level1_dpu_mem_usage_2",
+   "ph": "v",
+   "ts": "4161138",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "32034000"
+     }
+    }
+   }
+  },
+  {
+   "name": "1-vaiml@vaip-pass_vaiml",
+   "ph": "X",
+   "ts": "23681",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "30355456"
+    }
+   },
+   "dur": "4141997"
+  },
+  {
+   "id": "1-vaiml@vaip-pass_vaiml_mem_usage_1",
+   "ph": "v",
+   "ts": "23681",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecd0000"
+     }
+    }
+   }
+  },
+  {
+   "id": "1-vaiml@vaip-pass_vaiml_mem_usage_2",
+   "ph": "v",
+   "ts": "4165678",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "309c3000"
+     }
+    }
+   }
+  },
+  {
+   "name": "update_cache",
+   "ph": "X",
+   "ts": "21774",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "30400512"
+    }
+   },
+   "dur": "4144015"
+  },
+  {
+   "id": "update_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "21774",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ecc5000"
+     }
+    }
+   }
+  },
+  {
+   "id": "update_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "4165790",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "309c3000"
+     }
+    }
+   }
+  },
+  {
+   "name": "read_cache",
+   "ph": "X",
+   "ts": "4171438",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1445330944",
+     "currentMemoryInBytes": "167936"
+    }
+   },
+   "dur": "5542"
+  },
+  {
+   "id": "read_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "4171438",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "309ff000"
+     }
+    }
+   }
+  },
+  {
+   "id": "read_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "4176980",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "30a28000"
+     }
+    }
+   }
+  },
+  {
+   "name": "after_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "4176992",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1445330944",
+     "currentMemoryInBytes": "-1445888"
+    }
+   },
+   "dur": "3094"
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "4176992",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "30a28000"
+     }
+    }
+   }
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "4180086",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "308c7000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "20675",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "30486528"
+    }
+   },
+   "dur": "4159425"
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "20675",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ebb4000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "4180100",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "308c7000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_3",
+   "ph": "X",
+   "ts": "19779",
+   "pid": "8088",
+   "tid": "14964",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "1088688128",
+     "currentMemoryInBytes": "30486528"
+    }
+   },
+   "dur": "4160473"
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_1",
+   "ph": "v",
+   "ts": "19779",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "40e41000",
+      "current_memory": "2ebb4000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_2",
+   "ph": "v",
+   "ts": "4180253",
+   "pid": "8088",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "56260000",
+      "current_memory": "308c7000"
+     }
+    }
+   }
+  },
+  {
+   "name": "read_cache",
+   "ph": "X",
+   "ts": "13298",
+   "pid": "5764",
+   "tid": "14564",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "6904688640",
+     "currentMemoryInBytes": "77824"
+    }
+   },
+   "dur": "4475"
+  },
+  {
+   "id": "read_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "13298",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4220b000"
+     }
+    }
+   }
+  },
+  {
+   "id": "read_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "17774",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4221e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "after_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "17786",
+   "pid": "5764",
+   "tid": "14564",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "6904688640",
+     "currentMemoryInBytes": "-18808832"
+    }
+   },
+   "dur": "2335"
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "17786",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4221e000"
+     }
+    }
+   }
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "20122",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4102e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "3012",
+   "pid": "5764",
+   "tid": "14564",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "6904688640",
+     "currentMemoryInBytes": "602112"
+    }
+   },
+   "dur": "17142"
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "3012",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "40f9b000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "20154",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4102e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_3",
+   "ph": "X",
+   "ts": "2047",
+   "pid": "5764",
+   "tid": "14564",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "6904688640",
+     "currentMemoryInBytes": "602112"
+    }
+   },
+   "dur": "18590"
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_1",
+   "ph": "v",
+   "ts": "2047",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "40f9b000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_2",
+   "ph": "v",
+   "ts": "20637",
+   "pid": "5764",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "19b8d3000",
+      "current_memory": "4102e000"
+     }
+    }
+   }
+  },
+  {
+   "name": "read_cache",
+   "ph": "X",
+   "ts": "13539",
+   "pid": "13432",
+   "tid": "13452",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "665350144",
+     "currentMemoryInBytes": "94208"
+    }
+   },
+   "dur": "4523"
+  },
+  {
+   "id": "read_cache_mem_usage_1",
+   "ph": "v",
+   "ts": "13539",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "268f6000"
+     }
+    }
+   }
+  },
+  {
+   "id": "read_cache_mem_usage_2",
+   "ph": "v",
+   "ts": "18063",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "2690d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "after_compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "18074",
+   "pid": "13432",
+   "tid": "13452",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "665350144",
+     "currentMemoryInBytes": "-18808832"
+    }
+   },
+   "dur": "1842"
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "18074",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "2690d000"
+     }
+    }
+   }
+  },
+  {
+   "id": "after_compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "19917",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "2571d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_internal",
+   "ph": "X",
+   "ts": "3026",
+   "pid": "13432",
+   "tid": "13452",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "627519488",
+     "currentMemoryInBytes": "696320"
+    }
+   },
+   "dur": "16904"
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_1",
+   "ph": "v",
+   "ts": "3026",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "25673000",
+      "current_memory": "25673000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_internal_mem_usage_2",
+   "ph": "v",
+   "ts": "19931",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "2571d000"
+     }
+    }
+   }
+  },
+  {
+   "name": "compile_onnx_model_3",
+   "ph": "X",
+   "ts": "2173",
+   "pid": "13432",
+   "tid": "13452",
+   "args": {
+    "memUsage": {
+     "peakMemoryInBytes": "627519488",
+     "currentMemoryInBytes": "696320"
+    }
+   },
+   "dur": "18072"
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_1",
+   "ph": "v",
+   "ts": "2173",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "25673000",
+      "current_memory": "25673000"
+     }
+    }
+   }
+  },
+  {
+   "id": "compile_onnx_model_3_mem_usage_2",
+   "ph": "v",
+   "ts": "20245",
+   "pid": "13432",
+   "args": {
+    "dumps": {
+     "process_totals": {
+      "peak_memory": "27a87000",
+      "current_memory": "2571d000"
+     }
+    }
+   }
+  }
+ ],
+ "cpuUsage": [
+  {
+   "avgCpuUtil": 3.57142854,
+   "memPeakWorkingSetSize": 634.527344
+  }
+ ],
+ "cacheFiles": [
+  "1x4.xclbin",
+  "compiled.0x8000205000c9d3d.xmodel",
+  "context.json"
+ ]
+}

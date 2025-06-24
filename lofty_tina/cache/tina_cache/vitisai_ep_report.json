@@ -1,0 +1,66 @@
+{
+ "deviceStat": [
+  {
+   "name": "all",
+   "nodeNum": 2,
+   "supportedOpType": [
+    "::Conv",
+    "::Reshape"
+   ]
+  },
+  {
+   "name": "CPU",
+   "nodeNum": 2,
+   "supportedOpType": [
+    "::Conv",
+    "::Reshape"
+   ]
+  }
+ ],
+ "nodeStat": [
+  {
+   "output": [
+    "/matrix_mult/conv_layer/Conv_output_0"
+   ],
+   "input": [
+    "input",
+    "matrix_mult.conv_layer.weight"
+   ],
+   "opType": "Conv",
+   "comment": "@0 [/matrix_mult/conv_layer/Conv_output_0:(ty=1,shape=[-1,1024,1,1])] Conv [input:(ty=1,shape=[-1,2,96,96]),matrix_mult.conv_layer.weight:(ty=1,shape=[1024,2,96,96])]",
+   "device": "CPU"
+  },
+  {
+   "output": [
+    "output"
+   ],
+   "input": [
+    "/matrix_mult/conv_layer/Conv_output_0",
+    "/matrix_mult/Constant_output_0"
+   ],
+   "opType": "Reshape",
+   "comment": "@1 [output:(ty=1,shape=[1,1,1024,1])] Reshape [/matrix_mult/conv_layer/Conv_output_0:(ty=1,shape=[-1,1024,1,1]),/matrix_mult/Constant_output_0:(ty=7,shape=[4])]",
+   "device": "CPU"
+  }
+ ],
+ "shapeInfo": [
+  {
+   "name": "/matrix_mult/conv_layer/Conv_output_0",
+   "shape": [
+    "-1",
+    "1024",
+    "1",
+    "1"
+   ]
+  },
+  {
+   "name": "output",
+   "shape": [
+    "1",
+    "1",
+    "1024",
+    "1"
+   ]
+  }
+ ]
+}
