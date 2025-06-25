@@ -1,0 +1,6 @@
+stage,kernel,vsize,exec time,calls/pixel,total
+0,scale,256,353.45,1,353.45
+1,add,256,596.78,1,596.78
+2,main sin/cos,128,4537.68,1,4598.28
+3,sub,256,595.05,1,595.05
+4,mean,256,605.27,1,605.27

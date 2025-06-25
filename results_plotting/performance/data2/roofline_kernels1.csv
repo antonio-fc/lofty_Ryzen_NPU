@@ -1,0 +1,4 @@
+kernel,vsize,work,calls/pixel,exec time,data(bytes)
+main,64,589824,0.1875,71369.51595,8066
+mean,64,832,0.015625,120.97,1536
+main (w/o LUT),64,491520,0.1875,23110.80434,8066

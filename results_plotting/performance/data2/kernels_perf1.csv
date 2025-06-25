@@ -1,0 +1,3 @@
+stage,kernel,vsize,exec time,calls/pixel,total
+0,main,64,71369.51595,0.0078125,557.5743434
+1,mean,64,120.97,0.0078125,0.945078125
